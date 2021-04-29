@@ -12,5 +12,8 @@
   "license": "ISC",
   "devDependencies": {
     "nexe": "^4.0.0-beta.18"
+  },
+  "dependencies": {
+    "minimist": "^1.2.5"
   }
 }

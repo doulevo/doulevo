@@ -15,7 +15,7 @@ async function main(): Promise<void> {
     const argv = minimist(process.argv.slice(2));
 
     console.log("HOME: " + process.env.HOME);
-    console.log("APPDATA: " + process.env.APPDATA);
+    console.log("APPDATA: " + process.env.APPDATA); //TODO: Doesn't work on MacOS.
     console.log("Platform: " + process.platform);
 
     if (argv._.length > 0) {
@@ -30,7 +30,7 @@ async function main(): Promise<void> {
             await up(argv);
         }
         else if (cmd === "deploy") {
-            await up(argv);
+            await deploy(argv);
         }
         else {
             throw new Error(`Unexpected command ${cmd}`);

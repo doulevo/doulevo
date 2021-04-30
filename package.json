@@ -6,8 +6,7 @@
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
-    "start": "node ./build/index.js",
-    "start:dev": "nodemon",
+    "start": "nodemon",
     "c": "npm run clean",
     "clean": "rm -rf build/*",
     "b": "npm run build",
@@ -19,7 +18,7 @@
     "test": "jest",
     "tw": "npm run test:watch",
     "test:watch": "jest --watch",
-    "build-exe": "npm run test && npm run clean && npm run build && npx nexe build/index.js"
+    "build-exe": "npm run test && npm run clean && npx tsc && npx nexe build/index.js"
   },
   "bin": {
     "doulevo": "./bin/cli"

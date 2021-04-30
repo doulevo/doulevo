@@ -1,10 +1,16 @@
+import Plugin from "../plugins/docker";
 
 export default async function (argv: any): Promise<void> {
+
+    //TODO: Choose the current build plugin (eg "build/docker") based on project configuration.
+    const plugin = new Plugin();
+    await plugin.build(argv);
+
     
     // get the current build plugin
     //      (probably docker)
     //
-    //      if baked in files have changed since last build, or if force is enabled
+    //      
     //
     //          if the cached dockerfile is out of date
     //

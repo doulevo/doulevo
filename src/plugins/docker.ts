@@ -1,0 +1,34 @@
+
+class DockerPlugin { //TODO: Could have separate plugins for dev/prod?
+
+    async build(argv: any): Promise<void> {
+
+        if (!argv.force) {
+            // TODO: Does the Docker image for this project already exist.
+            const docker_image_exists = false;
+            if (docker_image_exists) {
+                const docker_image_needs_update = false; 
+                if (docker_image_needs_update) {
+                    // The Docker image exists and the files in it haven't changed, so it doesn't need to be updated.
+                    return;
+                }
+            }
+        }
+
+        // Get previous Dockerfile from local cache.
+
+        // If no previous Dockerfile, or it's out of date (eg if configuration has changed that would change the Dockerfile)
+
+            // Look up the Dockerfile generator based on the project type (eg "nodejs", "python", etc).
+
+            // Generate and cache the Dockerfile.
+
+        // Build the Dockerfile.
+
+        // Tag the Dockerfile so it can be identified as part of this project (the project needs a GUID).
+
+        // Tag the Dockerfile with the hash of the content.
+    }
+} 
+
+export default DockerPlugin;

@@ -10,6 +10,9 @@
 - Need a separate command to set the application.
 - How does backend authentication work?
 
+- How will I hash files to know if baked in files have changed?
+- How do I know what the baked in files are? This will be different for dev and prod.
+
 
 # Plugins
 

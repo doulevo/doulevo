@@ -1,11 +1,12 @@
 
 export default async function (argv: any): Promise<void> {
 
-    // get project type
+    // TODO: Get project type from user.
+    const projectType = "nodejs";
 
-    // download template
+    // TODO: Download and cache template.
 
-    // ask questions required by template
+    // TODO: Ask questions required by template
 
-    // instantiate template and fill in the blanks from the questions.
+    // Instantiate template and fill in the blanks from the questions.
 }

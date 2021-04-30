@@ -8,6 +8,8 @@ const path = require("path");
 
 import create from "./commands/create";
 import up from "./commands/up";
+import deploy from "./commands/deploy";
+import build from "./commands/build";
 
 async function main(): Promise<void> {
     const argv = minimist(process.argv.slice(2));
@@ -21,14 +23,19 @@ async function main(): Promise<void> {
         if (cmd === "create") {
             await create(argv);
         }
+        else if (cmd === "build") {
+            await build(argv);
+        }
         else if (cmd === "up") {
+            await up(argv);
+        }
+        else if (cmd === "deploy") {
             await up(argv);
         }
         else {
             throw new Error(`Unexpected command ${cmd}`);
         }
     }
-
 }
 
 main()

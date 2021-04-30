@@ -25,7 +25,7 @@ Use the `--plugin` command line argument to test inoking an external code module
 For example:
 
 ```bash
-build-system-test --plugin=test.js
+build-system-test --plugin=__test.js
 ```
 
 This invokes the code in test.js in the `plugins` subdirectory.

@@ -2,6 +2,7 @@ import * as path from "path";
 import * as fs from "fs-extra";
 import { exec } from "child_process";
 import { exportTemplate } from "inflate-template";
+import * as inquirer from "inquirer";
 
 function runCmd(cmd: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
@@ -63,13 +64,25 @@ export default async function (argv: any, appData: string): Promise<void> {
 
     // TODO: Ask questions required by template
 
+    const templateData = await inquirer.prompt([
+        {
+            type: "input",
+            name: "PROJECT_NAME",
+            message: "Please enter the name of your project: ",
+        },
+        {
+            type: "input",
+            name: "PROJECT_DESCRIPTION",
+            message: "Please enter a description of your project: ",
+        },
+    ]);    
+
+    console.log("Template data:");
+    console.log(templateData);
+
     //
     // Instantiate template and fill in the blanks from the questions.
     //
-    const templateData: any = { //TODO: get this from questions!
-        PROJECT_NAME: "A project",
-        PROJECT_DESCRIPTION: "A project description",
-    };
     await exportTemplate(localTemplatePath, templateData, projectPath);
 
     console.log(`Created project at ${projectPath}`)

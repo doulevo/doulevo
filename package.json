@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "fs-extra": "^9.1.0",
-    "inflate-template": "^1.1.8",
+    "inflate-template": "^1.1.9",
     "minimist": "^1.2.5"
   }
 }

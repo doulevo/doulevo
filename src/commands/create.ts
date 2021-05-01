@@ -51,8 +51,7 @@ export default async function (argv: any, appData: string): Promise<void> {
         const templateExists = await fs.pathExists(localTemplatePath);
         if (!templateExists) {
             // Download the template.
-            //TODO: Could also just read the complete template URL from the command line arg. Would allow anyone to use any template.
-            const templateUrl = `https://github.com/doulevo/create-template-${projectType}.git`;
+            const templateUrl = argv["template-url"] || `https://github.com/doulevo/create-template-${projectType}.git`;
             await runCmd(`git clone ${templateUrl} ${localTemplatePath}`);
     
             console.log(`Downloaded template to ${localTemplatePath}.`);

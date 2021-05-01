@@ -15,15 +15,18 @@ class DockerPlugin { //TODO: Could have separate plugins for dev/prod?
             }
         }
 
-        // Get previous Dockerfile from local cache.
-
-        // If no previous Dockerfile, or it's out of date (eg if configuration has changed that would change the Dockerfile)
-
-            // Look up the Dockerfile generator based on the project type (eg "nodejs", "python", etc).
-            
-            // Generate and cache the Dockerfile.
-            
-            // Pass in dev/prod.
+        const docker_file_already_exists = false; // TODO: If there's a Dockerfile-{dev|prod} or just a Dockerfile just use that.
+        if (!docker_file_already_exists) {
+            // Get previous Dockerfile from local cache.
+    
+            // If no previous Dockerfile, or it's out of date (eg if configuration has changed that would change the Dockerfile)
+    
+                // Look up the Dockerfile generator based on the project type (eg "nodejs", "python", etc).
+                
+                // Generate and cache the Dockerfile.
+                
+                // Pass in dev/prod.
+        }
 
         // Generate the .dockerignore file (if not existing, or out of date).
 

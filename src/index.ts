@@ -1,11 +1,5 @@
-const minimist = require("minimist");
-const path = require("path");
-
-//
-// https://stackoverflow.com/a/26227660/25868
-//
-// process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")
-
+import * as minimist from "minimist";
+import * as path from "path";
 import create from "./commands/create";
 import up from "./commands/up";
 import deploy from "./commands/deploy";
@@ -17,6 +11,8 @@ async function main(): Promise<void> {
     const argv = minimist(process.argv.slice(2));
 
     console.log("HOME: " + process.env.HOME);
+
+    // https://stackoverflow.com/a/26227660/25868
     const APPDATA = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
     const appData = path.join(`${APPDATA}/doulevo`);
     console.log("APPDATA: " + appData);

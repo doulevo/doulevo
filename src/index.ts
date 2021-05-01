@@ -10,6 +10,7 @@ import create from "./commands/create";
 import up from "./commands/up";
 import deploy from "./commands/deploy";
 import build from "./commands/build";
+import down from "./commands/down";
 
 async function main(): Promise<void> {
     const argv = minimist(process.argv.slice(2));
@@ -31,6 +32,9 @@ async function main(): Promise<void> {
         }
         else if (cmd === "up") {
             await up(cmdArgv);
+        }
+        else if (cmd === "down") {
+            await down(cmdArgv);
         }
         else if (cmd === "deploy") {
             await deploy(cmdArgv);

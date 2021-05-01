@@ -41,6 +41,9 @@ export default async function (argv: any, appData: string): Promise<void> {
         throw new Error(`Please set project type with --type=<project-type>, e.g. "nodejs"`);
     }
 
+    //
+    // Download and cache the template for this type of project.
+    //
     const cachePath = path.join(appData, "create-templates")
     const localTemplatePath = path.join(cachePath, `create-template-${projectType}`); 
     const templateExists = await fs.pathExists(localTemplatePath);
@@ -55,7 +58,9 @@ export default async function (argv: any, appData: string): Promise<void> {
 
     // TODO: Ask questions required by template
 
+    //
     // Instantiate template and fill in the blanks from the questions.
+    //
     const templateData: any = {};
     await exportTemplate(localTemplatePath, templateData, projectPath);
 

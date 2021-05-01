@@ -20,14 +20,33 @@ class DockerPlugin { //TODO: Could have separate plugins for dev/prod?
         // If no previous Dockerfile, or it's out of date (eg if configuration has changed that would change the Dockerfile)
 
             // Look up the Dockerfile generator based on the project type (eg "nodejs", "python", etc).
-
+            
             // Generate and cache the Dockerfile.
+            
+            // Pass in dev/prod.
+
+        // Generate the .dockerignore file (if not existing, or out of date).
 
         // Build the Dockerfile.
+        //
+        // exec 'docker build <applicaiton>/<project>'
+        // Input Dockerfile and .dockerignore from std input.
 
         // Tag the Dockerfile so it can be identified as part of this project (the project needs a GUID).
 
         // Tag the Dockerfile with the hash of the content.
+    }
+
+    async up(): Promise<void> {
+        //
+        //  generate the docker command line parameters
+        //  up the container (either in detatched or non-detatched mode)
+        //
+        // just exec 'docker run <application>/<project>'
+    }
+
+    async down(): Promise<void> {
+        // todo
     }
 } 
 

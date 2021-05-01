@@ -23,7 +23,7 @@ async function main(): Promise<void> {
     if (argv._.length > 0) {
         const cmd = argv._[0];
         if (cmd === "create") {
-            await create(argv);
+            await create(argv, appData);
         }
         else if (cmd === "build") {
             await build(argv);

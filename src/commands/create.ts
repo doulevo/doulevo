@@ -62,20 +62,43 @@ export default async function (argv: any, appData: string): Promise<void> {
         console.log(`Loading local template from ${localTemplatePath}.`);
     }
 
+    // TODO: Fill out answers already provided on the command line.
+    //    --answer=PROJECT_NAME=something etc
+
     // TODO: Ask questions required by template
 
-    const templateData = await inquirer.prompt([
+    let createQuestions = [
         {
             type: "input",
             name: "PROJECT_NAME",
             message: "Please enter the name of your project: ",
+            default: "new-project",
         },
         {
             type: "input",
             name: "PROJECT_DESCRIPTION",
             message: "Please enter a description of your project: ",
+            default: "A new project",
         },
-    ]);    
+    ];
+
+    const templateConfigFilePath = path.join(localTemplatePath, "template.json");
+    const templateConfigExists = await fs.pathExists(templateConfigFilePath);
+    if (templateConfigExists) {
+        const templateConfig = JSON.parse(await fs.readFile(templateConfigFilePath, "utf8"));
+        if (templateConfig.questions !== undefined) {
+            if (!Array.isArray(templateConfig.questions)) {
+                throw new Error(`Expected "questions" field in template config file ${templateConfigFilePath} to be an array of questions in the inquirer format (see https://www.npmjs.com/package/inquirer#question).`)
+            }
+
+            createQuestions = createQuestions.concat(templateConfig.questions);
+        }
+}
+
+    console.log("Create questions:");
+    console.log(createQuestions);
+
+    const templateData = await inquirer.prompt(createQuestions);
 
     console.log("Template data:");
     console.log(templateData);

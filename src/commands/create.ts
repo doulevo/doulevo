@@ -41,19 +41,25 @@ export default async function (argv: any, appData: string): Promise<void> {
         throw new Error(`Please set project type with --type=<project-type>, e.g. "nodejs"`);
     }
 
-    //
-    // Download and cache the template for this type of project.
-    //
-    const cachePath = path.join(appData, "create-templates")
-    const localTemplatePath = path.join(cachePath, `create-template-${projectType}`); 
-    const templateExists = await fs.pathExists(localTemplatePath);
-    if (!templateExists) {
-        // Download the template.
-        //TODO: Could also just read the complete template URL from the command line arg. Would allow anyone to use any template.
-        const templateUrl = `https://github.com/doulevo/create-template-${projectType}.git`;
-        await runCmd(`git clone ${templateUrl} ${localTemplatePath}`);
-
-        console.log(`Downloaded template to ${localTemplatePath}.`);
+    let localTemplatePath = argv["local-template"] as string;
+    if (localTemplatePath === undefined) {
+        //
+        // Download and cache the template for this type of project.
+        //
+        const cachePath = path.join(appData, "create-templates")
+        localTemplatePath = path.join(cachePath, `create-template-${projectType}`); 
+        const templateExists = await fs.pathExists(localTemplatePath);
+        if (!templateExists) {
+            // Download the template.
+            //TODO: Could also just read the complete template URL from the command line arg. Would allow anyone to use any template.
+            const templateUrl = `https://github.com/doulevo/create-template-${projectType}.git`;
+            await runCmd(`git clone ${templateUrl} ${localTemplatePath}`);
+    
+            console.log(`Downloaded template to ${localTemplatePath}.`);
+        }
+    }
+    else {
+        console.log(`Loading local template from ${localTemplatePath}.`);
     }
 
     // TODO: Ask questions required by template
@@ -61,8 +67,11 @@ export default async function (argv: any, appData: string): Promise<void> {
     //
     // Instantiate template and fill in the blanks from the questions.
     //
-    const templateData: any = {};
+    const templateData: any = { //TODO: get this from questions!
+        PROJECT_NAME: "A project",
+        PROJECT_DESCRIPTION: "A project description",
+    };
     await exportTemplate(localTemplatePath, templateData, projectPath);
 
     console.log(`Created project at ${projectPath}`)
-}
+} 

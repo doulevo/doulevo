@@ -2,3 +2,4 @@ build-system-test.exe
 node_modules/
 build/
 tsconfig.tsbuildinfo
+test-project/

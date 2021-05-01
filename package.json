@@ -6,7 +6,7 @@
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
-    "start": "ts-node src/index.ts create --type=nodejs",
+    "start": "ts-node src/index.ts create test-project --type=nodejs --force",
     "start:dev": "nodemon",
     "c": "npm run clean",
     "clean": "rm -rf build/*",
@@ -41,6 +41,7 @@
   },
   "dependencies": {
     "fs-extra": "^9.1.0",
+    "inflate-template": "^1.1.8",
     "minimist": "^1.2.5"
   }
 }

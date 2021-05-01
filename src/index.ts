@@ -22,17 +22,18 @@ async function main(): Promise<void> {
 
     if (argv._.length > 0) {
         const cmd = argv._[0];
+        const cmdArgv = Object.assign({}, argv, { _: argv._.slice(1) })
         if (cmd === "create") {
-            await create(argv, appData);
+            await create(cmdArgv, appData);
         }
         else if (cmd === "build") {
-            await build(argv);
+            await build(cmdArgv);
         }
         else if (cmd === "up") {
-            await up(argv);
+            await up(cmdArgv);
         }
         else if (cmd === "deploy") {
-            await deploy(argv);
+            await deploy(cmdArgv);
         }
         else {
             throw new Error(`Unexpected command ${cmd}`);

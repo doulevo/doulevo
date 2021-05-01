@@ -35,9 +35,9 @@ export default async function (argv: any, appData: string): Promise<void> {
         }
     }
 
-    // TODO: Get project type from user.
     const projectType = argv.type;
     if (!projectType) {
+        // TODO: Interactively get project type from user.
         throw new Error(`Please set project type with --type=<project-type>, e.g. "nodejs"`);
     }
 

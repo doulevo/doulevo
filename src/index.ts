@@ -15,7 +15,9 @@ async function main(): Promise<void> {
     const argv = minimist(process.argv.slice(2));
 
     console.log("HOME: " + process.env.HOME);
-    console.log("APPDATA: " + process.env.APPDATA); //TODO: Doesn't work on MacOS.
+    const APPDATA = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
+    const appData = path.join(`${APPDATA}/doulevo`);
+    console.log("APPDATA: " + appData);
     console.log("Platform: " + process.platform);
 
     if (argv._.length > 0) {

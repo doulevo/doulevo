@@ -1,6 +1,14 @@
-# Build system test
+# Doulevo
 
-This is a prototype that shows how to build a Node.js application into a self-contained executable.
+Prototype version of Doulevo. Don't use in production.
+
+To see what Doulevo is intended to be...
+
+[Please watch the video](https://youtu.be/BFayOne9LZk).
+
+Or [read the blog post](https://www.the-data-wrangler.com/simplifying-application-deployment-with-doulevo).
+
+[Follow the developer on Twitter for updates](https://twitter.com/ashleydavis75).
 
 ## Pre reqs
 

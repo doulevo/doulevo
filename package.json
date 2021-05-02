@@ -1,8 +1,7 @@
 {
-  "name": "build-system-text",
-  "private": true,
-  "version": "1.0.0",
-  "description": "This is a prototype that shows how to build a Node.js application into a self-contained executable.",
+  "name": "doulevo",
+  "version": "0.0.1",
+  "description": "Prototype version of Doulevo. Don't use in production.",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {

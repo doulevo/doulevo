@@ -5,6 +5,9 @@
   - Developers guides
   - Template authors guide
 
+- Better help
+  - Usage when no args
+
 - Do the first release of the exe!
 
 - Need some kind of DI!!

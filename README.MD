@@ -1,14 +1,26 @@
 # Doulevo
 
-Prototype version of Doulevo. Don't use in production.
+A platform that simplifies application development and deployment. 
 
-To see what Doulevo is intended to be...
+Doulevo is a command line tool and backend to simplify development and deployment of cloud-based applications.
 
-[Please watch the video](https://youtu.be/BFayOne9LZk).
+To learn more watch the video:
+https://youtu.be/BFayOne9LZk
 
-Or [read the blog post](https://www.the-data-wrangler.com/simplifying-application-deployment-with-doulevo).
+Or read the blog post:
+https://www.the-data-wrangler.com/simplifying-application-deployment-with-doulevo
+
+My intention is to develop Doulevo as an open source project in this code repository.
+
+If you like the idea please star this repo.
 
 [Follow the developer on Twitter for updates](https://twitter.com/ashleydavis75).
+
+---
+
+This is a prototype version of Doulevo. 
+
+**Don't it use in production.**
 
 ## Pre reqs
 
@@ -16,26 +28,24 @@ Have Node.js v12.16.3 installed. Nexe (the bundler) doesn't yet work with Node.j
 
 Use NVM to ensure you have the right version of Node.js installed.
 
-### Build the executable
+## Run it in development
+
+Run it once:
 
 ```bash
-npm run build
+npm start
 ```
 
-The executable is generated to `build-system-test.exe` in the current directory.
-
-Running the executable should print "Hello world!".
-
-### Testing local plugin support
-
-Use the `--plugin` command line argument to test inoking an external code module.
-
-For example:
+Or run it continously with live reload: 
 
 ```bash
-build-system-test --plugin=__test.js
+npm run start:dev
 ```
 
-This invokes the code in test.js in the `plugins` subdirectory.
+## Build the executable
 
-This is just a test to ensure the an app built with Nexe can run external code modules. This might be a good way to support plugins in Doulevo.
+```bash
+npm run build-exe
+```
+
+The executable is generated to `doulevo.exe` in the current directory.

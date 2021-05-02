@@ -1,5 +1,12 @@
 # Todo
 
+- Better readme
+  - Install / usage guide
+  - Developers guides
+  - Template authors guide
+
+- Do the first release of the exe!
+
 - Need some kind of DI!!
   - Inject the progress bar thingy...
   - Inject paths.

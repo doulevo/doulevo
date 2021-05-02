@@ -13,8 +13,8 @@ async function main(): Promise<void> {
     console.log("HOME: " + process.env.HOME);
 
     // https://stackoverflow.com/a/26227660/25868
-    // const APPDATA = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
-    // const appData = path.join(`${APPDATA}/doulevo`);
+    const APPDATA = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
+    const appData = path.join(`${APPDATA}/doulevo`);
     // console.log("APPDATA: " + appData);
     // console.log("Platform: " + process.platform);
 

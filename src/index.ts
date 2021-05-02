@@ -1,11 +1,16 @@
 import * as minimist from "minimist";
 import * as path from "path";
-import create from "./commands/create";
-import up from "./commands/up";
-import deploy from "./commands/deploy";
-import build from "./commands/build";
-import down from "./commands/down";
-import eject from "./commands/eject";
+import CreateCommand from "./commands/create";
+import { ICommand } from "./lib/command";
+// import up from "./commands/up";
+// import deploy from "./commands/deploy";
+// import build from "./commands/build";
+// import down from "./commands/down";
+// import eject from "./commands/eject";
+
+const commands: any = {
+    create: CreateCommand,
+};
 
 async function main(): Promise<void> {
     const argv = minimist(process.argv.slice(2));
@@ -21,27 +26,12 @@ async function main(): Promise<void> {
     if (argv._.length > 0) {
         const cmd = argv._[0];
         const cmdArgv = Object.assign({}, argv, { _: argv._.slice(1) })
-        if (cmd === "create") {
-            await create(cmdArgv, appData);
-        }
-        else if (cmd === "build") {
-            await build(cmdArgv);
-        }
-        else if (cmd === "up") {
-            await up(cmdArgv);
-        }
-        else if (cmd === "down") {
-            await down(cmdArgv);
-        }
-        else if (cmd === "deploy") {
-            await deploy(cmdArgv);
-        }
-        else if (cmd === "eject") {
-            await eject(cmdArgv);
-        }
-        else {
+        const Command = commands[cmd];
+        if (Command === undefined) {
             throw new Error(`Unexpected command ${cmd}`);
         }
+        const command: ICommand = new Command();
+        await command.invoke(cmdArgv, appData);
     }
 }
 

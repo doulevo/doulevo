@@ -1,5 +1,7 @@
 # Todo
 
+- Starting to need some automated tests!
+
 - Better readme
   - Install / usage guide
   - Developers guides

@@ -6,7 +6,7 @@
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
-    "start": "ts-node src/index.ts create test-project --type=nodejs --force --local-template=c:/projects/doulevo/templates/nodejs",
+    "start": "ts-node src/index.ts create test-project --force --local-template=c:/projects/doulevo/templates/nodejs",
     "start:dev": "nodemon",
     "c": "npm run clean",
     "clean": "rm -rf build/*",

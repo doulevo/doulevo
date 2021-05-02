@@ -2,5 +2,5 @@
     "watch": ["src"],
     "ext": "ts",
     "ignore": ["src/**/*.test.ts"],
-    "exec": "ts-node ./src/index.ts create test-project --type=nodejs --force --local-template=c:/projects/doulevo/templates/nodejs"
+    "exec": "ts-node ./src/index.ts create test-project --force --local-template=c:/projects/doulevo/templates/nodejs"
 }

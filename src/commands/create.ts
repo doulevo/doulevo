@@ -36,10 +36,25 @@ export default async function (argv: any, appData: string): Promise<void> {
         }
     }
 
-    const projectType = argv.type;
+    const projectTypeQuestion = {
+        type: "list",
+        name: "PROJECT_TYPE",
+        message: "Choose the type of the project (more choices comming in the future): ", 
+        choices: [ //TODO: Get choices from some kind of manifest.
+            {
+                name: "Node.js",
+                value: "nodejs",
+            },
+        ],
+    };
+
+    let projectType = argv.type;
     if (!projectType) {
-        // TODO: Interactively get project type from user.
-        throw new Error(`Please set project type with --type=<project-type>, e.g. "nodejs"`);
+        //
+        // Ask user for project type.
+        //
+        const templateData = await inquirer.prompt([ projectTypeQuestion ]);
+        projectType = templateData.PROJECT_TYPE;
     }
 
     let localTemplatePath = argv["local-template"] as string;
@@ -64,8 +79,6 @@ export default async function (argv: any, appData: string): Promise<void> {
 
     // TODO: Fill out answers already provided on the command line.
     //    --answer=PROJECT_NAME=something etc
-
-    // TODO: Ask questions required by template
 
     let createQuestions = [
         {
@@ -95,13 +108,18 @@ export default async function (argv: any, appData: string): Promise<void> {
         }
 }
 
-    console.log("Create questions:");
-    console.log(createQuestions);
+    // console.log("Create questions:");
+    // console.log(createQuestions);
 
+    //
+    // Ask questions required by the template.
+    //
     const templateData = await inquirer.prompt(createQuestions);
 
-    console.log("Template data:");
-    console.log(templateData);
+    templateData.PROJECT_TYPE = projectType;
+
+    // console.log("Template data:");
+    // console.log(templateData);
 
     //
     // Instantiate template and fill in the blanks from the questions.

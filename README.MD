@@ -71,3 +71,9 @@ npx ts-node src/index.ts create test-project --force --template-url=https://gith
 ```bash
 npx ts-node src/index.ts create test-project --force --project-type=nodejs
 ```
+
+### Building the project.
+
+```bash
+npx ts-node src/index.ts build
+```

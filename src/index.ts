@@ -4,12 +4,13 @@ import CreateCommand from "./commands/create";
 import { ICommand } from "./lib/command";
 // import up from "./commands/up";
 // import deploy from "./commands/deploy";
-// import build from "./commands/build";
+import BuildCommand from "./commands/build";
 // import down from "./commands/down";
 // import eject from "./commands/eject";
 
 const commands: any = {
     create: CreateCommand,
+    build: BuildCommand,
 };
 
 async function main(): Promise<void> {

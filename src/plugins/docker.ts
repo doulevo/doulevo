@@ -1,5 +1,8 @@
+import { InjectableClass, InjectProperty } from "@codecapers/fusion";
+import { ITemplateManager, ITemplateManager_id } from "../lib/template-manager";
 
-class DockerPlugin { //TODO: Could have separate plugins for dev/prod?
+@InjectableClass()
+class DockerPlugin {
 
     async build(argv: any): Promise<void> {
 
@@ -23,6 +26,8 @@ class DockerPlugin { //TODO: Could have separate plugins for dev/prod?
     
                 // Look up the Dockerfile generator based on the project type (eg "nodejs", "python", etc).
                 
+                //tod: get docker file template from plugin!
+
                 // Generate and cache the Dockerfile.
                 
                 // Pass in dev/prod.

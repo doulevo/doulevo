@@ -48,29 +48,43 @@ export default async function (argv: any, appData: string): Promise<void> {
         ],
     };
 
-    let projectType = argv.type;
-    if (!projectType) {
-        //
-        // Ask user for project type.
-        //
-        const templateData = await inquirer.prompt([ projectTypeQuestion ]);
-        projectType = templateData.PROJECT_TYPE;
-    }
-
     let localTemplatePath = argv["local-template"] as string;
     if (localTemplatePath === undefined) {
+
+        let templateUrl = argv["template-url"];
+        if (templateUrl === undefined) {
+            //
+            // Get the project type.
+            //
+            let projectType = argv["project-type"];
+            if (!projectType) {
+                //
+                // Ask user for project type.
+                //
+                const templateData = await inquirer.prompt([ projectTypeQuestion ]);
+                projectType = templateData.PROJECT_TYPE;
+            }
+
+            templateUrl = `https://github.com/doulevo/create-template-${projectType}.git`;
+        }
+
+        const templateDir = path.basename(templateUrl);
+
         //
         // Download and cache the template for this type of project.
         //
         const cachePath = path.join(appData, "create-templates")
-        localTemplatePath = path.join(cachePath, `create-template-${projectType}`); 
+        localTemplatePath = path.join(cachePath, templateDir); 
         const templateExists = await fs.pathExists(localTemplatePath);
         if (!templateExists) {
+        
             // Download the template.
-            const templateUrl = argv["template-url"] || `https://github.com/doulevo/create-template-${projectType}.git`;
             await runCmd(`git clone ${templateUrl} ${localTemplatePath}`);
     
             console.log(`Downloaded template to ${localTemplatePath}.`);
+        }
+        else {
+            console.log(`Template already cached at ${localTemplatePath}.`);
         }
     }
     else {
@@ -115,8 +129,6 @@ export default async function (argv: any, appData: string): Promise<void> {
     // Ask questions required by the template.
     //
     const templateData = await inquirer.prompt(createQuestions);
-
-    templateData.PROJECT_TYPE = projectType;
 
     // console.log("Template data:");
     // console.log(templateData);

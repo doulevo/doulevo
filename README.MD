@@ -49,3 +49,25 @@ npm run build-exe
 ```
 
 The executable is generated to `doulevo.exe` in the current directory.
+
+## Testing
+
+Some commands for testing...
+
+### Testing with a local template project
+
+```bash
+npx ts-node src/index.ts create test-project --force --local-template=c:/projects/doulevo/templates/nodejs
+```
+
+### Testing with a remote template project
+
+```bash
+npx ts-node src/index.ts create test-project --force --template-url=https://github.com/doulevo/create-template-nodejs.git
+```
+
+### Using the default template for the project type
+
+```bash
+npx ts-node src/index.ts create test-project --force --project-type=nodejs
+```

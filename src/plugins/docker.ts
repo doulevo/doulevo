@@ -1,5 +1,5 @@
 import { InjectableClass, InjectProperty } from "@codecapers/fusion";
-import { ITemplateManager, ITemplateManager_id } from "../lib/template-manager";
+import { IPluginManager, IPluginManager_id } from "../lib/plugin-manager";
 
 @InjectableClass()
 class DockerPlugin {

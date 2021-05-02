@@ -2,15 +2,15 @@ import * as path from "path";
 import * as fs from "fs-extra";
 import { exportTemplate } from "inflate-template";
 import { ICommand } from "../lib/command";
-import { ITemplateManager, ITemplateManager_id } from "../lib/template-manager";
+import { IPluginManager, IPluginManager_id } from "../lib/plugin-manager";
 import { InjectableClass, InjectProperty } from "@codecapers/fusion";
 import * as inquirer from "inquirer";
 
 @InjectableClass()
 export default class CreateCommand implements ICommand {
 
-    @InjectProperty(ITemplateManager_id)
-    templateManager!: ITemplateManager;
+    @InjectProperty(IPluginManager_id)
+    pluginManager!: IPluginManager;
 
     async invoke(argv: any, appData: string): Promise<void> {
     
@@ -30,7 +30,7 @@ export default class CreateCommand implements ICommand {
             }
         }
     
-        const localTemplatePath = await this.templateManager.getTemplateLocalPath(argv, appData);
+        const localTemplatePath = await this.pluginManager.getCreateTemplatePath(argv, appData);
     
         // TODO: Fill out answers already provided on the command line.
         //    --answer=PROJECT_NAME=something etc

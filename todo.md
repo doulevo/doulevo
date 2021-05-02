@@ -1,6 +1,9 @@
 # Todo
 
 - Starting to need some automated tests!
+    - Unit + integration
+
+- Automatically pull changes to template if it needs to be updated.
 
 - Better readme
   - Install / usage guide

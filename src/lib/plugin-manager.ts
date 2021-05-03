@@ -45,7 +45,7 @@ class PluginManager implements IPluginManager {
                 //
                 // Get the project type, request it from the user it not specified in the configuration.
                 //
-                const projectType = this.configuration.requestProjectType();
+                const projectType = await this.configuration.requestProjectType();
                 pluginUrl = `https://github.com/doulevo/plugin-${projectType}.git`;
                 this.configuration.setPluginUrl(pluginUrl);
             }

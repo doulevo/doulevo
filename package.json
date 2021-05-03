@@ -1,6 +1,6 @@
 {
   "name": "doulevo",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Prototype version of Doulevo. Don't use in production.",
   "main": "build/index.js",
   "types": "build/index.d.ts",

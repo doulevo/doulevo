@@ -5,6 +5,7 @@ import { ICommand } from "../lib/command";
 import { IPluginManager, IPluginManager_id } from "../lib/plugin-manager";
 import { InjectableClass, InjectProperty } from "@codecapers/fusion";
 import * as inquirer from "inquirer";
+import { IConfiguration, IConfiguration_id } from "../lib/configuration";
 
 @InjectableClass()
 export default class CreateCommand implements ICommand {
@@ -12,9 +13,12 @@ export default class CreateCommand implements ICommand {
     @InjectProperty(IPluginManager_id)
     pluginManager!: IPluginManager;
 
-    async invoke(argv: any): Promise<void> {
+    @InjectProperty(IConfiguration_id)
+    configuration!: IConfiguration;
+
+    async invoke(): Promise<void> {
     
-        const projectDir = argv._.length > 0 && argv._[0] || undefined;
+        const projectDir = this.configuration.getMainArg();
         if (!projectDir) {
             throw new Error(`Project directory not specified. Use "doulevo create <project-dir>`);
         }
@@ -22,7 +26,8 @@ export default class CreateCommand implements ICommand {
         const projectPath = path.join(process.cwd(), projectDir);
         const projectExists = await fs.pathExists(projectPath);
         if (projectExists) {
-            if (argv.force) {
+            const force = this.configuration.getArg<boolean>("force");
+            if (force) {
                 await fs.remove(projectPath);
             }
             else {
@@ -30,7 +35,7 @@ export default class CreateCommand implements ICommand {
             }
         }
     
-        const localTemplatePath = await this.pluginManager.getCreateTemplatePath(argv);
+        const localTemplatePath = await this.pluginManager.getCreateTemplatePath();
     
         // TODO: Fill out answers already provided on the command line.
         //    --answer=PROJECT_NAME=something etc

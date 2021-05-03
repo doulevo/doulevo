@@ -8,6 +8,7 @@ import * as path from "path";
 import * as fs from "fs-extra";
 import { runCmd } from "./run-cmd";
 import { IEnvironment, IEnvironment_id } from "./environment";
+import { IConfiguration, IConfiguration_id } from "./configuration";
 
 export const IPluginManager_id = "IPluginManager";
 
@@ -16,12 +17,12 @@ export interface IPluginManager {
     //
     // Gets the local path for a plugin.
     //
-    getPluginLocalPath(argv: any): Promise<string>;
+    getPluginLocalPath(): Promise<string>;
 
     //
     // Gets the local path for the "create" template.
     //
-    getCreateTemplatePath(argv: any): Promise<string>;
+    getCreateTemplatePath(): Promise<string>;
 }
 
 @InjectableSingleton(IPluginManager_id)
@@ -30,19 +31,22 @@ class PluginManager implements IPluginManager {
     @InjectProperty(IEnvironment_id)
     environment!: IEnvironment;
 
+    @InjectProperty(IConfiguration_id)
+    configuration!: IConfiguration;
+
     //
     // Gets the local path for a plugin.
     //
-    async getPluginLocalPath(argv: any): Promise<string> {
-        let localPluginPath = argv["local-plugin"] as string;
+    async getPluginLocalPath(): Promise<string> {
+        let localPluginPath = this.configuration.getArg("local-plugin");
         if (localPluginPath === undefined) {
     
-            let pluginUrl = argv["plugin-url"];
+            let pluginUrl = this.configuration.getArg("plugin-url");
             if (pluginUrl === undefined) {
                 //
                 // Get the project type.
                 //
-                let projectType = argv["project-type"];
+                let projectType = this.configuration.getArg("project-type");
                 if (!projectType) {
                     const projectTypeQuestion = {
                         type: "list",
@@ -95,8 +99,8 @@ class PluginManager implements IPluginManager {
     //
     // Gets the local path for the "create" template.
     //
-    async getCreateTemplatePath(argv: any): Promise<string> {
-        return path.join(await this.getPluginLocalPath(argv), "create-template");
+    async getCreateTemplatePath(): Promise<string> {
+        return path.join(await this.getPluginLocalPath(), "create-template");
     }
 
 }

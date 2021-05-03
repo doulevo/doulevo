@@ -24,7 +24,7 @@ class Environment implements IEnvironment {
     //
     private appData: string;
 
-    constructor() {
+    private constructor() {
         // https://stackoverflow.com/a/26227660/25868
         const APPDATA = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
 

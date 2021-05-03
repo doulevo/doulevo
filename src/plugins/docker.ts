@@ -1,12 +1,17 @@
 import { InjectableClass, InjectProperty } from "@codecapers/fusion";
+import { IConfiguration, IConfiguration_id } from "../lib/configuration";
 import { IPluginManager, IPluginManager_id } from "../lib/plugin-manager";
 
 @InjectableClass()
 class DockerPlugin {
 
-    async build(argv: any): Promise<void> {
+    @InjectProperty(IConfiguration_id)
+    configuration!: IConfiguration;
 
-        if (!argv.force) {
+    async build(): Promise<void> {
+
+        const force = this.configuration.getArg<boolean>("force");
+        if (!force) {
             // TODO: Does the Docker image for this project already exist.
             const docker_image_exists = false;
             if (docker_image_exists) {

@@ -10,7 +10,10 @@ todo.txt
 todo.md
 .nyc_output/
 tsconfig.json
+tsconfig.tsbuildinfo
 tslint.json
 nodemon.json
 jest.config.js
 .env
+test-project/
+doulevo.exe

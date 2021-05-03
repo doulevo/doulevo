@@ -39,7 +39,10 @@ export default class CreateCommand implements ICommand {
             }
         }
     
-        const localTemplatePath = await this.pluginManager.getCreateTemplatePath();
+        //
+        // Clone or update the plugin requested by the configuration.
+        //
+        await this.pluginManager.updatePlugin();
     
         // TODO: Fill out answers already provided on the command line.
         //    --answer=PROJECT_NAME=something etc
@@ -58,7 +61,8 @@ export default class CreateCommand implements ICommand {
                 default: "A new project",
             },
         ];
-    
+
+        const localTemplatePath = this.configuration.getCreateTemplatePath();
         const templateConfigFilePath = path.join(localTemplatePath, "template.json");
         const templateConfigExists = await fs.pathExists(templateConfigFilePath);
         if (templateConfigExists) {
@@ -87,7 +91,7 @@ export default class CreateCommand implements ICommand {
         // Instantiate template and fill in the blanks from the questions.
         //
         await exportTemplate(localTemplatePath, templateData, projectPath);
-    
+
         this.log.info(`Created project at ${projectPath}`)
     } 
 }

@@ -3,7 +3,6 @@
 //
 
 import { InjectableSingleton, InjectProperty } from "@codecapers/fusion";
-import * as inquirer from "inquirer";
 import * as path from "path";
 import * as fs from "fs-extra";
 import { runCmd } from "./run-cmd";
@@ -16,14 +15,9 @@ export const IPluginManager_id = "IPluginManager";
 export interface IPluginManager {
 
     //
-    // Gets the local path for a plugin.
+    // Clones or updates the local version of the plugin if necessary.
     //
-    getPluginLocalPath(): Promise<string>;
-
-    //
-    // Gets the local path for the "create" template.
-    //
-    getCreateTemplatePath(): Promise<string>;
+    updatePlugin(): Promise<void>;
 }
 
 @InjectableSingleton(IPluginManager_id)
@@ -39,39 +33,20 @@ class PluginManager implements IPluginManager {
     log!: ILog;
 
     //
-    // Gets the local path for a plugin.
+    // Clones or updates the local version of the plugin if necessary.
     //
-    async getPluginLocalPath(): Promise<string> {
-        let localPluginPath = this.configuration.getArg("local-plugin");
+    async updatePlugin(): Promise<void> {
+        let localPluginPath = this.configuration.getLocalPluginPath();
         if (localPluginPath === undefined) {
     
-            let pluginUrl = this.configuration.getArg("plugin-url");
+            let pluginUrl = this.configuration.getPluginUrl();
             if (pluginUrl === undefined) {
                 //
-                // Get the project type.
+                // Get the project type, request it from the user it not specified in the configuration.
                 //
-                let projectType = this.configuration.getArg("project-type");
-                if (!projectType) {
-                    const projectTypeQuestion = {
-                        type: "list",
-                        name: "PROJECT_TYPE",
-                        message: "Choose the type of the project (more choices comming in the future): ", 
-                        choices: [ //TODO: Get choices from some kind of manifest.
-                            {
-                                name: "Node.js",
-                                value: "nodejs",
-                            },
-                        ],
-                    };
-
-                    //
-                    // Ask user for project type.
-                    //
-                    const answers = await inquirer.prompt([ projectTypeQuestion ]);
-                    projectType = answers.PROJECT_TYPE;
-                }
-    
+                const projectType = this.configuration.requestProjectType();
                 pluginUrl = `https://github.com/doulevo/plugin-${projectType}.git`;
+                this.configuration.setPluginUrl(pluginUrl);
             }
     
             const pluginDir = path.parse(pluginUrl).name;
@@ -81,6 +56,8 @@ class PluginManager implements IPluginManager {
             //
             const pluginsCachePath = path.join(this.environment.getAppDataDirectory(), "plugins")
             localPluginPath = path.join(pluginsCachePath, pluginDir); 
+            this.configuration.setLocalPluginPath(localPluginPath);
+
             const pluginExists = await fs.pathExists(localPluginPath);
             if (!pluginExists) {
             
@@ -94,17 +71,8 @@ class PluginManager implements IPluginManager {
             }
         }
         else {
-            this.log.verbose(`Loading local plugin from ${localPluginPath}.`);
+            this.log.verbose(`Using local plugin at ${localPluginPath}.`);
         }
-        
-        return localPluginPath;
-    }
-
-    //
-    // Gets the local path for the "create" template.
-    //
-    async getCreateTemplatePath(): Promise<string> {
-        return path.join(await this.getPluginLocalPath(), "create-template");
     }
 
 }

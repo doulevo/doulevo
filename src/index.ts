@@ -1,5 +1,4 @@
 import * as minimist from "minimist";
-import * as path from "path";
 import CreateCommand from "./commands/create";
 import { ICommand } from "./lib/command";
 // import up from "./commands/up";
@@ -16,13 +15,6 @@ const commands: any = {
 async function main(): Promise<void> {
     const argv = minimist(process.argv.slice(2));
 
-    // console.log("HOME: " + process.env.HOME);
-
-    // https://stackoverflow.com/a/26227660/25868
-    const APPDATA = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
-    const appData = path.join(`${APPDATA}/doulevo`);
-    // console.log("APPDATA: " + appData);
-    // console.log("Platform: " + process.platform);
 
     if (argv._.length > 0) {
         const cmd = argv._[0];
@@ -32,7 +24,7 @@ async function main(): Promise<void> {
             throw new Error(`Unexpected command ${cmd}`);
         }
         const command: ICommand = new Command();
-        await command.invoke(cmdArgv, appData);
+        await command.invoke(cmdArgv);
     }
 }
 

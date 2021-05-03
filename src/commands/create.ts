@@ -12,7 +12,7 @@ export default class CreateCommand implements ICommand {
     @InjectProperty(IPluginManager_id)
     pluginManager!: IPluginManager;
 
-    async invoke(argv: any, appData: string): Promise<void> {
+    async invoke(argv: any): Promise<void> {
     
         const projectDir = argv._.length > 0 && argv._[0] || undefined;
         if (!projectDir) {
@@ -30,7 +30,7 @@ export default class CreateCommand implements ICommand {
             }
         }
     
-        const localTemplatePath = await this.pluginManager.getCreateTemplatePath(argv, appData);
+        const localTemplatePath = await this.pluginManager.getCreateTemplatePath(argv);
     
         // TODO: Fill out answers already provided on the command line.
         //    --answer=PROJECT_NAME=something etc

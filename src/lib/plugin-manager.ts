@@ -2,11 +2,12 @@
 // Manages plugins for Doulevo.
 //
 
-import { InjectableSingleton } from "@codecapers/fusion";
+import { InjectableSingleton, InjectProperty } from "@codecapers/fusion";
 import * as inquirer from "inquirer";
 import * as path from "path";
 import * as fs from "fs-extra";
 import { runCmd } from "./run-cmd";
+import { IEnvironment, IEnvironment_id } from "./environment";
 
 export const IPluginManager_id = "IPluginManager";
 
@@ -15,21 +16,24 @@ export interface IPluginManager {
     //
     // Gets the local path for a plugin.
     //
-    getPluginLocalPath(argv: any, appData: string): Promise<string>;
+    getPluginLocalPath(argv: any): Promise<string>;
 
     //
     // Gets the local path for the "create" template.
     //
-    getCreateTemplatePath(argv: any, appData: string): Promise<string>;
+    getCreateTemplatePath(argv: any): Promise<string>;
 }
 
 @InjectableSingleton(IPluginManager_id)
 class PluginManager implements IPluginManager {
 
+    @InjectProperty(IEnvironment_id)
+    environment!: IEnvironment;
+
     //
     // Gets the local path for a plugin.
     //
-    async getPluginLocalPath(argv: any, appData: string): Promise<string> {
+    async getPluginLocalPath(argv: any): Promise<string> {
         let localPluginPath = argv["local-plugin"] as string;
         if (localPluginPath === undefined) {
     
@@ -67,8 +71,8 @@ class PluginManager implements IPluginManager {
             //
             // Download and cache the plugin for this type of project.
             //
-            const cachePath = path.join(appData, "plugins")
-            localPluginPath = path.join(cachePath, pluginDir); 
+            const pluginsCachePath = path.join(this.environment.getAppDataDirectory(), "plugins")
+            localPluginPath = path.join(pluginsCachePath, pluginDir); 
             const pluginExists = await fs.pathExists(localPluginPath);
             if (!pluginExists) {
             
@@ -91,8 +95,8 @@ class PluginManager implements IPluginManager {
     //
     // Gets the local path for the "create" template.
     //
-    async getCreateTemplatePath(argv: any, appData: string): Promise<string> {
-        return path.join(await this.getPluginLocalPath(argv, appData), "create-template");
+    async getCreateTemplatePath(argv: any): Promise<string> {
+        return path.join(await this.getPluginLocalPath(argv), "create-template");
     }
 
 }

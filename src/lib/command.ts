@@ -7,5 +7,5 @@ export interface ICommand {
     //
     // Invokes the command.
     //
-    invoke(argv: any, appData: string): Promise<void>;
+    invoke(argv: any): Promise<void>;
 }

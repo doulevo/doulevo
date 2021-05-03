@@ -92,6 +92,17 @@ export default class CreateCommand implements ICommand {
         //
         await exportTemplate(localTemplatePath, templateData, projectPath);
 
+        //
+        // Create the Doulevo config file.
+        //
+        const configFilePath = path.join(projectPath, "doulevo.json");
+        const defaultConfig = {
+            projectType: this.configuration.getProjectType(),
+            localPluginPath: this.configuration.getRelativePluginPath(),
+            pluginUrl: this.configuration.getPluginUrl(),
+        };
+        await fs.writeFile(configFilePath, JSON.stringify(defaultConfig, null, 4));
+    
         this.log.info(`Created project at ${projectPath}`)
     } 
 }

@@ -64,6 +64,16 @@ export interface IConfiguration {
     setLocalPluginPath(localPluginPath: string): void;
 
     //
+    // Gets the plugin path relative to the plugins directory (or pull path if the plugin is loaded from elsewhere).
+    //
+    getRelativePluginPath(): string | undefined;
+
+    //
+    // Gets the plugin path relative to the plugins directory (or pull path if the plugin is loaded from elsewhere).
+    //
+    setRelativePluginPath(relativePluginPath: string): void;
+
+    //
     // Gets the local path for the "create" template.
     //
     getCreateTemplatePath(): string;
@@ -74,6 +84,7 @@ export class Configuration implements IConfiguration {
 
     private projectType: string | undefined;
     private localPluginPath: string | undefined;
+    private relativePluginPath: string | undefined;
     private pluginUrl: string | undefined;
     
     //
@@ -194,6 +205,24 @@ export class Configuration implements IConfiguration {
     //
     setLocalPluginPath(localPluginPath: string): void {
         this.localPluginPath = localPluginPath;
+    }
+
+    //
+    // Gets the plugin path relative to the plugins directory (or pull path if the plugin is loaded from elsewhere).
+    //
+    getRelativePluginPath(): string | undefined {
+        if (!this.relativePluginPath) {
+            this.relativePluginPath = this.getArg("local-plugin");
+        }
+        
+        return this.relativePluginPath;
+    }
+
+    //
+    // Gets the plugin path relative to the plugins directory (or pull path if the plugin is loaded from elsewhere).
+    //
+    setRelativePluginPath(relativePluginPath: string): void {
+        this.relativePluginPath = relativePluginPath;
     }
 
     //

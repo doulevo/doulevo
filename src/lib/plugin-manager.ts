@@ -36,9 +36,10 @@ class PluginManager implements IPluginManager {
     // Clones or updates the local version of the plugin if necessary.
     //
     async updatePlugin(): Promise<void> {
+
         let localPluginPath = this.configuration.getLocalPluginPath();
         if (localPluginPath === undefined) {
-    
+   
             let pluginUrl = this.configuration.getPluginUrl();
             if (pluginUrl === undefined) {
                 //
@@ -57,6 +58,7 @@ class PluginManager implements IPluginManager {
             const pluginsCachePath = path.join(this.environment.getAppDataDirectory(), "plugins")
             localPluginPath = path.join(pluginsCachePath, pluginDir); 
             this.configuration.setLocalPluginPath(localPluginPath);
+            this.configuration.setRelativePluginPath(path.join("^", pluginDir));
 
             const pluginExists = await fs.pathExists(localPluginPath);
             if (!pluginExists) {

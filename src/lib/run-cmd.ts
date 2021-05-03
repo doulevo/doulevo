@@ -1,8 +1,8 @@
 import { exec } from "child_process";
 
-export function runCmd(cmd: string): Promise<void> {
+export function runCmd(cmd: string, options?: any): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-        exec(cmd, (error, stdout, stderr) => {
+        exec(cmd, options, (error, stdout, stderr) => {
             if (error) {
                 //todo: display output?
                 reject(error);

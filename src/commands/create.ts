@@ -7,6 +7,7 @@ import { InjectableClass, InjectProperty } from "@codecapers/fusion";
 import * as inquirer from "inquirer";
 import { IConfiguration, IConfiguration_id } from "../lib/configuration";
 import { ILog, ILog_id } from "../lib/log";
+import { runCmd } from "../lib/run-cmd";
 
 @InjectableClass()
 export default class CreateCommand implements ICommand {
@@ -102,6 +103,10 @@ export default class CreateCommand implements ICommand {
             pluginUrl: this.configuration.getPluginUrl(),
         };
         await fs.writeFile(configFilePath, JSON.stringify(defaultConfig, null, 4));
+
+        await runCmd(`git init`, { cwd: projectPath });
+        await runCmd(`git add .`, { cwd: projectPath });
+        await runCmd(`git commit -m "Project generated from Doulevo template."`, { cwd: projectPath });
     
         this.log.info(`Created project at ${projectPath}`)
     } 

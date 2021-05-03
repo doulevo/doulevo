@@ -1,9 +1,19 @@
 # Todo
 
+- !! Move appData to an injectable !!
+
+- Do a git init on new project
+- Need a interface/class for Git
+- Ask more questions for project type (e.g. nodejs-javascript-express-jest)
+  - How do we know what questions to ask?
+    - There has to be a project type mannifest somewhere.
+
 - Starting to need some automated tests!
     - Unit + integration
 
 - Automatically pull changes to template if it needs to be updated.
+
+- Node.js version should be an input to the create template.
 
 - Better readme
   - Install / usage guide

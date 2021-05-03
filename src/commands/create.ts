@@ -1,4 +1,3 @@
-import * as path from "path";
 import * as fs from "fs-extra";
 import { exportTemplate } from "inflate-template";
 import { ICommand } from "../lib/command";
@@ -8,6 +7,7 @@ import * as inquirer from "inquirer";
 import { IConfiguration, IConfiguration_id } from "../lib/configuration";
 import { ILog, ILog_id } from "../lib/log";
 import { runCmd } from "../lib/run-cmd";
+import { joinPath } from "../lib/join-path";
 
 @InjectableClass()
 export default class CreateCommand implements ICommand {
@@ -28,7 +28,7 @@ export default class CreateCommand implements ICommand {
             throw new Error(`Project directory not specified. Use "doulevo create <project-dir>`);
         }
     
-        const projectPath = path.join(process.cwd(), projectDir);
+        const projectPath = joinPath(process.cwd(), projectDir);
         const projectExists = await fs.pathExists(projectPath);
         if (projectExists) {
             const force = this.configuration.getArg<boolean>("force");
@@ -64,7 +64,7 @@ export default class CreateCommand implements ICommand {
         ];
 
         const localTemplatePath = this.configuration.getCreateTemplatePath();
-        const templateConfigFilePath = path.join(localTemplatePath, "template.json");
+        const templateConfigFilePath = joinPath(localTemplatePath, "template.json");
         const templateConfigExists = await fs.pathExists(templateConfigFilePath);
         if (templateConfigExists) {
             const templateConfig = JSON.parse(await fs.readFile(templateConfigFilePath, "utf8"));
@@ -96,7 +96,7 @@ export default class CreateCommand implements ICommand {
         //
         // Create the Doulevo config file.
         //
-        const configFilePath = path.join(projectPath, "doulevo.json");
+        const configFilePath = joinPath(projectPath, "doulevo.json");
         const defaultConfig = {
             projectType: this.configuration.getProjectType(),
             localPluginPath: this.configuration.getRelativePluginPath(),

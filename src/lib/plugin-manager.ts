@@ -9,6 +9,7 @@ import { runCmd } from "./run-cmd";
 import { IEnvironment, IEnvironment_id } from "./environment";
 import { IConfiguration, IConfiguration_id } from "./configuration";
 import { ILog, ILog_id } from "./log";
+import { joinPath } from "./join-path";
 
 export const IPluginManager_id = "IPluginManager";
 
@@ -55,10 +56,10 @@ class PluginManager implements IPluginManager {
             //
             // Download and cache the plugin for this type of project.
             //
-            const pluginsCachePath = path.join(this.environment.getAppDataDirectory(), "plugins")
-            localPluginPath = path.join(pluginsCachePath, pluginDir); 
+            const pluginsCachePath = joinPath(this.environment.getAppDataDirectory(), "plugins")
+            localPluginPath = joinPath(pluginsCachePath, pluginDir); 
             this.configuration.setLocalPluginPath(localPluginPath);
-            this.configuration.setRelativePluginPath(path.join("^", pluginDir));
+            this.configuration.setRelativePluginPath(joinPath("^", pluginDir));
 
             const pluginExists = await fs.pathExists(localPluginPath);
             if (!pluginExists) {

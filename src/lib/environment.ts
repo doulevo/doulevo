@@ -3,7 +3,7 @@
 //
 
 import { InjectableSingleton, InjectProperty } from "@codecapers/fusion";
-import * as path from "path";
+import { joinPath } from "./join-path";
 import { ILog, ILog_id } from "./log";
 
 export const IEnvironment_id = "IEnvironment";
@@ -36,7 +36,7 @@ class Environment implements IEnvironment {
     private constructor() {
         // https://stackoverflow.com/a/26227660/25868
         const APPDATA = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
-        this.appData = path.join(`${APPDATA}/doulevo`);
+        this.appData = joinPath(`${APPDATA}/doulevo`);
     }
 
     //

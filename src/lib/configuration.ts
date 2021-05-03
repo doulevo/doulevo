@@ -5,7 +5,7 @@
 import { InjectableSingleton } from "@codecapers/fusion";
 import * as minimist from "minimist";
 import * as inquirer from "inquirer";
-import * as path from "path";
+import { joinPath } from "./join-path";
 
 export const IConfiguration_id = "IConfiguration";
 
@@ -234,6 +234,6 @@ export class Configuration implements IConfiguration {
             throw Error(`Failed to determine local plugin path!`);
         }
 
-        return path.join(localPluginPath, "create-template");
+        return joinPath(localPluginPath, "create-template");
     }
 }

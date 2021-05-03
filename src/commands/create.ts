@@ -6,6 +6,7 @@ import { IPluginManager, IPluginManager_id } from "../lib/plugin-manager";
 import { InjectableClass, InjectProperty } from "@codecapers/fusion";
 import * as inquirer from "inquirer";
 import { IConfiguration, IConfiguration_id } from "../lib/configuration";
+import { ILog, ILog_id } from "../lib/log";
 
 @InjectableClass()
 export default class CreateCommand implements ICommand {
@@ -16,9 +17,12 @@ export default class CreateCommand implements ICommand {
     @InjectProperty(IConfiguration_id)
     configuration!: IConfiguration;
 
+    @InjectProperty(ILog_id)
+    log!: ILog;
+
     async invoke(): Promise<void> {
     
-        const projectDir = this.configuration.getMainArg();
+        const projectDir = this.configuration.getMainCommand();
         if (!projectDir) {
             throw new Error(`Project directory not specified. Use "doulevo create <project-dir>`);
         }
@@ -66,24 +70,24 @@ export default class CreateCommand implements ICommand {
     
                 createQuestions = createQuestions.concat(templateConfig.questions);
             }
-    }
+        }
     
-        // console.log("Create questions:");
-        // console.log(createQuestions);
+        this.log.debug("Create questions:");
+        this.log.debug(createQuestions);
     
         //
         // Ask questions required by the template.
         //
         const templateData = await inquirer.prompt(createQuestions);
     
-        // console.log("Template data:");
-        // console.log(templateData);
+        this.log.debug("Template data:");
+        this.log.debug(templateData);
     
         //
         // Instantiate template and fill in the blanks from the questions.
         //
         await exportTemplate(localTemplatePath, templateData, projectPath);
     
-        console.log(`Created project at ${projectPath}`)
+        this.log.info(`Created project at ${projectPath}`)
     } 
 }

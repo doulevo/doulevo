@@ -4,10 +4,16 @@
 
 import { InjectableSingleton, InjectProperty } from "@codecapers/fusion";
 import * as path from "path";
+import { ILog, ILog_id } from "./log";
 
 export const IEnvironment_id = "IEnvironment";
 
 export interface IEnvironment {
+
+    //
+    // Display debug info about the environment.
+    //
+    info(): void;
 
     //
     // Gets the application's data directory.
@@ -19,6 +25,9 @@ export interface IEnvironment {
 @InjectableSingleton(IEnvironment_id)
 class Environment implements IEnvironment {
     
+    @InjectProperty(ILog_id)
+    log!: ILog;
+
     //
     // The data directory for the application.
     //
@@ -27,12 +36,16 @@ class Environment implements IEnvironment {
     private constructor() {
         // https://stackoverflow.com/a/26227660/25868
         const APPDATA = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
-
-        // console.log("HOME: " + process.env.HOME);
-        // console.log("APPDATA: " + appData);
-        // console.log("Platform: " + process.platform);
-
         this.appData = path.join(`${APPDATA}/doulevo`);
+    }
+
+    //
+    // Display info about the environment.
+    //
+    info(): void {
+        this.log.info("HOME: " + process.env.HOME);
+        this.log.info("Application data: " + this.appData);
+        this.log.info("Platform: " + process.platform);
     }
 
     //

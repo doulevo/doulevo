@@ -9,6 +9,7 @@ import * as fs from "fs-extra";
 import { runCmd } from "./run-cmd";
 import { IEnvironment, IEnvironment_id } from "./environment";
 import { IConfiguration, IConfiguration_id } from "./configuration";
+import { ILog, ILog_id } from "./log";
 
 export const IPluginManager_id = "IPluginManager";
 
@@ -33,6 +34,9 @@ class PluginManager implements IPluginManager {
 
     @InjectProperty(IConfiguration_id)
     configuration!: IConfiguration;
+
+    @InjectProperty(ILog_id)
+    log!: ILog;
 
     //
     // Gets the local path for a plugin.
@@ -83,14 +87,14 @@ class PluginManager implements IPluginManager {
                 // Download the plugin.
                 await runCmd(`git clone ${pluginUrl} ${localPluginPath}`);
         
-                console.log(`Downloaded plugin to ${localPluginPath}.`);
+                this.log.verbose(`Downloaded plugin to ${localPluginPath}.`);
             }
             else {
-                console.log(`Plugin already cached at ${localPluginPath}.`);
+                this.log.verbose(`Plugin already cached at ${localPluginPath}.`);
             }
         }
         else {
-            console.log(`Loading local plugin from ${localPluginPath}.`);
+            this.log.verbose(`Loading local plugin from ${localPluginPath}.`);
         }
         
         return localPluginPath;

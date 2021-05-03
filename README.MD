@@ -71,6 +71,11 @@ npx ts-node src/index.ts create test-project --force --plugin-url=https://github
 ```bash
 npx ts-node src/index.ts create test-project --force --project-type=nodejs
 ```
+### No project type specified, asks the user
+
+```bash
+npx ts-node src/index.ts create test-project --force
+```
 
 ### Building the project.
 

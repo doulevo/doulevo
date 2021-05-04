@@ -7,6 +7,7 @@ import { IEnvironment, IEnvironment_id } from "./services/environment";
 import { ILog_id } from "./services/log";
 import { ICommand } from "./lib/command";
 import { IConfiguration, IConfiguration_id } from "./services/configuration";
+const packageInfo = require("../package.json");
 
 import CreateCommand from "./commands/create";
 import BuildCommand from "./commands/build";
@@ -39,6 +40,11 @@ export class Doulevo {
         if (showInfo) {
             this.configuration.info();
             this.environment.info();
+        }
+
+        if (this.configuration.getArg<boolean>("version")) {
+            this.log.info(`Doulevo v${packageInfo.version}`);
+            return;
         }
 
         const cmd = this.configuration.getMainCommand();

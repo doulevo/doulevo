@@ -65,6 +65,12 @@ npx ts-node src/index.ts create test-project --force --project-type=nodejs
 npx ts-node src/index.ts create test-project --force
 ```
 
+### Printing the version number
+
+```bash
+npx ts-node src/index.ts --version
+```
+
 ### Building the project.
 
 ```bash

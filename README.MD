@@ -2,8 +2,6 @@
 
 WORK IN PROGRESS, NOT READY FOR PRODUCTION USE
 
-A platform that simplifies application development and deployment. 
-
 Doulevo is a command line tool and backend to simplify development and deployment of cloud-based applications.
 
 To learn more watch the video:
@@ -30,18 +28,18 @@ Email ashley@codecapers.com.au to find out how you can help.
 
 Doulevo is a work in progress, please email feedback to ashley@codecapers.com.au.
 
+## Write plugins
+
+Doulevo extensible by the community, [learn how to write a plugin](Plugin-developers-guide.md).
+
 # Installation
-
-This is a prototype version of Doulevo. 
-
-**Don't it use in production.**
 
 ## Installing the Doulevo executable
 
 Download the latest release from GitHub:
 https://github.com/doulevo/doulevo/releases
 
-Put `doulevo.exe` in your path.
+Download the appopriate zip file for your platform, unpack it and put the `doulevo` executable in your path.
 
 That's it!
 
@@ -53,3 +51,27 @@ If you have **Node.js**, you can install Doulevo using `npm`:
 npm install doulevo -g
 ```
 
+## Basic usage
+
+NOTE: CURRENTLY ONLY THE CREATE COMMAND IS IMPLEMENTED.
+
+To create a new Doulevo project:
+
+```bash
+doulevo create my-new-service
+```
+
+To run your new service:
+
+```bash
+cd my-new-service
+doulevo up
+```
+
+To deploy to production (assuming you have a backend and are authenticated):
+
+```bash
+doulevo deploy
+```
+
+To learn more read [the user guide](User-guide.md).

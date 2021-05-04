@@ -71,6 +71,22 @@ npx ts-node src/index.ts create test-project --force
 npx ts-node src/index.ts --version
 ```
 
+### Printing help
+
+Use the `help` command:
+
+```bash
+npx ts-node src/index.ts help
+```
+
+Or no command:
+
+```bash
+npx ts-node src/index.ts
+```
+
+
+
 ### Building the project.
 
 ```bash

@@ -1,7 +1,7 @@
 import { ICommand } from "../lib/command";
 import Plugin from "../plugins/docker";
 
-export default class BuildCommand implements ICommand {
+class BuildCommand implements ICommand {
 
     async invoke(): Promise<void> {
         //TODO: Choose the current build plugin (eg "build/docker") based on project configuration.
@@ -9,3 +9,9 @@ export default class BuildCommand implements ICommand {
         await plugin.build();
     }
 }
+
+export default {
+    name: "build",
+    description: "Builds the project in the working directory.",
+    constructor: BuildCommand,
+};

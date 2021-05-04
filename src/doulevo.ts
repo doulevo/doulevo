@@ -7,20 +7,8 @@ import { IEnvironment, IEnvironment_id } from "./services/environment";
 import { ILog_id } from "./services/log";
 import { ICommand } from "./lib/command";
 import { IConfiguration, IConfiguration_id } from "./services/configuration";
+import { ICommandManager, ICommandManager_id } from "./services/command-manager";
 const packageInfo = require("../package.json");
-
-import CreateCommand from "./commands/create";
-import BuildCommand from "./commands/build";
-//todo: Other commands
-// import up from "./commands/up";
-// import deploy from "./commands/deploy";
-// import down from "./commands/down";
-// import eject from "./commands/eject";
-
-const commands: any = {
-    create: CreateCommand,
-    build: BuildCommand,
-};
 
 @InjectableClass()
 export class Doulevo {
@@ -33,6 +21,9 @@ export class Doulevo {
 
     @InjectProperty(IConfiguration_id)
     configuration!: IConfiguration;
+
+    @InjectProperty(ICommandManager_id)
+    commandManager!: ICommandManager;
 
     async invoke(): Promise<void> {
         
@@ -47,20 +38,14 @@ export class Doulevo {
             return;
         }
 
-        const cmd = this.configuration.getMainCommand();
-        if (cmd !== undefined) {
-            // Consumes the main command, allows the next nested sub command to bubble up and be the new main command.
-            this.configuration.consumeMainCommand(); 
-
-            const Command = commands[cmd];
-            if (Command === undefined) {
-                throw new Error(`Unexpected command ${cmd}`);
-            }
-            const command: ICommand = new Command();
-            await command.invoke();
+        let cmd = this.configuration.getMainCommand();
+        if (cmd === undefined) {
+            cmd = "help";
         }
-        else {
-            throw new Error(`Please invoke a subcommand.`); //TODO: Want better help here.
-        }    
+
+        // Consumes the main command, allows the next nested sub command to bubble up and be the new main command.
+        this.configuration.consumeMainCommand(); 
+
+        await this.commandManager.invokeCommand(cmd);
     }
 }

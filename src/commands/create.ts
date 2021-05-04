@@ -10,7 +10,7 @@ import { runCmd } from "../lib/run-cmd";
 import { joinPath } from "../lib/join-path";
 
 @InjectableClass()
-export default class CreateCommand implements ICommand {
+class CreateCommand implements ICommand {
 
     @InjectProperty(IPluginManager_id)
     pluginManager!: IPluginManager;
@@ -111,3 +111,9 @@ export default class CreateCommand implements ICommand {
         this.log.info(`Created project at ${projectPath}`)
     } 
 }
+
+export default {
+    name: "create",
+    description: "Creates a new Doulevo project.",
+    constructor: CreateCommand,
+};

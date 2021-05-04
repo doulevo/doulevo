@@ -55,6 +55,12 @@ npm install doulevo -g
 
 NOTE: CURRENTLY ONLY THE CREATE COMMAND IS IMPLEMENTED.
 
+To get help:
+
+```bash
+doulevo help
+```
+
 To create a new Doulevo project:
 
 ```bash

@@ -1,5 +1,7 @@
 # Doulevo
 
+WORK IN PROGRESS, NOT READY FOR PRODUCTION USE
+
 A platform that simplifies application development and deployment. 
 
 Doulevo is a command line tool and backend to simplify development and deployment of cloud-based applications.

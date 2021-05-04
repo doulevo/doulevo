@@ -5,11 +5,11 @@
 import { InjectableSingleton, InjectProperty } from "@codecapers/fusion";
 import * as path from "path";
 import * as fs from "fs-extra";
-import { runCmd } from "./run-cmd";
+import { runCmd } from "../lib/run-cmd";
 import { IEnvironment, IEnvironment_id } from "./environment";
-import { IConfiguration, IConfiguration_id } from "./configuration";
+import { IConfiguration, IConfiguration_id } from "../services/configuration";
 import { ILog, ILog_id } from "./log";
-import { joinPath } from "./join-path";
+import { joinPath } from "../lib/join-path";
 
 export const IPluginManager_id = "IPluginManager";
 

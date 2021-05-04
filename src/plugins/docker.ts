@@ -1,6 +1,6 @@
 import { InjectableClass, InjectProperty } from "@codecapers/fusion";
-import { IConfiguration, IConfiguration_id } from "../lib/configuration";
-import { IPluginManager, IPluginManager_id } from "../lib/plugin-manager";
+import { IConfiguration, IConfiguration_id } from "../services/configuration";
+import { IPluginManager, IPluginManager_id } from "../services/plugin-manager";
 
 @InjectableClass()
 class DockerPlugin {

@@ -1,11 +1,11 @@
 import * as fs from "fs-extra";
 import { exportTemplate } from "inflate-template";
 import { ICommand } from "../lib/command";
-import { IPluginManager, IPluginManager_id } from "../lib/plugin-manager";
+import { IPluginManager, IPluginManager_id } from "../services/plugin-manager";
 import { InjectableClass, InjectProperty } from "@codecapers/fusion";
 import * as inquirer from "inquirer";
-import { IConfiguration, IConfiguration_id } from "../lib/configuration";
-import { ILog, ILog_id } from "../lib/log";
+import { IConfiguration, IConfiguration_id } from "../services/configuration";
+import { ILog, ILog_id } from "../services/log";
 import { runCmd } from "../lib/run-cmd";
 import { joinPath } from "../lib/join-path";
 

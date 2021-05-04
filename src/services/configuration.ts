@@ -5,7 +5,7 @@
 import { InjectableSingleton } from "@codecapers/fusion";
 import * as minimist from "minimist";
 import * as inquirer from "inquirer";
-import { joinPath } from "./join-path";
+import { joinPath } from "../lib/join-path";
 
 export const IConfiguration_id = "IConfiguration";
 

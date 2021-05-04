@@ -3,7 +3,7 @@
 //
 
 import { InjectableSingleton, InjectProperty } from "@codecapers/fusion";
-import { joinPath } from "./join-path";
+import { joinPath } from "../lib/join-path";
 import { ILog, ILog_id } from "./log";
 
 export const IEnvironment_id = "IEnvironment";

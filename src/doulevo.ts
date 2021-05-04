@@ -3,10 +3,10 @@
 //
 
 import { ILog, InjectableClass, InjectProperty } from "@codecapers/fusion";
-import { IEnvironment, IEnvironment_id } from "./lib/environment";
-import { ILog_id } from "./lib/log";
+import { IEnvironment, IEnvironment_id } from "./services/environment";
+import { ILog_id } from "./services/log";
 import { ICommand } from "./lib/command";
-import { IConfiguration, IConfiguration_id } from "./lib/configuration";
+import { IConfiguration, IConfiguration_id } from "./services/configuration";
 
 import CreateCommand from "./commands/create";
 import BuildCommand from "./commands/build";

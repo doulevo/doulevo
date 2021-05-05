@@ -1,4 +1,3 @@
-import * as fs from "fs-extra";
 import { exportTemplate } from "inflate-template";
 import { ICommand } from "../lib/command";
 import { IPluginManager, IPluginManager_id } from "../services/plugin-manager";
@@ -8,9 +7,10 @@ import { IConfiguration, IConfiguration_id } from "../services/configuration";
 import { ILog, ILog_id } from "../services/log";
 import { runCmd } from "../lib/run-cmd";
 import { joinPath } from "../lib/join-path";
+import { IFs, IFs_id } from "../services/fs";
 
 @InjectableClass()
-class CreateCommand implements ICommand {
+export class CreateCommand implements ICommand {
 
     @InjectProperty(IPluginManager_id)
     pluginManager!: IPluginManager;
@@ -21,6 +21,9 @@ class CreateCommand implements ICommand {
     @InjectProperty(ILog_id)
     log!: ILog;
 
+    @InjectProperty(IFs_id)
+    fs!: IFs;
+
     async invoke(): Promise<void> {
     
         const projectDir = this.configuration.getMainCommand();
@@ -29,11 +32,11 @@ class CreateCommand implements ICommand {
         }
     
         const projectPath = joinPath(process.cwd(), projectDir);
-        const projectExists = await fs.pathExists(projectPath);
+        const projectExists = await this.fs.exists(projectPath);
         if (projectExists) {
             const force = this.configuration.getArg<boolean>("force");
             if (force) {
-                await fs.remove(projectPath);
+                await this.fs.remove(projectPath);
             }
             else {
                 throw new Error(`Directory already exists at ${projectPath}, please delete the existing directory if you want to create a new project here`);
@@ -65,9 +68,9 @@ class CreateCommand implements ICommand {
 
         const localTemplatePath = this.configuration.getCreateTemplatePath();
         const templateConfigFilePath = joinPath(localTemplatePath, "template.json");
-        const templateConfigExists = await fs.pathExists(templateConfigFilePath);
+        const templateConfigExists = await this.fs.exists(templateConfigFilePath);
         if (templateConfigExists) {
-            const templateConfig = JSON.parse(await fs.readFile(templateConfigFilePath, "utf8"));
+            const templateConfig = await this.fs.readJsonFile(templateConfigFilePath);
             if (templateConfig.questions !== undefined) {
                 if (!Array.isArray(templateConfig.questions)) {
                     throw new Error(`Expected "questions" field in template config file ${templateConfigFilePath} to be an array of questions in the inquirer format (see https://www.npmjs.com/package/inquirer#question).`)
@@ -102,7 +105,7 @@ class CreateCommand implements ICommand {
             localPluginPath: this.configuration.getRelativePluginPath(),
             pluginUrl: this.configuration.getPluginUrl(),
         };
-        await fs.writeFile(configFilePath, JSON.stringify(defaultConfig, null, 4));
+        await this.fs.writeJsonFile(configFilePath, defaultConfig);
 
         await runCmd(`git init`, { cwd: projectPath });
         await runCmd(`git add .`, { cwd: projectPath });

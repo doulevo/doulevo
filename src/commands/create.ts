@@ -1,13 +1,12 @@
-import { exportTemplate } from "inflate-template";
 import { ICommand } from "../lib/command";
 import { IPluginManager, IPluginManager_id } from "../services/plugin-manager";
 import { InjectableClass, InjectProperty } from "@codecapers/fusion";
-import * as inquirer from "inquirer";
 import { IConfiguration, IConfiguration_id } from "../services/configuration";
 import { ILog, ILog_id } from "../services/log";
 import { runCmd } from "../lib/run-cmd";
 import { joinPath } from "../lib/join-path";
 import { IFs, IFs_id } from "../services/fs";
+import { ITemplateManager, ITemplateManager_id } from "../services/template-manager";
 
 @InjectableClass()
 export class CreateCommand implements ICommand {
@@ -23,6 +22,9 @@ export class CreateCommand implements ICommand {
 
     @InjectProperty(IFs_id)
     fs!: IFs;
+
+    @InjectProperty(ITemplateManager_id)
+    templateManager!: ITemplateManager;
 
     async invoke(): Promise<void> {
     
@@ -47,65 +49,11 @@ export class CreateCommand implements ICommand {
         // Clone or update the plugin requested by the configuration.
         //
         await this.pluginManager.updatePlugin();
-    
-        // TODO: Fill out answers already provided on the command line.
-        //    --answer=PROJECT_NAME=something etc
-    
-        let createQuestions = [
-            {
-                type: "input",
-                name: "PROJECT_NAME",
-                message: "Please enter the name of your project: ",
-                default: "new-project",
-            },
-            {
-                type: "input",
-                name: "PROJECT_DESCRIPTION",
-                message: "Please enter a description of your project: ",
-                default: "A new project",
-            },
-        ];
-
-        const localTemplatePath = this.configuration.getCreateTemplatePath();
-        const templateConfigFilePath = joinPath(localTemplatePath, "template.json");
-        const templateConfigExists = await this.fs.exists(templateConfigFilePath);
-        if (templateConfigExists) {
-            const templateConfig = await this.fs.readJsonFile(templateConfigFilePath);
-            if (templateConfig.questions !== undefined) {
-                if (!Array.isArray(templateConfig.questions)) {
-                    throw new Error(`Expected "questions" field in template config file ${templateConfigFilePath} to be an array of questions in the inquirer format (see https://www.npmjs.com/package/inquirer#question).`)
-                }
-    
-                createQuestions = createQuestions.concat(templateConfig.questions);
-            }
-        }
-    
-        this.log.debug("Create questions:");
-        this.log.debug(createQuestions);
-    
-        //
-        // Ask questions required by the template.
-        //
-        const templateData = await inquirer.prompt(createQuestions);
-    
-        this.log.debug("Template data:");
-        this.log.debug(templateData);
-    
-        //
-        // Instantiate template and fill in the blanks from the questions.
-        //
-        await exportTemplate(localTemplatePath, templateData, projectPath);
 
         //
-        // Create the Doulevo config file.
+        // Exports the create-template, filling in the blanks.
         //
-        const configFilePath = joinPath(projectPath, "doulevo.json");
-        const defaultConfig = {
-            projectType: this.configuration.getProjectType(),
-            localPluginPath: this.configuration.getRelativePluginPath(),
-            pluginUrl: this.configuration.getPluginUrl(),
-        };
-        await this.fs.writeJsonFile(configFilePath, defaultConfig);
+        await this.templateManager.export(projectPath);   
 
         await runCmd(`git init`, { cwd: projectPath });
         await runCmd(`git add .`, { cwd: projectPath });

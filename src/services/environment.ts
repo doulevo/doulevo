@@ -20,6 +20,10 @@ export interface IEnvironment {
     //
     getAppDataDirectory(): string;
 
+    //
+    // Gets the current working directory.
+    //
+    cwd(): string;
 }
 
 @InjectableSingleton(IEnvironment_id)
@@ -55,4 +59,10 @@ class Environment implements IEnvironment {
         return this.appData;
     }
 
+    //
+    // Gets the current working directory.
+    //
+    cwd(): string {
+        return process.cwd();
+    }
 }

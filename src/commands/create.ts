@@ -8,6 +8,7 @@ import { joinPath } from "../lib/join-path";
 import { IFs, IFs_id } from "../services/fs";
 import { ITemplateManager, ITemplateManager_id } from "../services/template-manager";
 import { IGit, IGit_id } from "../services/git";
+import { IEnvironment, IEnvironment_id } from "../services/environment";
 
 @InjectableClass()
 export class CreateCommand implements ICommand {
@@ -30,6 +31,9 @@ export class CreateCommand implements ICommand {
     @InjectProperty(ITemplateManager_id)
     templateManager!: ITemplateManager;
 
+    @InjectProperty(IEnvironment_id)
+    environment!: IEnvironment;
+
     async invoke(): Promise<void> {
     
         const projectDir = this.configuration.getMainCommand();
@@ -37,7 +41,7 @@ export class CreateCommand implements ICommand {
             throw new Error(`Project directory not specified. Use "doulevo create <project-dir>`);
         }
     
-        const projectPath = joinPath(process.cwd(), projectDir);
+        const projectPath = joinPath(this.environment.cwd(), projectDir);
         const projectExists = await this.fs.exists(projectPath);
         if (projectExists) {
             const force = this.configuration.getArg<boolean>("force");

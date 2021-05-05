@@ -7,6 +7,7 @@ import { runCmd } from "../lib/run-cmd";
 import { joinPath } from "../lib/join-path";
 import { IFs, IFs_id } from "../services/fs";
 import { ITemplateManager, ITemplateManager_id } from "../services/template-manager";
+import { IGit, IGit_id } from "../services/git";
 
 @InjectableClass()
 export class CreateCommand implements ICommand {
@@ -22,6 +23,9 @@ export class CreateCommand implements ICommand {
 
     @InjectProperty(IFs_id)
     fs!: IFs;
+
+    @InjectProperty(IGit_id)
+    git!: IGit;
 
     @InjectProperty(ITemplateManager_id)
     templateManager!: ITemplateManager;
@@ -55,9 +59,10 @@ export class CreateCommand implements ICommand {
         //
         await this.templateManager.export(projectPath);   
 
-        await runCmd(`git init`, { cwd: projectPath });
-        await runCmd(`git add .`, { cwd: projectPath });
-        await runCmd(`git commit -m "Project generated from Doulevo template."`, { cwd: projectPath });
+        //
+        // Create a Git repo for the project.
+        //
+        await this.git.createNewRepo(projectPath, "Project generated from Doulevo template.");
     
         this.log.info(`Created project at ${projectPath}`)
     } 

@@ -10,6 +10,7 @@ import { IEnvironment, IEnvironment_id } from "./environment";
 import { IConfiguration, IConfiguration_id } from "../services/configuration";
 import { ILog, ILog_id } from "./log";
 import { joinPath } from "../lib/join-path";
+import { IGit, IGit_id } from "./git";
 
 export const IPluginManager_id = "IPluginManager";
 
@@ -32,6 +33,9 @@ class PluginManager implements IPluginManager {
 
     @InjectProperty(ILog_id)
     log!: ILog;
+
+    @InjectProperty(IGit_id)
+    git!: IGit;
 
     //
     // Clones or updates the local version of the plugin if necessary.
@@ -65,7 +69,7 @@ class PluginManager implements IPluginManager {
             if (!pluginExists) {
             
                 // Download the plugin.
-                await runCmd(`git clone ${pluginUrl} ${localPluginPath}`);
+                await this.git.clone(pluginUrl, localPluginPath);
         
                 this.log.verbose(`Downloaded plugin to ${localPluginPath}.`);
             }

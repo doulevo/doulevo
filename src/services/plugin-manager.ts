@@ -47,12 +47,21 @@ class PluginManager implements IPluginManager {
    
             let pluginUrl = this.configuration.getPluginUrl();
             if (pluginUrl === undefined) {
-                //
-                // Get the project type, request it from the user it not specified in the configuration.
-                //
-                const projectType = await this.configuration.requestProjectType();
-                pluginUrl = `https://github.com/doulevo/plugin-${projectType}.git`;
-                this.configuration.setPluginUrl(pluginUrl);
+                const isNonInteractive = this.configuration.getArg<boolean>("non-interactive");
+                if (isNonInteractive) {
+                    //
+                    // Need to know the project type, but can't ask the user in non-interactive mode.
+                    //
+                    throw new Error(`Running in non-interactive mode, you need to set argument --project-type=<the-project-type>.`);
+                }
+                else {
+                    //
+                    // Get the project type, request it from the user it not specified in the configuration.
+                    //
+                    const projectType = await this.configuration.requestProjectType();
+                    pluginUrl = `https://github.com/doulevo/plugin-${projectType}.git`;
+                    this.configuration.setPluginUrl(pluginUrl);
+                }
             }
     
             const pluginDir = path.parse(pluginUrl).name;

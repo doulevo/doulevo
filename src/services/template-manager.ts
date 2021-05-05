@@ -73,12 +73,29 @@ class TemplateManager implements ITemplateManager {
     
         this.log.debug("Create questions:");
         this.log.debug(createQuestions);
-    
-        //
-        // Ask questions required by the template.
-        //
-        const templateData = await inquirer.prompt(createQuestions);
-    
+
+        let templateData: any;
+
+        const isNonInteractive = this.configuration.getArg<boolean>("non-interactive");
+        if (isNonInteractive) {
+            //
+            // Default questions in non-interactive mode.
+            //
+            templateData = {};
+
+            for (const question of createQuestions) {
+                //TODO: Need to throw an exception for any question that doesn't have a default.
+                
+                templateData[question.name] = question.default;
+            }
+        }
+        else {
+            //
+            // Ask questions required by the template.
+            //
+            templateData = await inquirer.prompt(createQuestions);
+        }
+
         this.log.debug("Template data:");
         this.log.debug(templateData);
     

@@ -2,8 +2,7 @@
 // Access to Configuration configuration.
 //
 
-import { InjectableSingleton } from "@codecapers/fusion";
-import * as minimist from "minimist";
+import { InjectableClass } from "@codecapers/fusion";
 import * as inquirer from "inquirer";
 import { joinPath } from "../lib/join-path";
 
@@ -79,7 +78,7 @@ export interface IConfiguration {
     getCreateTemplatePath(): string;
 }
 
-@InjectableSingleton(IConfiguration_id)
+@InjectableClass()
 export class Configuration implements IConfiguration {
 
     private projectType: string | undefined;
@@ -92,8 +91,7 @@ export class Configuration implements IConfiguration {
     //
     private argv: any;
 
-    private constructor() {
-        const argv = minimist(process.argv.slice(2));
+    constructor(argv: any) {
         this.argv = argv;
     }
 

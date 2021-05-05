@@ -16,4 +16,6 @@ nodemon.json
 jest.config.js
 .env
 test-project/
+test-plugin/
+expected-test-project/
 doulevo.exe

@@ -1,0 +1,13 @@
+{
+    "expand": [
+        "test.txt"
+    ],
+    "questions": [
+        {
+            "type": "input",
+            "name": "SOME_VALUE",
+            "default": "an-important-value",
+            "message": "An example of a question to provide a value to fill in the gaps of the template."
+        }
+    ]
+}

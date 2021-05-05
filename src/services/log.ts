@@ -34,6 +34,11 @@ class Log implements ILog {
     configuration!: IConfiguration;
 
     //
+    // Set to true to supress all info and verbose input.
+    //
+    quietMode?: boolean;
+
+    //
     // Set to true to enable verbose logging.
     //
     enableVerbose?: boolean;
@@ -56,7 +61,11 @@ class Log implements ILog {
             this.enableVerbose = this.configuration.getArg<boolean>("verbose");
         }
 
-        if (this.enableVerbose) {
+        if (this.quietMode === undefined) {
+            this.quietMode = this.configuration.getArg<boolean>("quiet");
+        }
+
+        if (this.enableVerbose && !this.quietMode) {
             console.log(...args);
         }
     }
@@ -70,7 +79,11 @@ class Log implements ILog {
             this.enableDebug = this.configuration.getArg<boolean>("verbose");
         }
 
-        if (this.enableDebug) {
+        if (this.quietMode === undefined) {
+            this.quietMode = this.configuration.getArg<boolean>("quiet");
+        }
+
+        if (this.enableDebug && !this.quietMode) {
             console.log(...args);
         }
     }
@@ -79,7 +92,13 @@ class Log implements ILog {
     // Information logging.
     //
     info(...args: any[]): void {
-        console.log(...args);
+        if (this.quietMode === undefined) {
+            this.quietMode = this.configuration.getArg<boolean>("quiet");
+        }
+
+        if (!this.quietMode) {
+            console.log(...args);
+        }
     }
 
 }

@@ -20,7 +20,8 @@ class BuildCommand implements ICommand {
         //
         // TODO: Could add a --project-path argument to specify the project directory.
         //
-        this.configuration.setProjectPath(this.environment.cwd());
+        const projectPath = this.configuration.getArg("project") || this.environment.cwd();
+        this.configuration.setProjectPath(projectPath);
 
         //TODO: Choose the current build plugin (eg "build/docker") based on project configuration.
         const plugin = new Plugin();

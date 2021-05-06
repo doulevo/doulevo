@@ -26,6 +26,7 @@ class HelpCommand implements ICommand {
         this.log.info(" ".repeat(4) + "--version".padEnd(optionPadding) + "Displays the current version number.");
         this.log.info(" ".repeat(4) + "--non-interactive".padEnd(optionPadding) + "Runs in non-interactive mode. All questions will default, except project-type, if you have to set the project type, use the --project-type options.");
         this.log.info(" ".repeat(4) + "--project-type=<type>".padEnd(optionPadding) + "Sets the type of project to create (if not specified you'll be asked).");
+        this.log.info(" ".repeat(4) + "--project=<path>".padEnd(optionPadding) + "Sets the path to the project, defaults to the working directory if not specified.");
         this.log.info(" ".repeat(4) + "--plugin-url=<url>".padEnd(optionPadding) + "Sets the URL of the Git repo for the plugin (no need to set project type if you use this).");
         this.log.info(" ".repeat(4) + "--local-plugin=<path>".padEnd(optionPadding) + "Sets the local path for a plugin (good for testing when you are developing a plugin).");
         

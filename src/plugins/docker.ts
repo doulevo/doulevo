@@ -47,18 +47,17 @@ class DockerPlugin {
 
         // Generate the .dockerignore file (if not existing, or out of date).
 
-        // Build the Dockerfile.
-        //
-        // exec 'docker build <applicaiton>/<project>'
-        // Input Dockerfile and .dockerignore from std input.
+        // Input .dockerignore from std input.
 
         const projectName = await this.configuration.getProjectName();
        
         await runCmd(`docker build . --tag=${projectName} -f -`, { stdin: dockerFileContent });
 
-        // Tag the Dockerfile so it can be identified as part of this project (the project needs a GUID).
-
-        // Tag the Dockerfile with the hash of the content and the dockerfile.
+        // Tag Dockerfile with:
+        //      - dev/prod
+        //      - project GUID
+        //      - project name
+        //      - content / dockerfile hash
     }
 
     async up(): Promise<void> {

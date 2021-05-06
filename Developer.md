@@ -85,10 +85,8 @@ Or no command:
 npx ts-node src/index.ts
 ```
 
-
-
 ### Building the project.
 
 ```bash
-npx ts-node src/index.ts build
+npx ts-node src/index.ts build --project=./test-project --local-plugin=c:/projects/doulevo/plugins/nodejs
 ```

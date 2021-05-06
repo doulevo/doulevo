@@ -2,6 +2,7 @@ import { InjectableClass, InjectProperty } from "@codecapers/fusion";
 import { runCmd } from "../lib/run-cmd";
 import { IConfiguration, IConfiguration_id } from "../services/configuration";
 import { IPluginManager, IPluginManager_id } from "../services/plugin-manager";
+import { IProject } from "../services/project";
 import { ITemplateManager, ITemplateManager_id } from "../services/template-manager";
 
 @InjectableClass()
@@ -13,7 +14,7 @@ class DockerPlugin {
     @InjectProperty(ITemplateManager_id)
     templateManager!: ITemplateManager;
 
-    async build(): Promise<void> {
+    async build(project: IProject): Promise<void> {
 
         const force = this.configuration.getArg<boolean>("force");
         if (!force) {
@@ -39,8 +40,7 @@ class DockerPlugin {
                 // Out of date if plugin hash has changed.
     
                 // Look up the Dockerfile generator based on the project type (eg "nodejs", "python", etc).
-                const projectData = await this.configuration.getProjectData();
-                dockerFileContent = await this.templateManager.expandTemplateFile(projectData, "docker/Dockerfile-dev", "docker/Dockerfile");
+                dockerFileContent = await this.templateManager.expandTemplateFile(project.getData(), "docker/Dockerfile-dev", "docker/Dockerfile");
 
                 // Generate and cache the Dockerfile.
         }
@@ -49,9 +49,7 @@ class DockerPlugin {
 
         // Input .dockerignore from std input.
 
-        const projectName = await this.configuration.getProjectName();
-       
-        await runCmd(`docker build . --tag=${projectName}:dev -f -`, { stdin: dockerFileContent });
+        await runCmd(`docker build . --tag=${project.getName()}:dev -f -`, { stdin: dockerFileContent });
 
         // Tag Dockerfile with:
         //      - application? 

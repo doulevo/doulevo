@@ -2,12 +2,25 @@ import { registerSingleton } from "@codecapers/fusion";
 import { Doulevo } from "./doulevo";
 import { Configuration, IConfiguration_id } from "./services/configuration";
 import * as minimist from "minimist";
+import { ILog_id, Log } from "./services/log";
 
 async function main(): Promise<void> {
+
     //
-    // Initialise argumentsa and configuration.
+    // Parse arguments.
     //
-    const configuration = new Configuration(minimist(process.argv.slice(2)));
+    const argv = minimist(process.argv.slice(2));
+
+    //
+    // Initalise logging.
+    //
+    const log = new Log(argv);
+    registerSingleton(ILog_id, log); // Register for injection.
+
+    //
+    // Initialise arguments and configuration.
+    //
+    const configuration = new Configuration(argv);
     registerSingleton(IConfiguration_id, configuration); // Register for injection.
 
     //

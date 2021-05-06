@@ -2,9 +2,6 @@
 // Access to Log configuration.
 //
 
-import { InjectableSingleton, InjectProperty } from "@codecapers/fusion";
-import { IConfiguration, IConfiguration_id } from "./configuration";
-
 export const ILog_id = "ILog";
 
 export interface ILog {
@@ -27,12 +24,8 @@ export interface ILog {
     info(...args: any[]): void;
 }
 
-@InjectableSingleton(ILog_id)
-class Log implements ILog {
+export class Log implements ILog {
     
-    @InjectProperty(IConfiguration_id)
-    configuration!: IConfiguration;
-
     //
     // Set to true to supress all info and verbose input.
     //
@@ -48,8 +41,10 @@ class Log implements ILog {
     //
     enableDebug?: boolean;
 
-    private constructor() {
-        // Private constructor.
+    constructor(argv: any) {
+        this.quietMode = argv.quiet;
+        this.enableVerbose = argv.verbose;
+        this.enableVerbose = argv.debug;
     }
 
     //
@@ -57,14 +52,6 @@ class Log implements ILog {
     // Enabled with --verbose command line argument.
     //
     verbose(...args: any[]): void {
-        if (this.enableVerbose === undefined) {
-            this.enableVerbose = this.configuration.getArg<boolean>("verbose");
-        }
-
-        if (this.quietMode === undefined) {
-            this.quietMode = this.configuration.getArg<boolean>("quiet");
-        }
-
         if (this.enableVerbose && !this.quietMode) {
             console.log(...args);
         }
@@ -75,14 +62,6 @@ class Log implements ILog {
     // Enabled with --debug command line argument.
     //
     debug(...args: any[]): void {
-        if (this.enableDebug === undefined) {
-            this.enableDebug = this.configuration.getArg<boolean>("verbose");
-        }
-
-        if (this.quietMode === undefined) {
-            this.quietMode = this.configuration.getArg<boolean>("quiet");
-        }
-
         if (this.enableDebug && !this.quietMode) {
             console.log(...args);
         }
@@ -92,10 +71,6 @@ class Log implements ILog {
     // Information logging.
     //
     info(...args: any[]): void {
-        if (this.quietMode === undefined) {
-            this.quietMode = this.configuration.getArg<boolean>("quiet");
-        }
-
         if (!this.quietMode) {
             console.log(...args);
         }

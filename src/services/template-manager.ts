@@ -84,7 +84,10 @@ class TemplateManager implements ITemplateManager {
             templateData = {};
 
             for (const question of createQuestions) {
-                //TODO: Need to throw an exception for any question that doesn't have a default.
+
+                if (question.default === undefined) {
+                    throw new Error(`No default answer to the question "${question.name}, this plugin can't run in non-interactive mode.`);
+                }
                 
                 templateData[question.name] = question.default;
             }

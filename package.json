@@ -29,6 +29,7 @@
   "devDependencies": {
     "@types/fs-extra": "^9.0.11",
     "@types/globby": "^9.1.0",
+    "@types/handlebars": "^4.1.0",
     "@types/inquirer": "^7.3.1",
     "@types/jest": "^26.0.20",
     "@types/minimist": "^1.2.1",
@@ -45,6 +46,7 @@
   "dependencies": {
     "@codecapers/fusion": "^1.0.5",
     "fs-extra": "^9.1.0",
+    "handlebars": "^4.7.7",
     "inflate-template": "^1.1.9",
     "inquirer": "^8.0.0",
     "minimist": "^1.2.5"

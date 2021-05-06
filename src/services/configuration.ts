@@ -5,11 +5,12 @@
 import { InjectableClass } from "@codecapers/fusion";
 import * as inquirer from "inquirer";
 import { joinPath } from "../lib/join-path";
+import * as fs from "fs-extra";
 
 export const IConfiguration_id = "IConfiguration";
 
 export interface IConfiguration {
-    
+       
     //
     // Displays debug info about the configuration.
     //
@@ -76,15 +77,46 @@ export interface IConfiguration {
     // Gets the local path for the "create" template.
     //
     getCreateTemplatePath(): string;
+
+    //
+    // Gets the name of the project.
+    //
+    getProjectName(): Promise<string>;
+
+    //
+    // Gets the path of the project, once set.
+    //
+    getProjectPath(): string | undefined;
+
+    //
+    // Sets the path of the project.
+    //
+    setProjectPath(path: string): void;
+
+    //
+    // Gets the data for the project.
+    //
+    getProjectData(): Promise<any>;
+
+    //
+    // Sets the data for the project.
+    //
+    setProjectData(data: any): void;
 }
 
 @InjectableClass()
 export class Configuration implements IConfiguration {
 
+    private projectPath: string | undefined;
     private projectType: string | undefined;
     private localPluginPath: string | undefined;
     private relativePluginPath: string | undefined;
     private pluginUrl: string | undefined;
+
+    //
+    // Project data, once set or loaded.
+    //
+    private data: any | undefined;
     
     //
     // Command line arguments to the application.
@@ -233,5 +265,54 @@ export class Configuration implements IConfiguration {
         }
 
         return joinPath(localPluginPath, "create-template");
+    }
+
+    //
+    // Gets the name of the project.
+    //
+    async getProjectName(): Promise<string> {
+        const projectData = await this.getProjectData();
+        return projectData.PROJECT_NAME; //todo: Need a better way manage/load project configuration. This should be a "name" field at the root of the Doulevo config file.
+    }
+
+    //
+    // Gets the path of the project, once set.
+    //
+    getProjectPath(): string | undefined {
+        return this.projectPath;
+    }
+
+    //
+    // Sets the path of the project.
+    //
+    setProjectPath(path: string): void {
+        this.projectPath = path;
+    }
+
+    //
+    // Gets the data for the project.
+    //
+    async getProjectData(): Promise<any> {
+        if (this.data === undefined) {
+            // 
+            // Try loading project data from configuration file.
+            //
+            if (this.projectPath === undefined) {
+                throw new Error(`Project path not set!`);
+            }
+
+            const configurationFilePath = joinPath(this.projectPath, "doulevo.json");
+            const configurationFile = JSON.parse(await fs.readFile(configurationFilePath, "utf8")); //TODO: Use the Fs interface for this.
+            this.data = configurationFile.data || {};
+        }
+
+        return this.data;
+    }
+
+    //
+    // Sets the data for the project.
+    //
+    setProjectData(data: any): void {
+        this.data = data;
     }
 }

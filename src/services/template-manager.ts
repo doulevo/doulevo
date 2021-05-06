@@ -8,7 +8,8 @@ import { IConfiguration, IConfiguration_id } from "./configuration";
 import { IFs, IFs_id } from "./fs";
 import { ILog, ILog_id } from "./log";
 import * as inquirer from "inquirer";
-import { exportTemplate } from "inflate-template";
+import { exportTemplate, Template } from "inflate-template";
+import * as handlebars from "handlebars";
 
 export const ITemplateManager_id = "ITemplateManager";
 
@@ -18,6 +19,11 @@ export interface ITemplateManager {
     // Exports a template.
     //
     export(defaultProjectName: string, projectPath: string): Promise<void>;
+
+    //
+    // Expands a template file with fallbacks.
+    //
+    expandTemplateFile(templateData: any, ...fileNames: string[]): Promise<string | undefined>;
 }
 
 @InjectableSingleton(ITemplateManager_id)
@@ -115,7 +121,32 @@ class TemplateManager implements ITemplateManager {
             projectType: this.configuration.getProjectType(),
             localPluginPath: this.configuration.getRelativePluginPath(),
             pluginUrl: this.configuration.getPluginUrl(),
+            data: templateData,
         };
         await this.fs.writeJsonFile(configFilePath, defaultConfig);
+    }
+
+    //
+    // Expands a template file with fallbacks.
+    //
+    async expandTemplateFile(templateData: any, ...fileNames: string[]): Promise<string | undefined> {
+
+        const pluginPath = await this.configuration.getLocalPluginPath();
+        if (!pluginPath) {
+            throw new Error(`Failed to detemrine local plugin path.`);
+        }
+
+        for (const fileName of fileNames) {
+            const templateFilePath = joinPath(pluginPath, "template-files", fileName);
+            if (await this.fs.exists(templateFilePath)) {
+                const templateFileContent = await this.fs.readFile(templateFilePath);
+                const template = handlebars.compile(templateFileContent);
+                const expandedContent = template(templateData);
+                return expandedContent;
+            }
+        }
+
+        // Template file was not found in this plugin.
+        return undefined;       
     }
 }

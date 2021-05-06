@@ -1,12 +1,17 @@
 import { InjectableClass, InjectProperty } from "@codecapers/fusion";
+import { runCmd } from "../lib/run-cmd";
 import { IConfiguration, IConfiguration_id } from "../services/configuration";
 import { IPluginManager, IPluginManager_id } from "../services/plugin-manager";
+import { ITemplateManager, ITemplateManager_id } from "../services/template-manager";
 
 @InjectableClass()
 class DockerPlugin {
 
     @InjectProperty(IConfiguration_id)
     configuration!: IConfiguration;
+
+    @InjectProperty(ITemplateManager_id)
+    templateManager!: ITemplateManager;
 
     async build(): Promise<void> {
 
@@ -23,19 +28,21 @@ class DockerPlugin {
             }
         }
 
+        let dockerFileContent: string | undefined;
+
         const docker_file_already_exists = false; // TODO: If there's a Dockerfile-{dev|prod} or just a Dockerfile just use that.
         if (!docker_file_already_exists) {
             // Get previous Dockerfile from local cache.
     
             // If no previous Dockerfile, or it's out of date (eg if configuration has changed that would change the Dockerfile)
+                // Out of date if project data has changed.
+                // Out of date if plugin hash has changed.
     
                 // Look up the Dockerfile generator based on the project type (eg "nodejs", "python", etc).
-                
-                //tod: get docker file template from plugin!
+                const projectData = await this.configuration.getProjectData();
+                dockerFileContent = await this.templateManager.expandTemplateFile(projectData, "docker/Dockerfile-dev", "docker/Dockerfile");
 
                 // Generate and cache the Dockerfile.
-                
-                // Pass in dev/prod.
         }
 
         // Generate the .dockerignore file (if not existing, or out of date).
@@ -45,9 +52,13 @@ class DockerPlugin {
         // exec 'docker build <applicaiton>/<project>'
         // Input Dockerfile and .dockerignore from std input.
 
+        const projectName = await this.configuration.getProjectName();
+       
+        await runCmd(`docker build . --tag=${projectName} -f -`, { stdin: dockerFileContent });
+
         // Tag the Dockerfile so it can be identified as part of this project (the project needs a GUID).
 
-        // Tag the Dockerfile with the hash of the content.
+        // Tag the Dockerfile with the hash of the content and the dockerfile.
     }
 
     async up(): Promise<void> {

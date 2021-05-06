@@ -29,7 +29,8 @@ class HelpCommand implements ICommand {
         this.log.info(" ".repeat(4) + "--project=<path>".padEnd(optionPadding) + "Sets the path to the project, defaults to the working directory if not specified.");
         this.log.info(" ".repeat(4) + "--plugin-url=<url>".padEnd(optionPadding) + "Sets the URL of the Git repo for the plugin (no need to set project type if you use this).");
         this.log.info(" ".repeat(4) + "--local-plugin=<path>".padEnd(optionPadding) + "Sets the local path for a plugin (good for testing when you are developing a plugin).");
-        
+        this.log.info(" ".repeat(4) + "--mode={dev|prod}".padEnd(optionPadding) + "Sets the mode for the build process, can be either dev or prod.");
+
         this.log.info(" ".repeat(4) + "--force".padEnd(optionPadding) + "Forces the command to be completed (even if it would overite existing files).");
         this.log.info(" ".repeat(4) + "--verbose".padEnd(optionPadding) + "Enables versbose logging.");
         this.log.info(" ".repeat(4) + "--quiet".padEnd(optionPadding) + "Tuns in quiet mode, supresses logging unless absolutely necessary.");

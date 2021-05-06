@@ -14,14 +14,14 @@ class DockerPlugin {
     @InjectProperty(ITemplateManager_id)
     templateManager!: ITemplateManager;
 
-    async build(project: IProject): Promise<void> {
+    async build(project: IProject, mode: "dev" | "prod"): Promise<void> {
 
         const force = this.configuration.getArg<boolean>("force");
         if (!force) {
             // TODO: Does the Docker image for this project already exist.
             const docker_image_exists = false;
             if (docker_image_exists) {
-                const docker_image_needs_update = false; 
+                const docker_image_needs_update = false; //TODO: compare hash in tag to content/dockerfile hash.
                 if (docker_image_needs_update) {
                     // The Docker image exists and the files in it haven't changed, so it doesn't need to be updated.
                     return;
@@ -38,9 +38,12 @@ class DockerPlugin {
             // If no previous Dockerfile, or it's out of date (eg if configuration has changed that would change the Dockerfile)
                 // Out of date if project data has changed.
                 // Out of date if plugin hash has changed.
-    
-                // Look up the Dockerfile generator based on the project type (eg "nodejs", "python", etc).
-                dockerFileContent = await this.templateManager.expandTemplateFile(project.getData(), "docker/Dockerfile-dev", "docker/Dockerfile");
+
+                //TODO: Could delegate generation of the Dockerfile to code in the plugin if necessary.
+                dockerFileContent = await this.templateManager.expandTemplateFile(project.getData(), `docker/Dockerfile-${mode}`, "docker/Dockerfile");
+                if (!dockerFileContent) {
+                    throw new Error(`Failed to find Docker template file in plugin.`);
+                }
 
                 // Generate and cache the Dockerfile.
         }
@@ -49,7 +52,8 @@ class DockerPlugin {
 
         // Input .dockerignore from std input.
 
-        await runCmd(`docker build . --tag=${project.getName()}:dev -f -`, { stdin: dockerFileContent });
+        //TODO: Ultimately need a way to allocation a version number.
+        await runCmd(`docker build . --tag=${project.getName()}:${mode} -f -`, { stdin: dockerFileContent });
 
         // Tag Dockerfile with:
         //      - application? 
@@ -65,6 +69,9 @@ class DockerPlugin {
         //  up the container (either in detatched or non-detatched mode)
         //
         // just exec 'docker run <application>/<project>'
+        //
+        // Setup volumes for live reload.
+        //
     }
 
     async down(): Promise<void> {

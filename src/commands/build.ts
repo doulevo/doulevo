@@ -27,13 +27,18 @@ class BuildCommand implements ICommand {
         //
         const project = await Project.load(projectPath);
 
+        const mode = this.configuration.getArg("mode") || "dev";
+        if (mode !== "prod" && mode !== "dev") {
+            throw new Error(`--mode can only be either "dev" or "prod".`);
+        }
+
         //
         // Do the build.
         //
         // TODO: Choose the current build plugin (eg "build/docker") based on project configuration.
         //
         const plugin = new Plugin();
-        await plugin.build(project);
+        await plugin.build(project, mode);
     }
 }
 

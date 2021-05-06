@@ -90,3 +90,15 @@ npx ts-node src/index.ts
 ```bash
 npx ts-node src/index.ts build --project=./test-project --local-plugin=c:/projects/doulevo/plugins/nodejs
 ```
+
+Dev  mode:
+
+```bash
+npx ts-node src/index.ts build --project=./test-project --local-plugin=c:/projects/doulevo/plugins/nodejs --mode=dev
+```
+
+Prod mode:
+
+```bash
+npx ts-node src/index.ts build --project=./test-project --local-plugin=c:/projects/doulevo/plugins/nodejs --mode=prod
+```

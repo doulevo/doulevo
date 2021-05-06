@@ -17,7 +17,7 @@ export interface ITemplateManager {
     //
     // Exports a template.
     //
-    export(projectPath: string): Promise<void>;
+    export(defaultProjectName: string, projectPath: string): Promise<void>;
 }
 
 @InjectableSingleton(ITemplateManager_id)
@@ -38,7 +38,7 @@ class TemplateManager implements ITemplateManager {
     //
     // Exports a template.
     //
-    async export(projectPath: string): Promise<void> {
+    async export(defaultProjectName: string, projectPath: string): Promise<void> {
         // TODO: Fill out answers already provided on the command line.
         //    --answer=PROJECT_NAME=something etc
     
@@ -47,7 +47,7 @@ class TemplateManager implements ITemplateManager {
                 type: "input",
                 name: "PROJECT_NAME",
                 message: "Please enter the name of your project: ",
-                default: "new-project",
+                default: defaultProjectName,
             },
             {
                 type: "input",

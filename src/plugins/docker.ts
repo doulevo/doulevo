@@ -51,9 +51,10 @@ class DockerPlugin {
 
         const projectName = await this.configuration.getProjectName();
        
-        await runCmd(`docker build . --tag=${projectName} -f -`, { stdin: dockerFileContent });
+        await runCmd(`docker build . --tag=${projectName}:dev -f -`, { stdin: dockerFileContent });
 
         // Tag Dockerfile with:
+        //      - application? 
         //      - dev/prod
         //      - project GUID
         //      - project name

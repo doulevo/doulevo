@@ -3,9 +3,6 @@
 //
 
 import { InjectableClass } from "@codecapers/fusion";
-import * as inquirer from "inquirer";
-import { joinPath } from "../lib/join-path";
-import * as fs from "fs-extra";
 
 export interface IProject {
        
@@ -51,16 +48,7 @@ export class Project implements IProject {
     //
     private configurationFile: any;
 
-    //
-    // Loads a Doulevo project from a directory.
-    //
-    static async load(projectPath: string): Promise<IProject> {
-        const configurationFilePath = joinPath(projectPath, "doulevo.json");
-        const configurationFile = JSON.parse(await fs.readFile(configurationFilePath, "utf8")); //TODO: Use the Fs interface for this.
-        return new Project(projectPath, configurationFile);
-    }
-    
-    private constructor(projectPath: string, configurationFile: any) {
+    constructor(projectPath: string, configurationFile: any) {
         this.projectPath = projectPath;
         this.configurationFile = configurationFile;
     }

@@ -1,12 +1,25 @@
-import { InjectableClass, InjectProperty } from "@codecapers/fusion";
+//
+// Interface to Docker.
+//
+
+import { InjectableSingleton, InjectProperty } from "@codecapers/fusion";
 import { runCmd } from "../lib/run-cmd";
 import { IConfiguration, IConfiguration_id } from "../services/configuration";
-import { IPluginManager, IPluginManager_id } from "../services/plugin-manager";
-import { IProject } from "../services/project";
+import { IProject } from "../lib/project";
 import { ITemplateManager, ITemplateManager_id } from "../services/template-manager";
 
-@InjectableClass()
-class DockerPlugin {
+export const IDocker_id = "IDocker"
+
+export interface IDocker {
+
+    //
+    // Builds a Docker project.
+    //
+    build(project: IProject, mode: "dev" | "prod"): Promise<void>;
+}
+
+@InjectableSingleton(IDocker_id)
+class Docker implements IDocker {
 
     @InjectProperty(IConfiguration_id)
     configuration!: IConfiguration;
@@ -14,6 +27,12 @@ class DockerPlugin {
     @InjectProperty(ITemplateManager_id)
     templateManager!: ITemplateManager;
 
+    private constructor() {
+    }
+
+    //
+    // Builds a Docker project.
+    //
     async build(project: IProject, mode: "dev" | "prod"): Promise<void> {
 
         const force = this.configuration.getArg<boolean>("force");
@@ -78,5 +97,3 @@ class DockerPlugin {
         // todo
     }
 } 
-
-export default DockerPlugin;

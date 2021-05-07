@@ -1,18 +1,26 @@
 import { InjectableClass, InjectProperty } from "@codecapers/fusion";
 import { ICommand } from "../lib/command";
-import Plugin from "../plugins/docker";
+import { joinPath } from "../lib/join-path";
+import { IDocker, IDocker_id } from "../plugins/docker";
 import { IConfiguration_id, IConfiguration } from "../services/configuration";
 import { IEnvironment, IEnvironment_id } from "../services/environment";
-import { Project } from "../services/project";
+import { IFs, IFs_id } from "../services/fs";
+import { Project } from "../lib/project";
 
 @InjectableClass()
-class BuildCommand implements ICommand {
+export class BuildCommand implements ICommand {
 
     @InjectProperty(IEnvironment_id)
     environment!: IEnvironment;
 
     @InjectProperty(IConfiguration_id)
     configuration!: IConfiguration;
+
+    @InjectProperty(IDocker_id)
+    docker!: IDocker;
+
+    @InjectProperty(IFs_id)
+    fs!: IFs;
 
     async invoke(): Promise<void> {
 
@@ -25,7 +33,9 @@ class BuildCommand implements ICommand {
         //
         // Load the project's configuration file.
         //
-        const project = await Project.load(projectPath);
+        const configurationFilePath = joinPath(projectPath, "doulevo.json");
+        const configurationFile = await this.fs.readJsonFile(configurationFilePath);
+        const project = new Project(projectPath, configurationFile);
 
         const mode = this.configuration.getArg("mode") || "dev";
         if (mode !== "prod" && mode !== "dev") {
@@ -37,8 +47,7 @@ class BuildCommand implements ICommand {
         //
         // TODO: Choose the current build plugin (eg "build/docker") based on project configuration.
         //
-        const plugin = new Plugin();
-        await plugin.build(project, mode);
+        await this.docker.build(project, mode);
     }
 }
 

@@ -4,12 +4,20 @@ import { Configuration, IConfiguration_id } from "../services/configuration";
 import * as fs from "fs-extra";
 import * as globby from "globby";
 import * as path from "path";
+import { ILog, ILog_id } from "../services/log";
 
 describe("integration", () => {
 
     it("can create new project from local path", async ()  => {
 
         await fs.remove("./test-project");        
+
+        const log: ILog = {
+            verbose: () => {},
+            debug: () => {},
+            info: () => {},        
+        };
+        registerSingleton(ILog_id, log);
 
         const argv = {
             _: [ "create", "test-project"],     // Main arguments

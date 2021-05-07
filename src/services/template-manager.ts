@@ -141,6 +141,7 @@ class TemplateManager implements ITemplateManager {
             if (await this.fs.exists(templateFilePath)) {
                 const templateFileContent = await this.fs.readFile(templateFilePath);
                 const template = handlebars.compile(templateFileContent);
+                //TODO: Should cache the compiled template.
                 const expandedContent = template(templateData);
                 return expandedContent;
             }

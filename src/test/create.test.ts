@@ -73,7 +73,7 @@ describe("create", () => {
 
         // New project is exported from template.
         expect(mockTemplateExport).toHaveBeenCalledTimes(1);
-        expect(mockTemplateExport).toHaveBeenCalledWith(`${cwd}/${projectDir}`);
+        expect(mockTemplateExport).toHaveBeenCalledWith(projectDir, `${cwd}/${projectDir}`);
 
         // Git repo is created for new project.
         expect(mockCreateNewRepo).toHaveBeenCalledTimes(1);

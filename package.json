@@ -15,9 +15,9 @@
     "build:watch": "tsc  --incremental --watch",
     "prepublishOnly": "npm test && npm run clean && tsc",
     "t": "npm run test",
-    "test": "jest",
+    "test": "jest --all",
     "tw": "npm run test:watch",
-    "test:watch": "jest --watch",
+    "test:watch": "jest --watch --all",
     "build-exe": "npm run test && npm run clean && npx tsc && npx nexe build/index.js"
   },
   "bin": {

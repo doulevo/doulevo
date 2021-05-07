@@ -36,8 +36,8 @@ describe("create", () => {
         expect(files).toEqual(expectedFiles);
 
         for (const file of expectedFiles) {
-            const generatedFile = fs.readFile(path.join("./test-project", file), "utf8");
-            const expectedFile = fs.readFile(path.join("./expected-test-project", file), "utf8");
+            const generatedFile = await fs.readFile(path.join("./test-project", file), "utf8");
+            const expectedFile = await fs.readFile(path.join("./expected-test-project", file), "utf8");
             expect(generatedFile).toEqual(expectedFile);
         }
     });

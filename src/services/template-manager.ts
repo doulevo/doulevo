@@ -51,13 +51,13 @@ class TemplateManager implements ITemplateManager {
         let createQuestions = [
             {
                 type: "input",
-                name: "PROJECT_NAME",
+                name: "name",
                 message: "Please enter the name of your project: ",
                 default: defaultProjectName,
             },
             {
                 type: "input",
-                name: "PROJECT_DESCRIPTION",
+                name: "description",
                 message: "Please enter a description of your project: ",
                 default: "A new project",
             },
@@ -113,11 +113,19 @@ class TemplateManager implements ITemplateManager {
         //
         await exportTemplate(localTemplatePath, templateData, projectPath);
 
+        const name = templateData.name;
+        delete templateData.name;
+
+        const description = templateData.description;
+        delete templateData.description;
+
         //
         // Create the Doulevo config file.
         //
         const configFilePath = joinPath(projectPath, "doulevo.json");
         const defaultConfig = {
+            name: name,
+            description: description,
             projectType: this.configuration.getProjectType(),
             localPluginPath: this.configuration.getRelativePluginPath(),
             pluginUrl: this.configuration.getPluginUrl(),

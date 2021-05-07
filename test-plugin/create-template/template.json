@@ -5,7 +5,7 @@
     "questions": [
         {
             "type": "input",
-            "name": "SOME_VALUE",
+            "name": "someValue",
             "default": "an-important-value",
             "message": "An example of a question to provide a value to fill in the gaps of the template."
         }

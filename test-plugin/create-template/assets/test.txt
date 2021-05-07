@@ -1,6 +1,6 @@
 
-{{PROJECT_NAME}}
+{{name}}
 
-{{PROJECT_DESCRIPTION}}
+{{description}}
 
-{{SOME_VALUE}}
+{{someValue}}

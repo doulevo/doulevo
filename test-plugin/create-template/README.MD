@@ -1,3 +1,3 @@
-# Create template
+# Template Node.js project
 
-This directory contains the template for new projects created by this plugin.
+A template for a Node.js project.

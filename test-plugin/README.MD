@@ -1,3 +1,3 @@
-# Test plugin
+# Doulevo Node.js plugin
 
-This is a mock Doulevo plugin just for testing.
+The Node.js plugin for Doulevo. 

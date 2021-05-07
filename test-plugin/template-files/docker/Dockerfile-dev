@@ -1,4 +1,4 @@
-FROM node:14-alpine
+FROM node:{{nodeJsVersion}}
 
 WORKDIR /usr/src/app
 COPY package*.json ./

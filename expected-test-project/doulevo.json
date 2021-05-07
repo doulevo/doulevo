@@ -1,0 +1,9 @@
+{
+    "name": "test-project",
+    "description": "A new project",
+    "localPluginPath": "./test-plugin",
+    "data": {
+        "packageVersion": "0.0.1",
+        "nodeJsVersion": "14"
+    }
+}

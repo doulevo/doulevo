@@ -4,19 +4,19 @@ import * as stream from "stream";
 //
 // Runs a command.
 //
-export function runCmd(cmd: string, options?: any): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
+export function runCmd(cmd: string, options?: any): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
         const proc = exec(cmd, options, (error, stdout, stderr) => {
             if (error) {
                 //todo: display output?
                 reject(error);
             }
             else {
-                resolve();
+                resolve(stdout.toString());
             }
         });
 
-        if (options.stdin) {
+        if (options && options.stdin) {
             //
             // https://stackoverflow.com/a/41343999/25868
             //

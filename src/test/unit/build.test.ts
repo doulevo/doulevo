@@ -59,7 +59,8 @@ describe("build", () => {
         expect(mockDockerBuild).toHaveBeenCalledTimes(1);
         expect(mockDockerBuild).toHaveBeenCalledWith(
             new Project(cwd, {}),
-            "dev"
+            "dev",
+            []
         );
     });
 

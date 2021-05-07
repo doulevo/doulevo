@@ -15,11 +15,21 @@ export interface IDocker {
     //
     // Builds a Docker project.
     //
-    build(project: IProject, mode: "dev" | "prod"): Promise<void>;
+    build(project: IProject, mode: "dev" | "prod", tags?: string[]): Promise<void>;
+
+    //
+    // List Docker images on the system.
+    //
+    listImages(): Promise<any[]>;
+
+    //
+    // Removes an image.
+    //
+    removeImage(imageId: string): Promise<void>;
 }
 
 @InjectableSingleton(IDocker_id)
-class Docker implements IDocker {
+export class Docker implements IDocker {
 
     @InjectProperty(IConfiguration_id)
     configuration!: IConfiguration;
@@ -27,13 +37,10 @@ class Docker implements IDocker {
     @InjectProperty(ITemplateManager_id)
     templateManager!: ITemplateManager;
 
-    private constructor() {
-    }
-
     //
     // Builds a Docker project.
     //
-    async build(project: IProject, mode: "dev" | "prod"): Promise<void> {
+    async build(project: IProject, mode: "dev" | "prod", tags?: string[]): Promise<void> {
 
         const force = this.configuration.getArg<boolean>("force");
         if (!force) {
@@ -72,7 +79,9 @@ class Docker implements IDocker {
         // Input .dockerignore from std input.
 
         //TODO: Ultimately need a way to allocation a version number.
-        await runCmd(`docker build . --tag=${project.getName()}:${mode} -f -`, { stdin: dockerFileContent });
+        const tagArgs = tags && tags.map(tag => `--tag=${tag}`).join(" ") || "";
+        await runCmd(`docker build . --tag=${project.getName()}:${mode} ${tagArgs} -f -`, { stdin: dockerFileContent });
+
 
         // Tag Dockerfile with:
         //      - application? 
@@ -95,5 +104,23 @@ class Docker implements IDocker {
 
     async down(): Promise<void> {
         // todo
+    }
+
+    //
+    // List Docker images on the system.
+    //
+    async listImages(): Promise<any[]> {
+        const output = await runCmd(`docker image ls  --format "{{json . }}"`);
+        
+        // Convert semi-JSON output to proper JSON.
+        const formattedJson = `[ ${output.split("\n").map(line => line.trim()).filter(line => line.length > 0).join(", ")} ]`;
+        return JSON.parse(formattedJson );
+    }
+
+    //
+    // Removes an image.
+    //
+    async removeImage(imageId: string): Promise<void> {
+        await runCmd(`docker image rm ${imageId} --force`);
     }
 } 

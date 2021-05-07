@@ -43,11 +43,28 @@ export class BuildCommand implements ICommand {
         }
 
         //
+        // Tags that can identify the image.
+        //
+        let tags: string[];
+        const tagArg = this.configuration.getArg<string | string[]>("tag");
+        if (tagArg) {
+            if (Array.isArray(tagArg)) {
+                tags = tagArg;
+            }
+            else {
+                tags = [ tagArg! ];
+            }
+        }
+        else {
+            tags = [];
+        }
+
+        //
         // Do the build.
         //
         // TODO: Choose the current build plugin (eg "build/docker") based on project configuration.
         //
-        await this.docker.build(project, mode);
+        await this.docker.build(project, mode, tags);
     }
 }
 

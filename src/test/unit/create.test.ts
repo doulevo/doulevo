@@ -1,5 +1,5 @@
 import { disableInjector, enableInjector } from "@codecapers/fusion";
-import { CreateCommand } from "../commands/create";
+import { CreateCommand } from "../../commands/create";
 
 describe("create", () => {
 

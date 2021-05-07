@@ -1,6 +1,6 @@
 import { disableInjector, enableInjector } from "@codecapers/fusion";
-import { BuildCommand } from "../commands/build";
-import { Project } from "../lib/project";
+import { BuildCommand } from "../../commands/build";
+import { Project } from "../../lib/project";
 
 describe("build", () => {
 

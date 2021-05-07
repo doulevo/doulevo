@@ -1,10 +1,10 @@
 import { registerSingleton } from "@codecapers/fusion";
-import { Doulevo } from "../doulevo";
-import { Configuration, IConfiguration_id } from "../services/configuration";
+import { Doulevo } from "../../doulevo";
+import { Configuration, IConfiguration_id } from "../../services/configuration";
 import * as fs from "fs-extra";
 import * as globby from "globby";
 import * as path from "path";
-import { ILog, ILog_id } from "../services/log";
+import { ILog, ILog_id } from "../../services/log";
 
 describe("integration", () => {
 

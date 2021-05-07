@@ -79,7 +79,7 @@ export class Project implements IProject {
     // Gets the name of the project.
     //
     getName(): string {
-        return this.configurationFile.data.PROJECT_NAME; //todo: Move name to root of config file.
+        return this.configurationFile.name;
     }
 
     //

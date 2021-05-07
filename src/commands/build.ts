@@ -45,19 +45,9 @@ export class BuildCommand implements ICommand {
         //
         // Tags that can identify the image.
         //
-        let tags: string[];
-        const tagArg = this.configuration.getArg<string | string[]>("tag");
-        if (tagArg) {
-            if (Array.isArray(tagArg)) {
-                tags = tagArg;
-            }
-            else {
-                tags = [ tagArg! ];
-            }
-        }
-        else {
-            tags = [];
-        }
+        const tags = this.configuration.getArrayArg("tag");
+
+        console.log("BUILD"); //fio:
 
         //
         // Do the build.
@@ -70,6 +60,6 @@ export class BuildCommand implements ICommand {
 
 export default {
     name: "build",
-    description: "Builds the project in the working directory.",
+    description: "Builds the project in the working directory (or the directory specified by --project=<path>).",
     constructor: BuildCommand,
 };

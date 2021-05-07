@@ -33,6 +33,11 @@ export interface IConfiguration {
     getArg<T = string>(argName: string): T | undefined;
 
     //
+    // Get an array of arguments.
+    //
+    getArrayArg<T = string>(argName: string): T[];
+
+    //
     // Gets the project type if specified, or undefined if not.
     // Project type doesn't have to be specified if a template is specified directly by local path or URL.
     //
@@ -129,6 +134,26 @@ export class Configuration implements IConfiguration {
     //
     getArg<T>(argName: string): T | undefined {
         return this.argv[argName];
+    }
+
+    //
+    // Get an array of arguments.
+    //
+    getArrayArg<T = string>(argName: string): T[] {
+        let values: T[];
+        const theArg = this.getArg<T | T[]>(argName);
+        if (theArg) {
+            if (Array.isArray(theArg)) {
+                values = theArg;
+            }
+            else {
+                values = [ theArg! ];
+            }
+        }
+        else {
+            values = [];
+        }
+        return values;
     }
 
     //

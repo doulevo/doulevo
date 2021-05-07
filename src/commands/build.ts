@@ -47,8 +47,6 @@ export class BuildCommand implements ICommand {
         //
         const tags = this.configuration.getArrayArg("tag");
 
-        console.log("BUILD"); //fio:
-
         //
         // Do the build.
         //

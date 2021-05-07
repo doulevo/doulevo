@@ -13,9 +13,14 @@ export const IDocker_id = "IDocker"
 export interface IDocker {
 
     //
-    // Builds a Docker project.
+    // Builds the requested project.
     //
-    build(project: IProject, mode: "dev" | "prod", tags?: string[]): Promise<void>;
+    build(project: IProject, mode: "dev" | "prod", tags: string[]): Promise<void>;
+
+    //
+    // Builds and runs the requested project.
+    //
+    up(project: IProject, mode: "dev" | "prod", tags: string[]): Promise<void>;
 
     //
     // List Docker images on the system.
@@ -38,9 +43,18 @@ export class Docker implements IDocker {
     templateManager!: ITemplateManager;
 
     //
-    // Builds a Docker project.
+    // Gets the tag that can identify the image build for a project.
     //
-    async build(project: IProject, mode: "dev" | "prod", tags?: string[]): Promise<void> {
+    private getProjectTag(project: IProject): string {
+        //todo: Possibly also include application name (or that could be a separate tag).
+        //      Or maybe use the projects UUID.
+        return project.getName();
+    }
+
+    //
+    // Builds the requested project.
+    //
+    async build(project: IProject, mode: "dev" | "prod", tags: string[]): Promise<void> {
 
         const force = this.configuration.getArg<boolean>("force");
         if (!force) {
@@ -78,9 +92,20 @@ export class Docker implements IDocker {
 
         // Input .dockerignore from std input.
 
+        console.log("Building with Dockerfile:");
+        console.log(dockerFileContent);
+
         //TODO: Ultimately need a way to allocation a version number.
-        const tagArgs = tags && tags.map(tag => `--tag=${tag}`).join(" ") || "";
-        await runCmd(`docker build . --tag=${project.getName()}:${mode} ${tagArgs} -f -`, { stdin: dockerFileContent });
+        const tagArgs = tags.map(tag => `--tag=${tag}`).join(" ") || "";
+        const projectTag = this.getProjectTag(project);
+        const projectPath = project.getPath();
+        await runCmd(
+            `docker build ${projectPath} --tag=${projectTag}:${mode} ${tagArgs} -f -`, 
+            { 
+                stdin: dockerFileContent, 
+                showOutput: this.configuration.getArg("debug"),
+            }
+        );
 
 
         // Tag Dockerfile with:
@@ -91,7 +116,11 @@ export class Docker implements IDocker {
         //      - content / dockerfile hash
     }
 
-    async up(): Promise<void> {
+    //
+    // Builds and runs the requested project.
+    //
+    async up(project: IProject, mode: "dev" | "prod", tags: string[]): Promise<void> {
+
         //
         //  generate the docker command line parameters
         //  up the container (either in detatched or non-detatched mode)
@@ -100,17 +129,24 @@ export class Docker implements IDocker {
         //
         // Setup volumes for live reload.
         //
+
+        await this.build(project, mode, tags);
+
+        //TODO: Support detached mode.
+
+        await runCmd(`docker run ${this.getProjectTag(project)}:${mode}`, { showOutput: true });
     }
 
     async down(): Promise<void> {
-        // todo
+        // todo:
     }
 
     //
     // List Docker images on the system.
     //
     async listImages(): Promise<any[]> {
-        const output = await runCmd(`docker image ls  --format "{{json . }}"`);
+        const result = await runCmd(`docker image ls  --format "{{json . }}"`, { showOutput: this.configuration.getArg("debug") });
+        const output = result.stdout; 
         
         // Convert semi-JSON output to proper JSON.
         const formattedJson = `[ ${output.split("\n").map(line => line.trim()).filter(line => line.length > 0).join(", ")} ]`;

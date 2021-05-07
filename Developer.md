@@ -45,7 +45,7 @@ Some commands for testing...
 ### Testing with a local plugin
 
 ```bash
-npx ts-node src/index.ts create test-project --force --local-plugin=c:/projects/doulevo/plugins/nodejs
+npx ts-node src/index.ts create test-project --force --local-plugin=./test-plugin
 ```
 
 ### Testing with a remote plugin
@@ -85,20 +85,38 @@ Or no command:
 npx ts-node src/index.ts
 ```
 
-### Building the project.
+### Building the project
 
 ```bash
-npx ts-node src/index.ts build --project=./test-project --local-plugin=c:/projects/doulevo/plugins/nodejs
+npx ts-node src/index.ts build --project=./test-project --local-plugin=./test-plugin
 ```
 
 Dev  mode:
 
 ```bash
-npx ts-node src/index.ts build --project=./test-project --local-plugin=c:/projects/doulevo/plugins/nodejs --mode=dev
+npx ts-node src/index.ts build --project=./test-project --local-plugin=./test-plugin --mode=dev
 ```
 
 Prod mode:
 
 ```bash
-npx ts-node src/index.ts build --project=./test-project --local-plugin=c:/projects/doulevo/plugins/nodejs --mode=prod
+npx ts-node src/index.ts build --project=./test-project --local-plugin=./test-plugin --mode=prod
+```
+
+### Running a project
+
+```bash
+npx ts-node src/index.ts up --project=./test-project --local-plugin=./test-plugin
+```
+
+Dev  mode:
+
+```bash
+npx ts-node src/index.ts up --project=./test-project --local-plugin=./test-plugin --mode=dev
+```
+
+Prod mode:
+
+```bash
+npx ts-node src/index.ts up --project=./test-project --local-plugin=./test-plugin --mode=prod
 ```

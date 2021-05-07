@@ -3,7 +3,6 @@ import { IPluginManager, IPluginManager_id } from "../services/plugin-manager";
 import { InjectableClass, InjectProperty } from "@codecapers/fusion";
 import { IConfiguration, IConfiguration_id } from "../services/configuration";
 import { ILog, ILog_id } from "../services/log";
-import { runCmd } from "../lib/run-cmd";
 import { joinPath } from "../lib/join-path";
 import { IFs, IFs_id } from "../services/fs";
 import { ITemplateManager, ITemplateManager_id } from "../services/template-manager";

@@ -3,8 +3,8 @@
 //
 
 import { InjectableSingleton, InjectProperty } from "@codecapers/fusion";
-import { joinPath } from "../lib/join-path";
 import { runCmd } from "../lib/run-cmd";
+import { IConfiguration, IConfiguration_id } from "./configuration";
 import { ILog, ILog_id } from "./log";
 
 export const IGit_id = "IGit";
@@ -28,6 +28,9 @@ class Git implements IGit {
     @InjectProperty(ILog_id)
     log!: ILog;
 
+    @InjectProperty(IConfiguration_id)
+    configuration!: IConfiguration;
+
     private constructor() {
     }
 
@@ -42,9 +45,10 @@ class Git implements IGit {
     // Create a new repo.
     //
     async createNewRepo(path: string, comment: string): Promise<void> {
-        await runCmd(`git init`, { cwd: path });
-        await runCmd(`git add .`, { cwd: path });
-        await runCmd(`git commit -m "${comment}"`, { cwd: path });
+        const isDebug = this.configuration.getArg<boolean>("debug") || false;
+        await runCmd(`git init`, { cwd: path, showCommand: isDebug, showOutput: isDebug });
+        await runCmd(`git add .`, { cwd: path, showCommand: isDebug, showOutput: isDebug });
+        await runCmd(`git commit -m "${comment}"`, { cwd: path, showCommand: isDebug, showOutput: isDebug });
     }
 
 }

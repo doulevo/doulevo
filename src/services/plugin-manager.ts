@@ -5,7 +5,6 @@
 import { InjectableSingleton, InjectProperty } from "@codecapers/fusion";
 import * as path from "path";
 import * as fs from "fs-extra";
-import { runCmd } from "../lib/run-cmd";
 import { IEnvironment, IEnvironment_id } from "./environment";
 import { IConfiguration, IConfiguration_id } from "../services/configuration";
 import { ILog, ILog_id } from "./log";

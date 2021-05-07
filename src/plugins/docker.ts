@@ -7,6 +7,8 @@ import { runCmd } from "../lib/run-cmd";
 import { IConfiguration, IConfiguration_id } from "../services/configuration";
 import { IProject } from "../lib/project";
 import { ITemplateManager, ITemplateManager_id } from "../services/template-manager";
+import { joinPath } from "../lib/join-path";
+import * as path from "path";
 
 export const IDocker_id = "IDocker"
 
@@ -99,11 +101,13 @@ export class Docker implements IDocker {
         const tagArgs = tags.map(tag => `--tag=${tag}`).join(" ") || "";
         const projectTag = this.getProjectTag(project);
         const projectPath = project.getPath();
+        const isDebug = this.configuration.getArg<boolean>("debug") || false;
         await runCmd(
             `docker build ${projectPath} --tag=${projectTag}:${mode} ${tagArgs} -f -`, 
             { 
                 stdin: dockerFileContent, 
-                showOutput: this.configuration.getArg("debug"),
+                showCommand: isDebug,
+                showOutput: isDebug,
             }
         );
 
@@ -134,7 +138,29 @@ export class Docker implements IDocker {
 
         //TODO: Support detached mode.
 
-        await runCmd(`docker run ${this.getProjectTag(project)}:${mode}`, { showOutput: true });
+        //TODO: Share the npm cache directory.
+
+        const sharedPaths = [ //todo: this information must come from the plugin, only in dev mode.
+            { 
+                host: "src",
+                container: "/usr/src/app/src",
+            },
+        ];
+        const projectPath = path.resolve(project.getPath());
+        const sharedVolumes = sharedPaths
+            .map(sharedPath => {
+                return `-v ${joinPath(projectPath, sharedPath.host)}:${sharedPath.container}:z`;
+            })
+            .join(" ");
+
+        const isDebug = this.configuration.getArg<boolean>("debug") || false;
+        await runCmd(
+            `docker run ${sharedVolumes} ${this.getProjectTag(project)}:${mode}`, 
+            { 
+                showCommand: isDebug,
+                showOutput: true,
+            }
+        );
     }
 
     async down(): Promise<void> {

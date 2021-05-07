@@ -2,6 +2,12 @@ import { exec, ExecOptions } from "child_process";
 import * as stream from "stream";
 
 export interface IRunCmdOptions extends ExecOptions {
+
+    //
+    // Set to true to print the command.
+    //
+    showCommand?: boolean;
+
     //
     // String to be piped to standard input.
     //
@@ -41,6 +47,10 @@ export interface IRunCmdResult {
 //
 export function runCmd(cmd: string, options?: IRunCmdOptions): Promise<IRunCmdResult> {
     return new Promise<IRunCmdResult>((resolve, reject) => {
+        if (options?.showCommand) {
+            console.log(`CMD: ${cmd}`);
+        }
+
         const proc = exec(cmd, options);
 
         let stdOutput = "";

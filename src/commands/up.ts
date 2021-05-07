@@ -1,4 +1,3 @@
-import Plugin from "../plugins/docker";
 
 export default async function (argv: any): Promise<void> {
 

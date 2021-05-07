@@ -6,7 +6,7 @@ import * as globby from "globby";
 import * as path from "path";
 import { ILog, ILog_id } from "../../services/log";
 
-describe("integration", () => {
+describe("create", () => {
 
     it("can create new project from local path", async ()  => {
 

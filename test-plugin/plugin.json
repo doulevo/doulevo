@@ -1,0 +1,8 @@
+{
+    "sharedDirectories": [
+        {
+            "host": "src",
+            "container": "/usr/src/app/src"
+        }
+    ]
+}

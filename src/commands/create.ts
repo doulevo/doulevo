@@ -60,7 +60,7 @@ export class CreateCommand implements ICommand {
         //
         // Exports the create-template, filling in the blanks.
         //
-        await this.templateManager.export(projectDir, projectPath);   
+        await this.templateManager.export(projectDir, projectPath);  //todo: Pass in the plugin!
 
         //
         // Create a Git repo for the project.

@@ -6,6 +6,7 @@ import { IConfiguration_id, IConfiguration } from "../services/configuration";
 import { IEnvironment, IEnvironment_id } from "../services/environment";
 import { IFs, IFs_id } from "../services/fs";
 import { Project } from "../lib/project";
+import { Plugin } from "../lib/plugin";
 
 @InjectableClass()
 export class UpCommand implements ICommand {
@@ -47,12 +48,25 @@ export class UpCommand implements ICommand {
         //
         const tags = this.configuration.getArrayArg("tag");
 
+        //todo: automatically update the plugin!
+
+        //
+        // Load the plugin for this project.
+        //
+        const pluginPath = project.getLocalPluginPath();
+        if (!pluginPath) {
+            throw new Error(`Failed to determine local plugin path for project!`);
+        }
+        const pluginConfigurationFilePath = joinPath(pluginPath, "plugin.json");
+        const pluginConfigurationFile = await this.fs.readJsonFile(pluginConfigurationFilePath);
+        const plugin = new Plugin(pluginPath, pluginConfigurationFile); 
+
         //
         // Do the build.
         //
         // TODO: Choose the current build plugin (eg "build/docker") based on project configuration.
         //
-        await this.docker.up(project, mode, tags);
+        await this.docker.up(project, mode, tags, plugin);
     }
 }
 

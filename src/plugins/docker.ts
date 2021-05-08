@@ -9,6 +9,8 @@ import { IProject } from "../lib/project";
 import { ITemplateManager, ITemplateManager_id } from "../services/template-manager";
 import { joinPath } from "../lib/join-path";
 import * as path from "path";
+import { IPlugin } from "../lib/plugin";
+import { ILog_id, ILog } from "../services/log";
 
 export const IDocker_id = "IDocker"
 
@@ -17,12 +19,12 @@ export interface IDocker {
     //
     // Builds the requested project.
     //
-    build(project: IProject, mode: "dev" | "prod", tags: string[]): Promise<void>;
+    build(project: IProject, mode: "dev" | "prod", tags: string[], plugin: IPlugin): Promise<void>;
 
     //
     // Builds and runs the requested project.
     //
-    up(project: IProject, mode: "dev" | "prod", tags: string[]): Promise<void>;
+    up(project: IProject, mode: "dev" | "prod", tags: string[], plugin: IPlugin): Promise<void>;
 
     //
     // List Docker images on the system.
@@ -44,6 +46,9 @@ export class Docker implements IDocker {
     @InjectProperty(ITemplateManager_id)
     templateManager!: ITemplateManager;
 
+    @InjectProperty(ILog_id)
+    log!: ILog;
+
     //
     // Gets the tag that can identify the image build for a project.
     //
@@ -56,7 +61,7 @@ export class Docker implements IDocker {
     //
     // Builds the requested project.
     //
-    async build(project: IProject, mode: "dev" | "prod", tags: string[]): Promise<void> {
+    async build(project: IProject, mode: "dev" | "prod", tags: string[], plugin: IPlugin): Promise<void> {
 
         const force = this.configuration.getArg<boolean>("force");
         if (!force) {
@@ -94,8 +99,8 @@ export class Docker implements IDocker {
 
         // Input .dockerignore from std input.
 
-        console.log("Building with Dockerfile:");
-        console.log(dockerFileContent);
+        this.log.verbose("Building with Dockerfile:");
+        this.log.verbose(dockerFileContent);
 
         //TODO: Ultimately need a way to allocation a version number.
         const tagArgs = tags.map(tag => `--tag=${tag}`).join(" ") || "";
@@ -111,19 +116,19 @@ export class Docker implements IDocker {
             }
         );
 
-
         // Tag Dockerfile with:
         //      - application? 
         //      - dev/prod
         //      - project GUID
         //      - project name
         //      - content / dockerfile hash
+        //      - tag it with "local" if not build in an official CD system.
     }
 
     //
     // Builds and runs the requested project.
     //
-    async up(project: IProject, mode: "dev" | "prod", tags: string[]): Promise<void> {
+    async up(project: IProject, mode: "dev" | "prod", tags: string[], plugin: IPlugin): Promise<void> {
 
         //
         //  generate the docker command line parameters
@@ -134,20 +139,18 @@ export class Docker implements IDocker {
         // Setup volumes for live reload.
         //
 
-        await this.build(project, mode, tags);
+        await this.build(project, mode, tags, plugin);
 
         //TODO: Support detached mode.
 
         //TODO: Share the npm cache directory.
 
-        const sharedPaths = [ //todo: this information must come from the plugin, only in dev mode.
-            { 
-                host: "src",
-                container: "/usr/src/app/src",
-            },
-        ];
+        const sharedDirectories = plugin.getSharedDirectories(); //todo: dev only
+        this.log.verbose("Sharing directories:");
+        this.log.verbose(JSON.stringify(sharedDirectories, null, 4));
+
         const projectPath = path.resolve(project.getPath());
-        const sharedVolumes = sharedPaths
+        const sharedVolumes = sharedDirectories
             .map(sharedPath => {
                 return `-v ${joinPath(projectPath, sharedPath.host)}:${sharedPath.container}:z`;
             })

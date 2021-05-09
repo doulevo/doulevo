@@ -169,6 +169,8 @@ export class Docker implements IDocker {
                 showOutput: true,
             }
         );
+
+        //todo: kill/remove the container on ctrl c. when runnning in attached mode.
     }
 
     async down(): Promise<void> {

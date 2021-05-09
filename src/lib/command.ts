@@ -2,8 +2,10 @@
 // Manages execution of a system command.
 //
 
+import { InjectableClass, InjectProperty } from "@codecapers/fusion";
 import { exec, ExecOptions } from "child_process";
 import * as stream from "stream";
+import { IDetectInterrupt, IDetectInterrupt_id } from "../services/detect-interrupt";
 
 export interface ICommandOptions extends ExecOptions {
 
@@ -53,7 +55,11 @@ export interface ICommand {
     exec(): Promise<ICommandResult>;
 }
 
+@InjectableClass()
 export class Command implements ICommand {
+
+    @InjectProperty(IDetectInterrupt_id)
+    detectIterrupt!: IDetectInterrupt;
 
     //
     // The command to execute.
@@ -79,7 +85,15 @@ export class Command implements ICommand {
                 console.log(`CMD: ${this.cmd}`);
             }
 
+            let didTerminate = false;
+
             const proc = exec(this.cmd, this.options);
+
+            this.detectIterrupt.pushHandler(async () => {
+                proc.kill("SIGINT");
+                didTerminate = true;
+                return true; // Allow process termination.
+            });
 
             let stdOutput = "";
 
@@ -104,7 +118,13 @@ export class Command implements ICommand {
             });
 
             proc.on("exit", code => {
-                const throwOnNonZeroExitCode = this.options.throwOnNonZeroExitCode === true || this.options.throwOnNonZeroExitCode === undefined;
+                this.detectIterrupt.popHandler();
+
+                if (this.options.showCommand) {
+                    console.log(`CMD finished: ${this.cmd}`);
+                }
+
+                const throwOnNonZeroExitCode = !didTerminate && (this.options.throwOnNonZeroExitCode === true || this.options.throwOnNonZeroExitCode === undefined);
                 if (throwOnNonZeroExitCode && code !== 0) {
                     const err: any = new Error(`Cmd "${this.cmd}" exited with error code ${code}`);
                     err.code = code;

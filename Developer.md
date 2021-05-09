@@ -42,19 +42,19 @@ The executable is generated to `doulevo.exe` in the current directory.
 
 Some commands for testing...
 
-### Testing with a local plugin
+### Creawting a project with a local plugin
 
 ```bash
 npx ts-node src/index.ts create test-project --force --local-plugin=./test-plugin
 ```
 
-### Testing with a remote plugin
+### Creating a project with a remote plugin
 
 ```bash
 npx ts-node src/index.ts create test-project --force --plugin-url=https://github.com/doulevo/plugin-nodejs.git
 ```
 
-### Using the default plugin for the project type
+### Creating a project using the default plugin for the project type
 
 ```bash
 npx ts-node src/index.ts create test-project --force --project-type=nodejs

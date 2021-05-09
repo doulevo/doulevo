@@ -35,6 +35,7 @@
     "@types/jest": "^26.0.20",
     "@types/minimist": "^1.2.1",
     "@types/node": "^14.14.25",
+    "@types/ora": "^3.2.0",
     "@types/uuid": "^8.3.0",
     "globby": "^11.0.3",
     "jest": "^26.6.3",
@@ -53,6 +54,7 @@
     "inflate-template": "^1.1.9",
     "inquirer": "^8.0.0",
     "minimist": "^1.2.5",
+    "ora": "^5.4.0",
     "uuid": "^8.3.2"
   }
 }

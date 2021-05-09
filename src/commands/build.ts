@@ -7,6 +7,7 @@ import { IEnvironment, IEnvironment_id } from "../services/environment";
 import { IFs, IFs_id } from "../services/fs";
 import { Project } from "../lib/project";
 import { Plugin } from "../lib/plugin";
+import { IProgressIndicator, IProgressIndicator_id } from "../services/progress-indicator";
 
 @InjectableClass()
 export class BuildCommand implements ICommand {
@@ -22,6 +23,9 @@ export class BuildCommand implements ICommand {
 
     @InjectProperty(IFs_id)
     fs!: IFs;
+
+    @InjectProperty(IProgressIndicator_id)
+    progressIndicator!: IProgressIndicator;
 
     async invoke(): Promise<void> {
 
@@ -58,13 +62,24 @@ export class BuildCommand implements ICommand {
         const pluginConfigurationFilePath = joinPath(pluginPath, "plugin.json");
         const pluginConfigurationFile = await this.fs.readJsonFile(pluginConfigurationFilePath);
         const plugin = new Plugin(pluginPath, pluginConfigurationFile); 
-        
-        //
-        // Do the build.
-        //
-        // TODO: Choose the current build plugin (eg "build/docker") based on project configuration.
-        //
-        await this.docker.build(project, mode, tags, plugin);
+
+        this.progressIndicator.start("Building project...");
+
+        try {
+            //
+            // Do the build.
+            //
+            // TODO: Choose the current build plugin (eg "build/docker") based on project configuration.
+            //
+            await this.docker.build(project, mode, tags, plugin);
+
+            this.progressIndicator.succeed("Build successful.");
+        }
+        catch (err) {
+            this.progressIndicator.fail("Building failed.");
+            //TODO: Now display errors that occured.
+            throw err;
+        }
     }
 }
 

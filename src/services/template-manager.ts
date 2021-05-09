@@ -10,6 +10,7 @@ import { ILog, ILog_id } from "./log";
 import * as inquirer from "inquirer";
 import { exportTemplate, Template } from "inflate-template";
 import * as handlebars from "handlebars";
+import { IProgressIndicator, IProgressIndicator_id } from "./progress-indicator";
 
 export const ITemplateManager_id = "ITemplateManager";
 
@@ -18,7 +19,7 @@ export interface ITemplateManager {
     //
     // Exports a template.
     //
-    export(defaultProjectName: string, projectPath: string): Promise<void>;
+    exportTemplate(defaultProjectName: string, projectPath: string): Promise<void>;
 
     //
     // Expands a template file with fallbacks.
@@ -38,13 +39,16 @@ class TemplateManager implements ITemplateManager {
     @InjectProperty(IConfiguration_id)
     configuration!: IConfiguration;
 
+    @InjectProperty(IProgressIndicator_id)
+    progressIndicator!: IProgressIndicator;
+
     private constructor() {
     }
 
     //
     // Exports a template.
     //
-    async export(defaultProjectName: string, projectPath: string): Promise<void> {
+    async exportTemplate(defaultProjectName: string, projectPath: string): Promise<void> {
         // TODO: Fill out answers already provided on the command line.
         //    --answer=PROJECT_NAME=something etc
     
@@ -107,31 +111,41 @@ class TemplateManager implements ITemplateManager {
 
         this.log.debug("Template data:");
         this.log.debug(templateData);
+
+        this.progressIndicator.start("Creating new project...");
     
-        //
-        // Instantiate template and fill in the blanks from the questions.
-        //
-        await exportTemplate(localTemplatePath, templateData, projectPath);
+        try {
+            //
+            // Instantiate template and fill in the blanks from the questions.
+            //
+            await exportTemplate(localTemplatePath, templateData, projectPath);
 
-        const name = templateData.name;
-        delete templateData.name;
+            const name = templateData.name;
+            delete templateData.name;
 
-        const description = templateData.description;
-        delete templateData.description;
+            const description = templateData.description;
+            delete templateData.description;
 
-        //
-        // Create the Doulevo config file.
-        //
-        const configFilePath = joinPath(projectPath, "doulevo.json");
-        const defaultConfig = {
-            name: name,
-            description: description,
-            projectType: this.configuration.getProjectType(),
-            localPluginPath: this.configuration.getRelativePluginPath(),
-            pluginUrl: this.configuration.getPluginUrl(),
-            data: templateData,
-        };
-        await this.fs.writeJsonFile(configFilePath, defaultConfig);
+            //
+            // Create the Doulevo config file.
+            //
+            const configFilePath = joinPath(projectPath, "doulevo.json");
+            const defaultConfig = {
+                name: name,
+                description: description,
+                projectType: this.configuration.getProjectType(),
+                localPluginPath: this.configuration.getRelativePluginPath(),
+                pluginUrl: this.configuration.getPluginUrl(),
+                data: templateData,
+            };
+            await this.fs.writeJsonFile(configFilePath, defaultConfig);
+
+            this.progressIndicator.succeed(`Created project at ${projectPath}`);
+        }
+        catch (err) {
+            this.progressIndicator.fail("Failed to create project.");
+            throw err;
+        }
     }
 
     //

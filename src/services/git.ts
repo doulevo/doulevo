@@ -5,7 +5,7 @@
 import { InjectableSingleton, InjectProperty } from "@codecapers/fusion";
 import { IConfiguration, IConfiguration_id } from "./configuration";
 import { ILog, ILog_id } from "./log";
-import { IRunCmd, IRunCmd_id } from "./run-cmd";
+import { IExec, IExec_id } from "./exec";
 
 export const IGit_id = "IGit";
 
@@ -31,8 +31,8 @@ class Git implements IGit {
     @InjectProperty(IConfiguration_id)
     configuration!: IConfiguration;
 
-    @InjectProperty(IRunCmd_id)
-    runCmd!: IRunCmd;
+    @InjectProperty(IExec_id)
+    exec!: IExec;
 
     private constructor() {
     }
@@ -41,7 +41,7 @@ class Git implements IGit {
     // Clones a Git repo.
     //
     async clone(remoteRepo: string, localPath: string): Promise<void> {
-        await this.runCmd.invoke(`git clone ${remoteRepo} ${localPath}`);
+        await this.exec.invoke(`git clone ${remoteRepo} ${localPath}`);
     }
 
     //
@@ -49,9 +49,9 @@ class Git implements IGit {
     //
     async createNewRepo(path: string, comment: string): Promise<void> {
         const isDebug = this.configuration.getArg<boolean>("debug") || false;
-        await this.runCmd.invoke(`git init`, { cwd: path, showCommand: isDebug, showOutput: isDebug });
-        await this.runCmd.invoke(`git add .`, { cwd: path, showCommand: isDebug, showOutput: isDebug });
-        await this.runCmd.invoke(`git commit -m "${comment}"`, { cwd: path, showCommand: isDebug, showOutput: isDebug });
+        await this.exec.invoke(`git init`, { cwd: path, showCommand: isDebug, showOutput: isDebug });
+        await this.exec.invoke(`git add .`, { cwd: path, showCommand: isDebug, showOutput: isDebug });
+        await this.exec.invoke(`git commit -m "${comment}"`, { cwd: path, showCommand: isDebug, showOutput: isDebug });
     }
 
 }

@@ -10,7 +10,7 @@ import { joinPath } from "../lib/join-path";
 import * as path from "path";
 import { IPlugin } from "../lib/plugin";
 import { ILog_id, ILog } from "../services/log";
-import { IRunCmd, IRunCmd_id } from "../services/run-cmd";
+import { IExec, IExec_id } from "../services/exec";
 
 export const IDocker_id = "IDocker"
 
@@ -49,8 +49,8 @@ export class Docker implements IDocker {
     @InjectProperty(ILog_id)
     log!: ILog;
 
-    @InjectProperty(IRunCmd_id)
-    runCmd!: IRunCmd;
+    @InjectProperty(IExec_id)
+    exec!: IExec;
 
     //
     // Gets the tag that can identify the image build for a project.
@@ -110,7 +110,7 @@ export class Docker implements IDocker {
         const projectTag = this.getProjectTag(project);
         const projectPath = project.getPath();
         const isDebug = this.configuration.getArg<boolean>("debug") || false;
-        await this.runCmd.invoke(
+        await this.exec.invoke(
             `docker build ${projectPath} --tag=${projectTag}:${mode} ${tagArgs} -f -`, 
             { 
                 stdin: dockerFileContent, 
@@ -162,7 +162,7 @@ export class Docker implements IDocker {
         
 
         const isDebug = this.configuration.getArg<boolean>("debug") || false;
-        await this.runCmd.invoke(
+        await this.exec.invoke(
             `docker run ${sharedVolumes} ${this.getProjectTag(project)}:${mode}`, 
             { 
                 showCommand: isDebug,
@@ -179,7 +179,7 @@ export class Docker implements IDocker {
     // List Docker images on the system.
     //
     async listImages(): Promise<any[]> {
-        const result = await this.runCmd.invoke(`docker image ls  --format "{{json . }}"`, { showOutput: this.configuration.getArg("debug") });
+        const result = await this.exec.invoke(`docker image ls  --format "{{json . }}"`, { showOutput: this.configuration.getArg("debug") });
         const output = result.stdout; 
         
         // Convert semi-JSON output to proper JSON.
@@ -191,6 +191,6 @@ export class Docker implements IDocker {
     // Removes an image.
     //
     async removeImage(imageId: string): Promise<void> {
-        await this.runCmd.invoke(`docker image rm ${imageId} --force`);
+        await this.exec.invoke(`docker image rm ${imageId} --force`);
     }
 } 

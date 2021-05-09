@@ -7,10 +7,10 @@ import { exec, ExecOptions } from "child_process";
 import * as stream from "stream";
 import { IDetectInterupt as IDetectInterrupt, IDetectInterupt_id as IDetectInterrupt_id } from "./detect-interrupt";
 
-export const IRunCmd_id = "IRunCmd";
+export const IExec_id = "IExec";
 
 
-export interface IRunCmdOptions extends ExecOptions {
+export interface IExecOptions extends ExecOptions {
 
     //
     // Set to true to print the command.
@@ -34,7 +34,7 @@ export interface IRunCmdOptions extends ExecOptions {
     throwOnNonZeroExitCode?: boolean;
 }
 
-export interface IRunCmdResult {
+export interface IExecResult {
     //
     // The exit code from the command.
     //
@@ -51,15 +51,15 @@ export interface IRunCmdResult {
     stderr: string;
 }
 
-export interface IRunCmd {
+export interface IExec {
     //
-    // Runs a command.
+    // Executes a command.
     //
-    invoke(cmd: string, options?: IRunCmdOptions): Promise<IRunCmdResult>;
+    invoke(cmd: string, options?: IExecOptions): Promise<IExecResult>;
 }
 
-@InjectableSingleton(IRunCmd_id)
-export class RunCmd implements IRunCmd {
+@InjectableSingleton(IExec_id)
+export class Exec implements IExec {
 
     @InjectProperty(IDetectInterrupt_id)
     detectInterrupt!: IDetectInterrupt;
@@ -68,10 +68,10 @@ export class RunCmd implements IRunCmd {
     }
 
     //
-    // Runs a command.
+    // Executes a command.
     //
-    invoke(cmd: string, options?: IRunCmdOptions): Promise<IRunCmdResult> {
-        return new Promise<IRunCmdResult>((resolve, reject) => {
+    invoke(cmd: string, options?: IExecOptions): Promise<IExecResult> {
+        return new Promise<IExecResult>((resolve, reject) => {
             if (options?.showCommand) {
                 console.log(`CMD: ${cmd}`);
             }

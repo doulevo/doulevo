@@ -1,4 +1,4 @@
-import { ICommand } from "../lib/command";
+import { IDoulevoCommand } from "../lib/doulevo-command";
 import { IPluginManager, IPluginManager_id } from "../services/plugin-manager";
 import { InjectableClass, InjectProperty } from "@codecapers/fusion";
 import { IConfiguration, IConfiguration_id } from "../services/configuration";
@@ -11,7 +11,7 @@ import { IEnvironment, IEnvironment_id } from "../services/environment";
 import { IProgressIndicator, IProgressIndicator_id } from "../services/progress-indicator";
 
 @InjectableClass()
-export class CreateCommand implements ICommand {
+export class CreateCommand implements IDoulevoCommand {
 
     @InjectProperty(IPluginManager_id)
     pluginManager!: IPluginManager;

@@ -1,8 +1,8 @@
 
 //
-// Interface for a command.
+// Interface for a Doulevo command.
 //
-export interface ICommand {
+export interface IDoulevoCommand {
 
     //
     // Invokes the command.
@@ -11,9 +11,9 @@ export interface ICommand {
 }
 
 //
-// Describes a command.
+// Describes a Doulevo command.
 //
-export interface ICommandDesc {
+export interface IDoulevoCommandDesc {
 
     //
     // The name of the command.

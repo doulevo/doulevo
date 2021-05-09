@@ -5,7 +5,7 @@
 import { ILog, InjectableClass, InjectProperty } from "@codecapers/fusion";
 import { IEnvironment, IEnvironment_id } from "./services/environment";
 import { ILog_id } from "./services/log";
-import { ICommand } from "./lib/command";
+import { IDoulevoCommand } from "./lib/doulevo-command";
 import { IConfiguration, IConfiguration_id } from "./services/configuration";
 import { ICommandManager, ICommandManager_id } from "./services/command-manager";
 const packageInfo = require("../package.json");

@@ -1,10 +1,10 @@
 import { ILog, InjectableClass, InjectProperty } from "@codecapers/fusion";
 import { commands } from "../commands";
-import { ICommand } from "../lib/command";
+import { IDoulevoCommand } from "../lib/doulevo-command";
 import { ILog_id } from "../services/log";
 
 @InjectableClass()
-class HelpCommand implements ICommand {
+class HelpCommand implements IDoulevoCommand {
 
     @InjectProperty(ILog_id)
     log!: ILog;

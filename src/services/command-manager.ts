@@ -5,7 +5,7 @@
 import { InjectableSingleton, InjectProperty } from "@codecapers/fusion";
 import { ILog, ILog_id } from "./log";
 
-import { ICommand } from "../lib/command";
+import { IDoulevoCommand } from "../lib/doulevo-command";
 import { commands } from "../commands";
 
 
@@ -42,7 +42,7 @@ class CommandManager implements ICommandManager {
         if (Command === undefined) {
             throw new Error(`Unexpected command ${cmd}`);
         }
-        const command: ICommand = new Command();
+        const command: IDoulevoCommand = new Command();
         await command.invoke();
     }
 }

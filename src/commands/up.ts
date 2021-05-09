@@ -1,5 +1,5 @@
 import { InjectableClass, InjectProperty } from "@codecapers/fusion";
-import { ICommand } from "../lib/command";
+import { IDoulevoCommand } from "../lib/doulevo-command";
 import { joinPath } from "../lib/join-path";
 import { IDocker, IDocker_id } from "../plugins/docker";
 import { IConfiguration_id, IConfiguration } from "../services/configuration";
@@ -9,7 +9,7 @@ import { Project } from "../lib/project";
 import { Plugin } from "../lib/plugin";
 
 @InjectableClass()
-export class UpCommand implements ICommand {
+export class UpCommand implements IDoulevoCommand {
 
     @InjectProperty(IEnvironment_id)
     environment!: IEnvironment;

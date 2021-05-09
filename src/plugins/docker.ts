@@ -3,7 +3,6 @@
 //
 
 import { InjectableSingleton, InjectProperty } from "@codecapers/fusion";
-import { runCmd } from "../lib/run-cmd";
 import { IConfiguration, IConfiguration_id } from "../services/configuration";
 import { IProject } from "../lib/project";
 import { ITemplateManager, ITemplateManager_id } from "../services/template-manager";
@@ -11,6 +10,7 @@ import { joinPath } from "../lib/join-path";
 import * as path from "path";
 import { IPlugin } from "../lib/plugin";
 import { ILog_id, ILog } from "../services/log";
+import { IRunCmd, IRunCmd_id } from "../services/run-cmd";
 
 export const IDocker_id = "IDocker"
 
@@ -48,6 +48,9 @@ export class Docker implements IDocker {
 
     @InjectProperty(ILog_id)
     log!: ILog;
+
+    @InjectProperty(IRunCmd_id)
+    runCmd!: IRunCmd;
 
     //
     // Gets the tag that can identify the image build for a project.
@@ -107,7 +110,7 @@ export class Docker implements IDocker {
         const projectTag = this.getProjectTag(project);
         const projectPath = project.getPath();
         const isDebug = this.configuration.getArg<boolean>("debug") || false;
-        await runCmd(
+        await this.runCmd.invoke(
             `docker build ${projectPath} --tag=${projectTag}:${mode} ${tagArgs} -f -`, 
             { 
                 stdin: dockerFileContent, 
@@ -156,8 +159,10 @@ export class Docker implements IDocker {
             })
             .join(" ");
 
+        
+
         const isDebug = this.configuration.getArg<boolean>("debug") || false;
-        await runCmd(
+        await this.runCmd.invoke(
             `docker run ${sharedVolumes} ${this.getProjectTag(project)}:${mode}`, 
             { 
                 showCommand: isDebug,
@@ -174,7 +179,7 @@ export class Docker implements IDocker {
     // List Docker images on the system.
     //
     async listImages(): Promise<any[]> {
-        const result = await runCmd(`docker image ls  --format "{{json . }}"`, { showOutput: this.configuration.getArg("debug") });
+        const result = await this.runCmd.invoke(`docker image ls  --format "{{json . }}"`, { showOutput: this.configuration.getArg("debug") });
         const output = result.stdout; 
         
         // Convert semi-JSON output to proper JSON.
@@ -186,6 +191,6 @@ export class Docker implements IDocker {
     // Removes an image.
     //
     async removeImage(imageId: string): Promise<void> {
-        await runCmd(`docker image rm ${imageId} --force`);
+        await this.runCmd.invoke(`docker image rm ${imageId} --force`);
     }
 } 

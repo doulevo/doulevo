@@ -45,24 +45,24 @@ Some commands for testing...
 ### Creawting a project with a local plugin
 
 ```bash
-npx ts-node src/index.ts create test-project --force --local-plugin=./test-plugin
+npx ts-node src/index.ts create test-project --force --local-plugin=./test-plugin --debug
 ```
 
 ### Creating a project with a remote plugin
 
 ```bash
-npx ts-node src/index.ts create test-project --force --plugin-url=https://github.com/doulevo/plugin-nodejs.git
+npx ts-node src/index.ts create test-project --force --plugin-url=https://github.com/doulevo/plugin-nodejs.git --debug
 ```
 
 ### Creating a project using the default plugin for the project type
 
 ```bash
-npx ts-node src/index.ts create test-project --force --project-type=nodejs
+npx ts-node src/index.ts create test-project --force --project-type=nodejs --debug
 ```
 ### No project type specified, asks the user
 
 ```bash
-npx ts-node src/index.ts create test-project --force
+npx ts-node src/index.ts create test-project --force --debug
 ```
 
 ### Printing the version number
@@ -88,35 +88,35 @@ npx ts-node src/index.ts
 ### Building the project
 
 ```bash
-npx ts-node src/index.ts build --project=./test-project --local-plugin=./test-plugin
+npx ts-node src/index.ts build --project=./test-project --local-plugin=./test-plugin --debug
 ```
 
 Dev  mode:
 
 ```bash
-npx ts-node src/index.ts build --project=./test-project --local-plugin=./test-plugin --mode=dev
+npx ts-node src/index.ts build --project=./test-project --local-plugin=./test-plugin --mode=dev --debug
 ```
 
 Prod mode:
 
 ```bash
-npx ts-node src/index.ts build --project=./test-project --local-plugin=./test-plugin --mode=prod
+npx ts-node src/index.ts build --project=./test-project --local-plugin=./test-plugin --mode=prod --debug
 ```
 
 ### Running a project
 
 ```bash
-npx ts-node src/index.ts up --project=./test-project --local-plugin=./test-plugin
+npx ts-node src/index.ts up --project=./test-project --local-plugin=./test-plugin --debug
 ```
 
 Dev  mode:
 
 ```bash
-npx ts-node src/index.ts up --project=./test-project --local-plugin=./test-plugin --mode=dev
+npx ts-node src/index.ts up --project=./test-project --local-plugin=./test-plugin --mode=dev --debug
 ```
 
 Prod mode:
 
 ```bash
-npx ts-node src/index.ts up --project=./test-project --local-plugin=./test-plugin --mode=prod
+npx ts-node src/index.ts up --project=./test-project --local-plugin=./test-plugin --mode=prod --debug
 ```

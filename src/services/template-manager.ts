@@ -7,10 +7,10 @@ import { joinPath } from "../lib/join-path";
 import { IConfiguration, IConfiguration_id } from "./configuration";
 import { IFs, IFs_id } from "./fs";
 import { ILog, ILog_id } from "./log";
-import * as inquirer from "inquirer";
-import { exportTemplate, Template } from "inflate-template";
+import { exportTemplate } from "inflate-template";
 import * as handlebars from "handlebars";
 import { IProgressIndicator, IProgressIndicator_id } from "./progress-indicator";
+import { IQuestioner, IQuestioner_id } from "./questioner";
 
 export const ITemplateManager_id = "ITemplateManager";
 
@@ -41,6 +41,9 @@ class TemplateManager implements ITemplateManager {
 
     @InjectProperty(IProgressIndicator_id)
     progressIndicator!: IProgressIndicator;
+
+    @InjectProperty(IQuestioner_id)
+    questioner!: IQuestioner;
 
     private constructor() {
     }
@@ -106,7 +109,7 @@ class TemplateManager implements ITemplateManager {
             //
             // Ask questions required by the template.
             //
-            templateData = await inquirer.prompt(createQuestions);
+            templateData = await this.questioner.prompt(createQuestions);
         }
 
         this.log.debug("Template data:");

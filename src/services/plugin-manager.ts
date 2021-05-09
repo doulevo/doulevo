@@ -10,6 +10,7 @@ import { IConfiguration, IConfiguration_id } from "../services/configuration";
 import { ILog, ILog_id } from "./log";
 import { joinPath } from "../lib/join-path";
 import { IGit, IGit_id } from "./git";
+import { IQuestioner, IQuestioner_id } from "./questioner";
 
 export const IPluginManager_id = "IPluginManager";
 
@@ -36,6 +37,37 @@ class PluginManager implements IPluginManager {
     @InjectProperty(IGit_id)
     git!: IGit;
 
+    @InjectProperty(IQuestioner_id)
+    questioner!: IQuestioner;
+
+    //
+    // Requests the project type from the user if it's not already set in the configuration.
+    //
+    private async requestProjectType(): Promise<string> {
+        if (!this.configuration.getProjectType()) {
+            const projectTypeQuestion = {
+                type: "list",
+                name: "PROJECT_TYPE",
+                message: "Choose the type of the project (more choices comming in the future): ", 
+                choices: [ //TODO: Get choices from some kind of manifest.
+                    {
+                        name: "Node.js",
+                        value: "nodejs",
+                    },
+                ],
+            };
+
+            //
+            // Ask user for project type.
+            //
+            const answers = await this.questioner.prompt([ projectTypeQuestion ]);
+            this.configuration.setProjectType(answers.PROJECT_TYPE);
+        }
+
+        return this.configuration.getProjectType()!;
+    }
+
+
     //
     // Clones or updates the local version of the plugin if necessary.
     //
@@ -57,7 +89,7 @@ class PluginManager implements IPluginManager {
                     //
                     // Get the project type, request it from the user it not specified in the configuration.
                     //
-                    const projectType = await this.configuration.requestProjectType();
+                    const projectType = await this.requestProjectType();
                     pluginUrl = `https://github.com/doulevo/plugin-${projectType}.git`;
                     this.configuration.setPluginUrl(pluginUrl);
                 }

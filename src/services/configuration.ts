@@ -3,9 +3,7 @@
 //
 
 import { InjectableClass } from "@codecapers/fusion";
-import * as inquirer from "inquirer";
 import { joinPath } from "../lib/join-path";
-import * as fs from "fs-extra";
 
 export const IConfiguration_id = "IConfiguration";
 
@@ -44,10 +42,10 @@ export interface IConfiguration {
     getProjectType(): string | undefined;
 
     //
-    // Requests the project type from the user if it's not already set in the configuration.
+    // Sets the type of the project.
     //
-    requestProjectType(): Promise<string>;
-    
+    setProjectType(projectType: string): void;
+
     //
     // The URL for the plugin, if specified.
     //
@@ -170,30 +168,10 @@ export class Configuration implements IConfiguration {
     }
 
     //
-    // Requests the project type from the user if it's not already set in the configuration.
+    // Sets the type of the project.
     //
-    async requestProjectType(): Promise<string> {
-        if (!this.getProjectType()) {
-            const projectTypeQuestion = {
-                type: "list",
-                name: "PROJECT_TYPE",
-                message: "Choose the type of the project (more choices comming in the future): ", 
-                choices: [ //TODO: Get choices from some kind of manifest.
-                    {
-                        name: "Node.js",
-                        value: "nodejs",
-                    },
-                ],
-            };
-
-            //
-            // Ask user for project type.
-            //
-            const answers = await inquirer.prompt([ projectTypeQuestion ]);
-            this.projectType = answers.PROJECT_TYPE;
-        }
-
-        return this.projectType!;
+    setProjectType(projectType: string): void {
+        this.projectType = projectType;
     }
 
     //
@@ -210,7 +188,7 @@ export class Configuration implements IConfiguration {
     //
     // Set the URL for the plugin.
     //
-    setPluginUrl(pluginUrl: string): void {
+    setPluginUrl(pluginUrl: string): void { //fio:
         this.pluginUrl = pluginUrl;
     }
 
@@ -228,7 +206,7 @@ export class Configuration implements IConfiguration {
     //
     // Sets the local path to the plugin.
     //
-    setLocalPluginPath(localPluginPath: string): void {
+    setLocalPluginPath(localPluginPath: string): void { //fio:
         this.localPluginPath = localPluginPath;
     }
 
@@ -246,7 +224,7 @@ export class Configuration implements IConfiguration {
     //
     // Gets the plugin path relative to the plugins directory (or pull path if the plugin is loaded from elsewhere).
     //
-    setRelativePluginPath(relativePluginPath: string): void {
+    setRelativePluginPath(relativePluginPath: string): void { //fio:
         this.relativePluginPath = relativePluginPath;
     }
 

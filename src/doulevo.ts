@@ -8,6 +8,7 @@ import { ILog_id } from "./services/log";
 import { IDoulevoCommand } from "./lib/doulevo-command";
 import { IConfiguration, IConfiguration_id } from "./services/configuration";
 import { ICommandManager, ICommandManager_id } from "./services/command-manager";
+import { IDetectInterrupt, IDetectInterrupt_id } from "./services/detect-interrupt";
 const packageInfo = require("../package.json");
 
 @InjectableClass()
@@ -24,6 +25,9 @@ export class Doulevo {
 
     @InjectProperty(ICommandManager_id)
     commandManager!: ICommandManager;
+
+    @InjectProperty(IDetectInterrupt_id)
+    detectInterrupt!: IDetectInterrupt;
 
     async invoke(): Promise<void> {
         
@@ -47,5 +51,7 @@ export class Doulevo {
         this.configuration.consumeMainCommand(); 
 
         await this.commandManager.invokeCommand(cmd);
+
+        await this.detectInterrupt.close();
     }
 }

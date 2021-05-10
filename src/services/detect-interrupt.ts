@@ -13,6 +13,11 @@ export type InterruptHandler = () => Promise<boolean>;
 export interface IDetectInterrupt {
 
     //
+    // Shutdown the interrupt handler.
+    //
+    close(): void;
+
+    //
     // Pushs an interrupt handler.
     //
     pushHandler(handler: InterruptHandler): void;
@@ -30,6 +35,11 @@ export class DetectInterrupt implements IDetectInterrupt {
     // Stack of interrupt handlers.
     //
     private handlers: InterruptHandler[] = [];
+
+    //
+    // Read input line by line.
+    //
+    private readline?: readline.Interface;
     
     private constructor() {
         //
@@ -37,12 +47,12 @@ export class DetectInterrupt implements IDetectInterrupt {
         // https://stackoverflow.com/a/14861513/25868
         //
         if (process.platform === "win32") {
-            const rl = readline.createInterface({
+            this.readline = readline.createInterface({
                 input: process.stdin,
                 output: process.stdout
             });
           
-            rl.on("SIGINT", () => {
+            this.readline.on("SIGINT", () => {
                 (process.emit as any)("SIGINT");
             });
         }
@@ -50,6 +60,16 @@ export class DetectInterrupt implements IDetectInterrupt {
         process.on("SIGINT", () =>  {
             this.invokeHandlers();
         });
+    }
+
+    //
+    // Shutdown the interrupt handler.
+    //
+    close(): void {
+        if (this.readline) {
+            this.readline.close();
+            this.readline = undefined;
+        }  
     }
 
     //

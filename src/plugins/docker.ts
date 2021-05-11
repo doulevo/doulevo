@@ -133,13 +133,10 @@ export class Docker implements IDocker {
         const tagArgs = tags.map(tag => `--tag=${tag}`).join(" ") || "";
         const projectTag = this.getProjectTag(project);
         const projectPath = project.getPath();
-        const isDebug = this.configuration.getArg<boolean>("debug") || false;
         await this.exec.invoke(
             `docker build ${projectPath} --tag=${projectTag} ${tagArgs} -f -`, 
             { 
                 stdin: dockerFileContent, 
-                showCommand: isDebug,
-                showOutput: isDebug,
             }
         );
 
@@ -201,14 +198,8 @@ export class Docker implements IDocker {
         let runResult: ICommandResult;
 
         try {
-            const isDebug = this.configuration.getArg<boolean>("debug") || false;
             runResult = await this.exec.invoke(
-                `docker run -d ${sharedVolumes} ${this.getProjectTag(project)}`, 
-                { 
-                    showCommand: isDebug,
-                    showOutput: isDebug,
-                }
-            );
+                `docker run -d ${sharedVolumes} ${this.getProjectTag(project)}`);
         }
         finally {
             this.progressIndicator.succeed("Container was started.");
@@ -281,7 +272,7 @@ export class Docker implements IDocker {
     // List Docker images on the system.
     //
     async listImages(): Promise<any[]> {
-        const result = await this.exec.invoke(`docker image ls  --format "{{json . }}"`, { showOutput: this.configuration.getArg("debug") });
+        const result = await this.exec.invoke(`docker image ls  --format "{{json . }}"`);
         const output = result.stdout; 
         
         // Convert semi-JSON output to proper JSON.
@@ -293,7 +284,7 @@ export class Docker implements IDocker {
     // List Docker containers on the system.
     //
     async listContainers(): Promise<any[]> {
-        const result = await this.exec.invoke(`docker ps --format "{{json . }}"`, { showOutput: this.configuration.getArg("debug") });
+        const result = await this.exec.invoke(`docker ps --format "{{json . }}"`);
         const output = result.stdout; 
         
         // Convert semi-JSON output to proper JSON.

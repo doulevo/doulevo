@@ -5,6 +5,7 @@
 import { InjectableClass, InjectProperty } from "@codecapers/fusion";
 import { exec, ExecOptions } from "child_process";
 import * as stream from "stream";
+import { IConfiguration, IConfiguration_id } from "../services/configuration";
 import { IDetectInterrupt, IDetectInterrupt_id } from "../services/detect-interrupt";
 
 export interface ICommandOptions extends ExecOptions {
@@ -61,6 +62,9 @@ export class Command implements ICommand {
     @InjectProperty(IDetectInterrupt_id)
     detectInterrupt!: IDetectInterrupt;
 
+    @InjectProperty(IConfiguration_id)
+    configuration!: IConfiguration;
+
     //
     // The command to execute.
     //
@@ -81,7 +85,7 @@ export class Command implements ICommand {
     //
     exec(): Promise<ICommandResult> {
         return new Promise<ICommandResult>((resolve, reject) => {
-            if (this.options.showCommand) {
+            if (this.options.showCommand || this.configuration.isDebug()) {
                 console.log(`CMD: ${this.cmd}`);
             }
 
@@ -101,7 +105,7 @@ export class Command implements ICommand {
                 const output = data.toString();
                 stdOutput += output;
 
-                if (this.options.showOutput) {
+                if (this.options.showOutput || this.configuration.isDebug()) {
                     console.log(output);
                 }
             });
@@ -112,7 +116,7 @@ export class Command implements ICommand {
                 const output = data.toString();
                 stdError += output;
 
-                if (this.options.showOutput) {
+                if (this.options.showOutput || this.configuration.isDebug()) {
                     console.log(output);
                 }
             });
@@ -120,7 +124,7 @@ export class Command implements ICommand {
             proc.on("exit", code => {
                 this.detectInterrupt.popHandler();
 
-                if (this.options.showCommand) {
+                if (this.options.showCommand || this.configuration.isDebug()) {
                     console.log(`CMD finished: ${this.cmd}`);
                 }
 

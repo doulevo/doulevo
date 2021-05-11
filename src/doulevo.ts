@@ -30,7 +30,7 @@ export class Doulevo {
 
     async invoke(): Promise<void> {
         
-        const showInfo = this.configuration.getArg<boolean>("info") || this.configuration.getArg<boolean>("debug");
+        const showInfo = this.configuration.getArg<boolean>("info") || this.configuration.isDebug();
         if (showInfo) {
             this.configuration.info();
             this.environment.info();

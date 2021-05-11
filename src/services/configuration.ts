@@ -8,6 +8,17 @@ import { joinPath } from "../lib/join-path";
 export const IConfiguration_id = "IConfiguration";
 
 export interface IConfiguration {
+
+    
+    //
+    // Returns true if running in debug mode.
+    //
+    isDebug(): boolean;
+
+    //
+    // Returns true if running in verbose mode.
+    //
+    isVerbose(): boolean;
        
     //
     // Displays debug info about the configuration.
@@ -85,7 +96,6 @@ export interface IConfiguration {
 @InjectableClass()
 export class Configuration implements IConfiguration {
 
-    private projectPath: string | undefined; //fio: ?
     private projectType: string | undefined;
     private localPluginPath: string | undefined;
     private relativePluginPath: string | undefined;
@@ -98,6 +108,20 @@ export class Configuration implements IConfiguration {
 
     constructor(argv: any) {
         this.argv = argv;
+    }
+
+    //
+    // Returns true if running in debug mode.
+    //
+    isDebug(): boolean {
+        return this.getArg<boolean>("debug") || false;
+    }
+
+    //
+    // Returns true if running in verbose mode.
+    //
+    isVerbose(): boolean {
+        return this.getArg<boolean>("verbose") || this.isDebug();
     }
 
     //

@@ -43,8 +43,8 @@ export class Log implements ILog {
 
     constructor(argv: any) {
         this.quietMode = argv.quiet;
-        this.enableVerbose = argv.verbose;
-        this.enableVerbose = argv.debug;
+        this.enableVerbose = argv.verbose || argv.debug;
+        this.enableDebug = argv.debug;
     }
 
     //

@@ -48,10 +48,9 @@ class Git implements IGit {
     // Create a new repo.
     //
     async createNewRepo(path: string, comment: string): Promise<void> {
-        const isDebug = this.configuration.getArg<boolean>("debug") || false;
-        await this.exec.invoke(`git init`, { cwd: path, showCommand: isDebug, showOutput: isDebug });
-        await this.exec.invoke(`git add .`, { cwd: path, showCommand: isDebug, showOutput: isDebug });
-        await this.exec.invoke(`git commit -m "${comment}"`, { cwd: path, showCommand: isDebug, showOutput: isDebug });
+        await this.exec.invoke(`git init`, { cwd: path });
+        await this.exec.invoke(`git add .`, { cwd: path });
+        await this.exec.invoke(`git commit -m "${comment}"`, { cwd: path });
     }
 
 }

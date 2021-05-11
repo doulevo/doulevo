@@ -12,6 +12,8 @@ import { IPlugin } from "../lib/plugin";
 import { ILog_id, ILog } from "../services/log";
 import { IExec, IExec_id } from "../services/exec";
 import { IDetectInterrupt, IDetectInterrupt_id } from "../services/detect-interrupt";
+import { IProgressIndicator, IProgressIndicator_id } from "../services/progress-indicator";
+import { ICommandResult } from "../lib/command";
 
 export const IDocker_id = "IDocker"
 
@@ -70,6 +72,9 @@ export class Docker implements IDocker {
 
     @InjectProperty(IDetectInterrupt_id)
     detectInterrupt!: IDetectInterrupt;
+
+    @InjectProperty(IProgressIndicator_id)
+    progressIndicator!: IProgressIndicator;
 
     //
     // Gets the tag that can identify the image build for a project.
@@ -161,10 +166,17 @@ export class Docker implements IDocker {
         // Setup volumes for live reload.
         //
 
-        await Promise.all([
-            this.build(project, mode, tags, plugin),
-            this.down(project, true)
-        ]);
+        this.progressIndicator.start("Building...");
+
+        try {
+            await Promise.all([
+                this.build(project, mode, tags, plugin),
+                this.down(project, true)
+            ]);
+        }
+        finally {
+            this.progressIndicator.stop();
+        }
 
         let sharedVolumes = "";
 
@@ -184,17 +196,26 @@ export class Docker implements IDocker {
                 .join(" ");
         }
 
-        const isDebug = this.configuration.getArg<boolean>("debug") || false;
-        const runResult = await this.exec.invoke(
-            `docker run -d ${sharedVolumes} ${this.getProjectTag(project)}`, 
-            { 
-                showCommand: isDebug,
-                showOutput: true,
-            }
-        );
+        this.progressIndicator.start("Starting container...");
+
+        let runResult: ICommandResult;
+
+        try {
+            const isDebug = this.configuration.getArg<boolean>("debug") || false;
+            runResult = await this.exec.invoke(
+                `docker run -d ${sharedVolumes} ${this.getProjectTag(project)}`, 
+                { 
+                    showCommand: isDebug,
+                    showOutput: isDebug,
+                }
+            );
+        }
+        finally {
+            this.progressIndicator.succeed("Container was started.");
+        }
 
         const containerId = runResult.stdout.trim();
-        this.log.verbose(`Container ID: ${containerId}`);
+        this.log.info(`Container ID: ${containerId}`);
 
         if (!isDetached) {
             this.detectInterrupt.pushHandler(async () => {

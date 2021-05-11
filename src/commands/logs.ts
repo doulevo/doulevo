@@ -9,7 +9,7 @@ import { Project } from "../lib/project";
 import { Plugin } from "../lib/plugin";
 
 @InjectableClass()
-export class DownCommand implements IDoulevoCommand {
+export class LogsCommand implements IDoulevoCommand {
 
     @InjectProperty(IEnvironment_id)
     environment!: IEnvironment;
@@ -43,17 +43,17 @@ export class DownCommand implements IDoulevoCommand {
             throw new Error(`--mode can only be either "dev" or "prod".`);
         }
 
+        const follow = this.configuration.getArg<boolean>("f") || this.configuration.getArg<boolean>("follow") || false;
+
         //
-        // Do the build.
+        // Show logs.
         //
-        // TODO: Choose the current build plugin (eg "build/docker") based on project configuration.
-        //
-        await this.docker.down(project, false);
+        await this.docker.logs(project, follow);
     }
 }
 
 export default {
-    name: "down",
-    description: "Stops the container for the project in the working directory (or the directory specified byx --project=<path>).",
-    constructor: DownCommand,
+    name: "logs",
+    description: "Shows logs from the container for the project in the working directory (or the directory specified byx --project=<path>).",
+    constructor: LogsCommand,
 };

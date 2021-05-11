@@ -120,3 +120,27 @@ Prod mode:
 ```bash
 npx ts-node src/index.ts up --project=./test-project --local-plugin=./test-plugin --mode=prod --debug
 ```
+
+Detached:
+
+```bash
+npx ts-node src/index.ts up -d --project=./test-project --local-plugin=./test-plugin --debug
+```
+
+### Stoping a project
+
+```bash
+npx ts-node src/index.ts down --project=./test-project --local-plugin=./test-plugin --debug
+```
+
+### Viewing logs
+
+```bash
+npx ts-node src/index.ts logs --project=./test-project --local-plugin=./test-plugin --debug
+```
+
+Follow:
+
+```bash
+npx ts-node src/index.ts logs --follow --project=./test-project --local-plugin=./test-plugin --debug
+```

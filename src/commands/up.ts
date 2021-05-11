@@ -48,7 +48,7 @@ export class UpCommand implements IDoulevoCommand {
         //
         const tags = this.configuration.getArrayArg("tag");
 
-        //todo: automatically update the plugin!
+        const isDetached = this.configuration.getArg<boolean>("d") || this.configuration.getArg<boolean>("detached") || false;
 
         //
         // Load the plugin for this project.
@@ -66,7 +66,7 @@ export class UpCommand implements IDoulevoCommand {
         //
         // TODO: Choose the current build plugin (eg "build/docker") based on project configuration.
         //
-        await this.docker.up(project, mode, tags, plugin);
+        await this.docker.up(project, mode, tags, plugin, isDetached);
     }
 }
 

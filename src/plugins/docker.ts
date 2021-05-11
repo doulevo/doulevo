@@ -11,6 +11,7 @@ import * as path from "path";
 import { IPlugin } from "../lib/plugin";
 import { ILog_id, ILog } from "../services/log";
 import { IExec, IExec_id } from "../services/exec";
+import { IDetectInterrupt, IDetectInterrupt_id } from "../services/detect-interrupt";
 
 export const IDocker_id = "IDocker"
 
@@ -24,12 +25,27 @@ export interface IDocker {
     //
     // Builds and runs the requested project.
     //
-    up(project: IProject, mode: "dev" | "prod", tags: string[], plugin: IPlugin): Promise<void>;
+    up(project: IProject, mode: "dev" | "prod", tags: string[], plugin: IPlugin, isDetached: boolean): Promise<void>;
+
+    //
+    // Stops the container for the current project.
+    //
+    down(project: IProject, quiet: boolean): Promise<void>;
+
+    //
+    // Show logs for the project.
+    //
+    logs(project: IProject, follow: boolean): Promise<void>;
 
     //
     // List Docker images on the system.
     //
     listImages(): Promise<any[]>;
+
+    //
+    // List Docker containers on the system.
+    //
+    listContainers(): Promise<any[]>;
 
     //
     // Removes an image.
@@ -52,13 +68,16 @@ export class Docker implements IDocker {
     @InjectProperty(IExec_id)
     exec!: IExec;
 
+    @InjectProperty(IDetectInterrupt_id)
+    detectInterrupt!: IDetectInterrupt;
+
     //
     // Gets the tag that can identify the image build for a project.
     //
     private getProjectTag(project: IProject): string {
         //todo: Possibly also include application name (or that could be a separate tag).
         //      Or maybe use the projects UUID.
-        return project.getName();
+        return `${project.getName()}:local`;
     }
 
     //
@@ -111,7 +130,7 @@ export class Docker implements IDocker {
         const projectPath = project.getPath();
         const isDebug = this.configuration.getArg<boolean>("debug") || false;
         await this.exec.invoke(
-            `docker build ${projectPath} --tag=${projectTag}:${mode} ${tagArgs} -f -`, 
+            `docker build ${projectPath} --tag=${projectTag} ${tagArgs} -f -`, 
             { 
                 stdin: dockerFileContent, 
                 showCommand: isDebug,
@@ -131,7 +150,7 @@ export class Docker implements IDocker {
     //
     // Builds and runs the requested project.
     //
-    async up(project: IProject, mode: "dev" | "prod", tags: string[], plugin: IPlugin): Promise<void> {
+    async up(project: IProject, mode: "dev" | "prod", tags: string[], plugin: IPlugin, isDetached: boolean): Promise<void> {
 
         //
         //  generate the docker command line parameters
@@ -142,11 +161,10 @@ export class Docker implements IDocker {
         // Setup volumes for live reload.
         //
 
-        await this.build(project, mode, tags, plugin);
-
-        //TODO: Support detached mode.
-
-        //TODO: Share the npm cache directory.
+        await Promise.all([
+            this.build(project, mode, tags, plugin),
+            this.down(project, true)
+        ]);
 
         const sharedDirectories = plugin.getSharedDirectories(); //todo: dev only
         this.log.verbose("Sharing directories:");
@@ -159,22 +177,69 @@ export class Docker implements IDocker {
             })
             .join(" ");
 
-        
-
         const isDebug = this.configuration.getArg<boolean>("debug") || false;
-        await this.exec.invoke(
-            `docker run ${sharedVolumes} ${this.getProjectTag(project)}:${mode}`, 
+        const runResult = await this.exec.invoke(
+            `docker run -d ${sharedVolumes} ${this.getProjectTag(project)}`, 
             { 
                 showCommand: isDebug,
                 showOutput: true,
             }
         );
 
-        //todo: kill/remove the container on ctrl c. when runnning in attached mode.
+        const containerId = runResult.stdout.trim();
+        this.log.verbose(`Container ID: ${containerId}`);
+
+        if (!isDetached) {
+            this.detectInterrupt.pushHandler(async () => {
+                this.log.verbose(`Stoppping and removing container ${containerId}.`);
+                await this.exec.invoke(`docker stop ${containerId}`);
+                await this.exec.invoke(`docker rm ${containerId}`);
+                return true;
+            });
+
+            try {
+                await this.logs(project, true);
+            }
+            finally {
+                this.detectInterrupt.popHandler();
+            }
+        }       
     }
 
-    async down(): Promise<void> {
-        // todo:
+    //
+    // Stops the container for the current project.
+    //
+    async down(project: IProject, quiet: boolean): Promise<void> {
+        const containers = await this.listProjectContainers(project);
+        if (containers.length > 0) {
+            if (!quiet) {
+                this.log.verbose(`Killing containers:`);
+                for (const container of containers) {
+                    this.log.verbose(`    ${container.ID}`);
+                }
+            }
+                
+            await Promise.all(containers.map(container => this.exec.invoke(`docker stop ${container.ID}`)));
+            await Promise.all(containers.map(container => this.exec.invoke(`docker rm ${container.ID}`)));
+        }
+        else {
+            if (!quiet) {
+                this.log.info("Not running.");
+            }
+        }
+    }
+
+    //
+    // Show logs for the project.
+    //
+    async logs(project: IProject, follow: boolean): Promise<void> {
+        const containerId = await this.findContainerId(project);
+        if (containerId) {
+            await this.exec.invoke(`docker logs ${containerId} ${follow ? "--follow" : ""}`, { showOutput: true })
+        }
+        else {
+            this.log.info(`Not running.`);
+        }
     }
 
     //
@@ -187,6 +252,43 @@ export class Docker implements IDocker {
         // Convert semi-JSON output to proper JSON.
         const formattedJson = `[ ${output.split("\n").map(line => line.trim()).filter(line => line.length > 0).join(", ")} ]`;
         return JSON.parse(formattedJson );
+    }
+
+    //
+    // List Docker containers on the system.
+    //
+    async listContainers(): Promise<any[]> {
+        const result = await this.exec.invoke(`docker ps --format "{{json . }}"`, { showOutput: this.configuration.getArg("debug") });
+        const output = result.stdout; 
+        
+        // Convert semi-JSON output to proper JSON.
+        const formattedJson = `[ ${output.split("\n").map(line => line.trim()).filter(line => line.length > 0).join(", ")} ]`;
+        return JSON.parse(formattedJson );
+    }
+
+    //
+    // List any containers running for this project.
+    //
+    private async listProjectContainers(project: IProject): Promise<any[]> {
+        const containers = await this.listContainers();
+        const matchingContainers = containers.filter(container => container.Image === this.getProjectTag(project));
+        return matchingContainers;
+    }
+
+    //
+    // Find the container ID for hte project.
+    //
+    private async findContainerId(project: IProject): Promise<string | undefined> {
+        const containers = await this.listProjectContainers(project);
+        if (containers.length > 1) {
+            throw new Error(`Something went wrong, found ${containers.length} for image ${this.getProjectTag(project)}`);
+        }
+
+        if (containers.length === 1) {
+            return containers[0].ID;
+        }
+
+        return undefined;
     }
 
     //

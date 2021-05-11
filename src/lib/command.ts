@@ -59,7 +59,7 @@ export interface ICommand {
 export class Command implements ICommand {
 
     @InjectProperty(IDetectInterrupt_id)
-    detectIterrupt!: IDetectInterrupt;
+    detectInterrupt!: IDetectInterrupt;
 
     //
     // The command to execute.
@@ -89,7 +89,7 @@ export class Command implements ICommand {
 
             const proc = exec(this.cmd, this.options);
 
-            this.detectIterrupt.pushHandler(async () => {
+            this.detectInterrupt.pushHandler(async () => {
                 proc.kill("SIGINT");
                 didTerminate = true;
                 return true; // Allow process termination.
@@ -118,7 +118,7 @@ export class Command implements ICommand {
             });
 
             proc.on("exit", code => {
-                this.detectIterrupt.popHandler();
+                this.detectInterrupt.popHandler();
 
                 if (this.options.showCommand) {
                     console.log(`CMD finished: ${this.cmd}`);

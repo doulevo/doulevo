@@ -1,4 +1,4 @@
-import { InjectableClass, InjectProperty } from "@codecapers/fusion";
+import { ILog, InjectableClass, InjectProperty } from "@codecapers/fusion";
 import { IDoulevoCommand } from "../lib/doulevo-command";
 import { joinPath } from "../lib/join-path";
 import { IDocker, IDocker_id } from "../plugins/docker";
@@ -8,6 +8,7 @@ import { IFs, IFs_id } from "../services/fs";
 import { Project } from "../lib/project";
 import { Plugin } from "../lib/plugin";
 import { IProgressIndicator, IProgressIndicator_id } from "../services/progress-indicator";
+import { ILog_id } from "../services/log";
 
 @InjectableClass()
 export class BuildCommand implements IDoulevoCommand {
@@ -26,6 +27,9 @@ export class BuildCommand implements IDoulevoCommand {
 
     @InjectProperty(IProgressIndicator_id)
     progressIndicator!: IProgressIndicator;
+
+    @InjectProperty(ILog_id)
+    log!: ILog;
 
     async invoke(): Promise<void> {
 
@@ -77,8 +81,13 @@ export class BuildCommand implements IDoulevoCommand {
         }
         catch (err) {
             this.progressIndicator.fail("Building failed.");
-            //TODO: Now display errors that occured.
             throw err;
+        }
+
+        const images = await this.docker.listProjectImages(project, mode);
+        this.log.info(`Created images:`);
+        for (const image of images) {
+            this.log.info(`    ${image.ID} ${image.Repository}:${image.Tag} ${image.Size}`);
         }
     }
 }

@@ -50,6 +50,16 @@ export interface IDocker {
     listContainers(): Promise<any[]>;
 
     //
+    // List images for this project.
+    //
+    listProjectImages(project: IProject, mode: "dev" | "prod"): Promise<any[]>;
+
+    //
+    // List any containers running for this project.
+    //
+    listProjectContainers(project: IProject): Promise<any[]>;
+
+    //
     // Removes an image.
     //
     removeImage(imageId: string): Promise<void>;
@@ -77,12 +87,19 @@ export class Docker implements IDocker {
     progressIndicator!: IProgressIndicator;
 
     //
-    // Gets the tag that can identify the image build for a project.
+    // Gets the name of the repository for the project.
     //
-    private getProjectTag(project: IProject): string {
+    private getProjectRespository(project: IProject): string {
         //todo: Possibly also include application name (or that could be a separate tag).
         //      Or maybe use the projects UUID.
-        return `${project.getName()}:local`;
+        return project.getName();
+    }
+
+    //
+    // Gets the tag that can identify the image build for a project.
+    //
+    private getProjectTag(project: IProject, mode: "dev" | "prod"): string {
+        return `${this.getProjectRespository(project)}:${mode}`;
     }
 
     //
@@ -131,7 +148,7 @@ export class Docker implements IDocker {
 
         //TODO: Ultimately need a way to allocation a version number.
         const tagArgs = tags.map(tag => `--tag=${tag}`).join(" ") || "";
-        const projectTag = this.getProjectTag(project);
+        const projectTag = this.getProjectTag(project, mode);
         const projectPath = project.getPath();
         await this.exec.invoke(
             `docker build ${projectPath} --tag=${projectTag} ${tagArgs} -f -`, 
@@ -199,7 +216,7 @@ export class Docker implements IDocker {
 
         try {
             runResult = await this.exec.invoke(
-                `docker run -d ${sharedVolumes} ${this.getProjectTag(project)}`);
+                `docker run -d ${sharedVolumes} ${this.getProjectTag(project, mode)}`);
         }
         finally {
             this.progressIndicator.succeed("Container was started.");
@@ -281,6 +298,15 @@ export class Docker implements IDocker {
     }
 
     //
+    // List images for this project.
+    //
+    async listProjectImages(project: IProject, mode: "dev" | "prod"): Promise<any[]> {
+        const images = await this.listImages();
+        const matchingImages = images.filter(image => image.Repository === this.getProjectRespository(project) && image.Tag === mode);
+        return matchingImages;
+    }
+
+    //
     // List Docker containers on the system.
     //
     async listContainers(): Promise<any[]> {
@@ -295,9 +321,9 @@ export class Docker implements IDocker {
     //
     // List any containers running for this project.
     //
-    private async listProjectContainers(project: IProject): Promise<any[]> {
+    async listProjectContainers(project: IProject): Promise<any[]> {
         const containers = await this.listContainers();
-        const matchingContainers = containers.filter(container => container.Image === this.getProjectTag(project));
+        const matchingContainers = containers.filter(container => container.Image.startsWith(this.getProjectRespository(project)));
         return matchingContainers;
     }
 
@@ -307,7 +333,7 @@ export class Docker implements IDocker {
     private async findContainerId(project: IProject): Promise<string | undefined> {
         const containers = await this.listProjectContainers(project);
         if (containers.length > 1) {
-            throw new Error(`Something went wrong, found ${containers.length} for image ${this.getProjectTag(project)}`);
+            throw new Error(`Something went wrong, found ${containers.length} for images ${this.getProjectRespository(project)}`);
         }
 
         if (containers.length === 1) {

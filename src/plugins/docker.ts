@@ -246,9 +246,16 @@ export class Docker implements IDocker {
                     this.log.verbose(`    ${container.ID}`);
                 }
             }
-                
-            await Promise.all(containers.map(container => this.exec.invoke(`docker stop ${container.ID}`)));
-            await Promise.all(containers.map(container => this.exec.invoke(`docker rm ${container.ID}`)));
+              
+            this.progressIndicator.start("Stopping containers...");
+
+            try {
+                await Promise.all(containers.map(container => this.exec.invoke(`docker stop ${container.ID}`)));
+                await Promise.all(containers.map(container => this.exec.invoke(`docker rm ${container.ID}`)));
+            }
+            finally {
+                this.progressIndicator.succeed("Stopped containers.");
+            }
         }
         else {
             if (!quiet) {

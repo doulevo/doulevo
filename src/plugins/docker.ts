@@ -166,16 +166,23 @@ export class Docker implements IDocker {
             this.down(project, true)
         ]);
 
-        const sharedDirectories = plugin.getSharedDirectories(); //todo: dev only
-        this.log.verbose("Sharing directories:");
-        this.log.verbose(JSON.stringify(sharedDirectories, null, 4));
+        let sharedVolumes = "";
 
-        const projectPath = path.resolve(project.getPath());
-        const sharedVolumes = sharedDirectories
-            .map(sharedPath => {
-                return `-v ${joinPath(projectPath, sharedPath.host)}:${sharedPath.container}:z`;
-            })
-            .join(" ");
+        if (mode === "dev") {
+            //
+            // When running in dev mode, share code into the container.
+            //
+            const sharedDirectories = plugin.getSharedDirectories();
+            this.log.verbose("Sharing directories:");
+            this.log.verbose(JSON.stringify(sharedDirectories, null, 4));
+    
+            const projectPath = path.resolve(project.getPath());
+            sharedVolumes = sharedDirectories
+                .map(sharedPath => {
+                    return `-v ${joinPath(projectPath, sharedPath.host)}:${sharedPath.container}:z`;
+                })
+                .join(" ");
+        }
 
         const isDebug = this.configuration.getArg<boolean>("debug") || false;
         const runResult = await this.exec.invoke(

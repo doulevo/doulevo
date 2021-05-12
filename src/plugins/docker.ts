@@ -14,6 +14,7 @@ import { IExec, IExec_id } from "../services/exec";
 import { IDetectInterrupt, IDetectInterrupt_id } from "../services/detect-interrupt";
 import { IProgressIndicator, IProgressIndicator_id } from "../services/progress-indicator";
 import { ICommandResult } from "../lib/command";
+const AsciiTable = require('../lib/ascii-table');
 
 export const IDocker_id = "IDocker"
 
@@ -38,6 +39,11 @@ export interface IDocker {
     // Show logs for the project.
     //
     logs(project: IProject, follow: boolean): Promise<void>;
+
+    //
+    // Show containers for the project.
+    //
+    ps(project: IProject): Promise<void>;
 
     //
     // List Docker images on the system.
@@ -283,6 +289,30 @@ export class Docker implements IDocker {
         else {
             this.log.info(`Not running.`);
         }
+    }
+
+
+    //
+    // Show containers for the project.
+    //
+    async ps(project: IProject): Promise<void> {
+        const containers = await this.listProjectContainers(project);
+
+        const table = new AsciiTable()
+        table
+            // .setBorder("", "", "", "")
+            .removeBorder()
+            .setAlign(0, AsciiTable.LEFT)
+            .setAlign(1, AsciiTable.LEFT)
+            .setAlign(2, AsciiTable.LEFT)
+            .setHeadingAlign(AsciiTable.LEFT)
+            .setHeading('Container', 'Image', 'Status');
+
+        for (const container of containers) {
+            table.addRow(container.ID, container.Image, container.Status);
+        }
+    
+        this.log.info(table.toString());
     }
 
     //

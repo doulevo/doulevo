@@ -144,3 +144,9 @@ Follow:
 ```bash
 npx ts-node src/index.ts logs --follow --project=./test-project --local-plugin=./test-plugin --debug
 ```
+
+### Viewing containers for the project
+
+```bash
+npx ts-node src/index.ts ps --project=./test-project --local-plugin=./test-plugin --debug
+```

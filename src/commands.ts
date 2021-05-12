@@ -9,6 +9,7 @@ import buildCommand from "./commands/build";
 import upCommand from "./commands/up";
 import downCommand from "./commands/down";
 import logsCommand from "./commands/logs";
+import psCommand from "./commands/ps";
 
 export const commands: IDoulevoCommandDesc[] = [
     helpCommand,
@@ -17,5 +18,6 @@ export const commands: IDoulevoCommandDesc[] = [
     upCommand,
     downCommand,
     logsCommand,
+    psCommand,
 ];
 

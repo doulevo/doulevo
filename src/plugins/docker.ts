@@ -41,6 +41,11 @@ export interface IDocker {
     logs(project: IProject, follow: boolean): Promise<void>;
 
     //
+    // Show images for the project.
+    //
+    ls(project: IProject): Promise<void>;
+
+    //
     // Show containers for the project.
     //
     ps(project: IProject): Promise<void>;
@@ -58,7 +63,7 @@ export interface IDocker {
     //
     // List images for this project.
     //
-    listProjectImages(project: IProject, mode: "dev" | "prod"): Promise<any[]>;
+    listProjectImages(project: IProject, mode?: "dev" | "prod"): Promise<any[]>;
 
     //
     // List any containers running for this project.
@@ -291,6 +296,30 @@ export class Docker implements IDocker {
         }
     }
 
+    //
+    // Show images for the project.
+    //
+    async ls(project: IProject): Promise<void> {
+        const images = await this.listProjectImages(project);
+
+        const table = new AsciiTable()
+        table
+            // .setBorder("", "", "", "")
+            .removeBorder()
+            .setAlign(0, AsciiTable.LEFT)
+            .setAlign(1, AsciiTable.LEFT)
+            .setAlign(2, AsciiTable.LEFT)
+            .setAlign(3, AsciiTable.LEFT)
+            .setAlign(4, AsciiTable.LEFT)
+            .setHeadingAlign(AsciiTable.LEFT)
+            .setHeading('Image', 'Repository', 'Tag', "Created", "Size");
+
+        for (const image of images) {
+            table.addRow(image.ID, image.Repository, image.Tag, image.CreatedSince, image.VirtualSize);
+        }
+    
+        this.log.info(table.toString());
+    }
 
     //
     // Show containers for the project.
@@ -305,11 +334,12 @@ export class Docker implements IDocker {
             .setAlign(0, AsciiTable.LEFT)
             .setAlign(1, AsciiTable.LEFT)
             .setAlign(2, AsciiTable.LEFT)
+            .setAlign(3, AsciiTable.LEFT)
             .setHeadingAlign(AsciiTable.LEFT)
-            .setHeading('Container', 'Image', 'Status');
+            .setHeading('Container', 'Image', 'Status', "Size");
 
         for (const container of containers) {
-            table.addRow(container.ID, container.Image, container.Status);
+            table.addRow(container.ID, container.Image, container.Status, container.Size);
         }
     
         this.log.info(table.toString());
@@ -330,9 +360,19 @@ export class Docker implements IDocker {
     //
     // List images for this project.
     //
-    async listProjectImages(project: IProject, mode: "dev" | "prod"): Promise<any[]> {
+    async listProjectImages(project: IProject, mode?: "dev" | "prod"): Promise<any[]> {
         const images = await this.listImages();
-        const matchingImages = images.filter(image => image.Repository === this.getProjectRespository(project) && image.Tag === mode);
+        const matchingImages = images.filter(image => {
+            if (image.Repository !== this.getProjectRespository(project)) {
+                return false;
+            }
+
+            if (mode !== undefined && image.Tag !== mode) {
+                return false;
+            }
+
+            return true;
+        });
         return matchingImages;
     }
 

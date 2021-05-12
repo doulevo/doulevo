@@ -54,6 +54,6 @@ export class DownCommand implements IDoulevoCommand {
 
 export default {
     name: "down",
-    description: "Stops the container for the project in the working directory (or the directory specified byx --project=<path>).",
+    description: "Stops the container for the project in the working directory (or the directory specified by --project=<path>).",
     constructor: DownCommand,
 };

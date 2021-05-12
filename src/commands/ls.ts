@@ -6,10 +6,9 @@ import { IConfiguration_id, IConfiguration } from "../services/configuration";
 import { IEnvironment, IEnvironment_id } from "../services/environment";
 import { IFs, IFs_id } from "../services/fs";
 import { Project } from "../lib/project";
-import { Plugin } from "../lib/plugin";
 
 @InjectableClass()
-export class UpCommand implements IDoulevoCommand {
+export class LsCommand implements IDoulevoCommand {
 
     @InjectProperty(IEnvironment_id)
     environment!: IEnvironment;
@@ -38,40 +37,17 @@ export class UpCommand implements IDoulevoCommand {
         const configurationFile = await this.fs.readJsonFile(configurationFilePath);
         const project = new Project(projectPath, configurationFile);
 
-        const mode = this.configuration.getArg("mode") || "dev";
-        if (mode !== "prod" && mode !== "dev") {
-            throw new Error(`--mode can only be either "dev" or "prod".`);
-        }
-
-        //
-        // Tags that can identify the image.
-        //
-        const tags = this.configuration.getArrayArg("tag");
-
-        const isDetached = this.configuration.getArg<boolean>("d") || this.configuration.getArg<boolean>("detached") || false;
-
-        //
-        // Load the plugin for this project.
-        //
-        const pluginPath = project.getLocalPluginPath();
-        if (!pluginPath) {
-            throw new Error(`Failed to determine local plugin path for project!`);
-        }
-        const pluginConfigurationFilePath = joinPath(pluginPath, "plugin.json");
-        const pluginConfigurationFile = await this.fs.readJsonFile(pluginConfigurationFilePath);
-        const plugin = new Plugin(pluginPath, pluginConfigurationFile); 
-
         //
         // Do the build.
         //
         // TODO: Choose the current build plugin (eg "build/docker") based on project configuration.
         //
-        await this.docker.up(project, mode, tags, plugin, isDetached);
+        await this.docker.ls(project);
     }
 }
 
 export default {
-    name: "up",
-    description: "Builds and runs the project in the working directory (or the directory specified by --project=<path>).",
-    constructor: UpCommand,
+    name: "ls",
+    description: "View images for the project in the working directory (or the directory specified by --project=<path>).",
+    constructor: LsCommand,
 };

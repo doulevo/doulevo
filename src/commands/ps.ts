@@ -48,6 +48,6 @@ export class PsCommand implements IDoulevoCommand {
 
 export default {
     name: "ps",
-    description: "View containers for the project in the working directory (or the directory specified byx --project=<path>).",
+    description: "View containers for the project in the working directory (or the directory specified by --project=<path>).",
     constructor: PsCommand,
 };

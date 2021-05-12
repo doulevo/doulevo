@@ -54,6 +54,6 @@ export class LogsCommand implements IDoulevoCommand {
 
 export default {
     name: "logs",
-    description: "Shows logs from the container for the project in the working directory (or the directory specified byx --project=<path>).",
+    description: "Shows logs from the container for the project in the working directory (or the directory specified by --project=<path>).",
     constructor: LogsCommand,
 };

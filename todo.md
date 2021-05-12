@@ -1,19 +1,35 @@
+# Next relesae
+
+- --version
+- help command
+- Dev guide
+- User guide
+- Plugin devs guide
+- build command
+- up command
+- down command
+
 # Todo
 
-- !! Move appData to an injectable !!
+- Need a cmd to shell in!
 
-- Do a git init on new project
-- Need a interface/class for Git
+- Each command should document its arguments to provide help for that command.
+
+- Need to have the application name in the creation process.
+
+- Need "doulevo ps" to be able to find all projects in the application.
+
 - Ask more questions for project type (e.g. nodejs-javascript-express-jest)
   - How do we know what questions to ask?
     - There has to be a project type mannifest somewhere.
 
-- Starting to need some automated tests!
-    - Unit + integration
+- Need help/options for each sub command!
 
-- Automatically pull changes to template if it needs to be updated.
+- The next plugin for Doulevo should be TypeScript!
 
-- Node.js version should be an input to the create template.
+- Be great to ask what type of licence to include.
+  - This is cross plugin!!
+  - Could plugins have layers?
 
 - Better readme
   - Install / usage guide
@@ -21,14 +37,7 @@
   - Template authors guide
 
 - Better help
-  - Usage when no args
-
-- Do the first release of the exe!
-
-- Need some kind of DI!!
-  - Inject the progress bar thingy...
-  - Inject paths.
-  - Logger (verbose logging)
+  - Usage when no args / no command.
 
 - How to download a plugin?
   - Git!
@@ -43,8 +52,10 @@
   - In the app data directory.
 - Need a separate command to set the application.
 - How does backend authentication work?
+    - Can just reply on Kubectl auth for now.
 
 - How will I hash files to know if baked in files have changed?
+  - Can I get a hash from Git for a file or the whole project?
 - How do I know what the baked in files are? This will be different for dev and prod.
 
 - Use inflate-template to expand a template on disk.
@@ -52,47 +63,27 @@
   - Need to support pre compiled tempates.
   - Need to document the template creation process.
 
-- Need to make my own simple package manager module.
-  - NO. Git is perfectly suited for this.
-  - Need to be able to grab a package from the internet by URL.
-  - Unzip / untar a package.
-  - Need to be able to cache a package locally.
-  - Is there a package manager I can simply reuse?
-    - Is npm included in my node.js-based executable?
-  - https://medium.com/@sdboyer/so-you-want-to-write-a-package-manager-4ae9c17d9527
+## Soon
+
+- How do I get template data into the directory and file names? (for the Java plugin)
+- Want tests for the services!
 
 
-- a simple package manager
-    don't have package directory locally
-        if don't have zip file
-            download zip file from url
-              - https://www.npmjs.com/package/nodejs-file-downloader
-              - https://www.npmjs.com/package/turbo-downloader
-        
-        unpack zip file
-        - https://npm.io/search/keyword:unzip
-        - https://npm.io/package/decompress
-    - All I need is Git!!
+## Future
 
-# Plugins
-
-- doulevo create
-
-    - Python template
-    - JS Template
-
-
-- doulevo up
-
-    - Docker build
-      - Python
-      - Node.js
-      - etc
-
-
-- doulevo deploy
-
-    - Kubernetes deploy
-      - Python
-      - Node.js
-      - etc
+- Need a clean command to kill all images and containers.
+- Automatically update the plugin on up (and any other comnmand!)
+- Share the npm cache directory.
+- Want built in timing so I know how longer commands are taking.
+- Automatically pull changes to template if it needs to be updated.
+- Need to call home so I can tell if people are using it!
+- Create a GUID during creation?
+  - Could this be an issue for copying a project?
+- How will I deploy a database?
+  - Will it be a plugin?
+- How do I version plugins? 
+    - Could just install them to a local cache directory.
+    - Shared would be better though.
+- Be good to load json from file or std input that specifies values for questions. 
+- Need to log verbosely to a log file in the Douleveo app data directory.
+- When adding caching, need per project and per system caching. Include the content hash in the cache key. That way the cache lookup won't yield results unless the content is the same.

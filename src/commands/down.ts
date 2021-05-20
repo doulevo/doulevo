@@ -26,7 +26,7 @@ export class DownCommand implements IDoulevoCommand {
     async invoke(): Promise<void> {
 
         //
-        // The build command operates against the current working directory.
+        // The down command operates against the current working directory.
         // Or the path can be set with the --project=<path> argument.
         //
         const projectPath = this.configuration.getArg("project") || this.environment.cwd();
@@ -44,9 +44,7 @@ export class DownCommand implements IDoulevoCommand {
         }
 
         //
-        // Do the build.
-        //
-        // TODO: Choose the current build plugin (eg "build/docker") based on project configuration.
+        // Stop the container
         //
         await this.docker.down(project, false);
     }

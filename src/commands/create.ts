@@ -52,7 +52,7 @@ export class CreateCommand implements IDoulevoCommand {
                 await this.fs.remove(projectPath);
             }
             else {
-                throw new Error(`Directory already exists at ${projectPath}, please delete the existing directory if you want to create a new project here`);
+                throw new Error(`Directory already exists at ${projectPath}, please delete the existing directory, or use the --force flag if you want to create a new project here`);
             }
         }
 

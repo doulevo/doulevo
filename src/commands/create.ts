@@ -37,13 +37,34 @@ export class CreateCommand implements IDoulevoCommand {
     @InjectProperty(IProgressIndicator_id)
     progressIndicator!: IProgressIndicator;
 
+    displayHelp(): void {
+        this.log.info(`\nUsage: doulevo create [options] <project-dir>\n`);
+        this.log.info(`Creates a new Doulevo project at <project-dir>\n`);
+
+        this.log.info(`Options:`);
+
+        const optionPadding = 25;
+        this.log.info(" ".repeat(4) + "--force".padEnd(optionPadding) + "Deletes project directory if it already exists.");
+        this.log.info(" ".repeat(4) + "--local-plugin".padEnd(optionPadding) + "When set, Doulevo will create the project using the 'local' plugin from the specified location.");
+        this.log.info(" ".repeat(4) + "--plugin-url".padEnd(optionPadding) + "When set, Doulevo will create the project using the 'remote' plugin from the specified location.");
+        this.log.info(" ".repeat(4) + "--project-type".padEnd(optionPadding) + "When set, Doulevo will create the project using the default plugin for the specified project type.");
+        this.log.info(" ".repeat(4) + "--debug".padEnd(optionPadding) + "Logs command executions in the terminal.");
+        this.log.info(" ".repeat(4) + "--help".padEnd(optionPadding) + "Prints usage for this command.");
+    }
+
     async invoke(): Promise<void> {
-    
+
+        const isHelp = this.configuration.getArg<boolean>("help");
+
+        if (isHelp) {
+            return this.displayHelp();
+        }
+
         const projectDir = this.configuration.getMainCommand();
         if (!projectDir) {
             throw new Error(`Project directory not specified. Use "doulevo create <project-dir>`);
         }
-    
+
         const projectPath = joinPath(this.environment.cwd(), projectDir);
         const projectExists = await this.fs.exists(projectPath);
         if (projectExists) {
@@ -52,7 +73,7 @@ export class CreateCommand implements IDoulevoCommand {
                 await this.fs.remove(projectPath);
             }
             else {
-                throw new Error(`Directory already exists at ${projectPath}, please delete the existing directory if you want to create a new project here`);
+                throw new Error(`Directory already exists at ${projectPath}, please delete the existing directory, or use the --force flag if you want to create a new project here`);
             }
         }
 

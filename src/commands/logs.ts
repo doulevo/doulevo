@@ -26,7 +26,7 @@ export class LogsCommand implements IDoulevoCommand {
     async invoke(): Promise<void> {
 
         //
-        // The build command operates against the current working directory.
+        // The log command operates against the current working directory.
         // Or the path can be set with the --project=<path> argument.
         //
         const projectPath = this.configuration.getArg("project") || this.environment.cwd();

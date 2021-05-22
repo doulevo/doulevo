@@ -20,7 +20,7 @@ If you like the idea please star this repo.
 
 Doulevo needs your help! 
 
-Check out [the developer guide](Developer)
+Check out [the developer guide](Developer.md)
 
 Email ashley@codecapers.com.au to find out how you can help.
 
@@ -30,7 +30,7 @@ Doulevo is a work in progress, please email feedback to ashley@codecapers.com.au
 
 ## Write plugins
 
-Doulevo extensible by the community, [learn how to write a plugin](Plugin-developers-guide.md).
+Doulevo is extensible by the community, [learn how to write a plugin](Plugin-developers-guide.md).
 
 # Installation
 

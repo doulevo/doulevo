@@ -42,7 +42,7 @@ The executable is generated to `doulevo.exe` in the current directory.
 
 Some commands for testing...
 
-### Creawting a project with a local plugin
+### Creating a project with a local plugin
 
 ```bash
 npx ts-node src/index.ts create test-project --force --local-plugin=./test-plugin --debug
@@ -91,7 +91,7 @@ npx ts-node src/index.ts
 npx ts-node src/index.ts build --project=./test-project --local-plugin=./test-plugin --debug
 ```
 
-Dev  mode:
+Dev mode:
 
 ```bash
 npx ts-node src/index.ts build --project=./test-project --local-plugin=./test-plugin --mode=dev --debug

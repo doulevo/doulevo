@@ -142,7 +142,7 @@ export class Docker implements IDocker {
                 // Out of date if plugin hash has changed.
 
                 //TODO: Could delegate generation of the Dockerfile to code in the plugin if necessary.
-                dockerFileContent = await this.templateManager.expandTemplateFile(project.getData(), `docker/Dockerfile-${mode}`, "docker/Dockerfile");
+                dockerFileContent = await this.templateManager.expandTemplateFile(project, project.getData(), `docker/Dockerfile-${mode}`, "docker/Dockerfile");
                 if (!dockerFileContent) {
                     throw new Error(`Failed to find Docker template file in plugin.`);
                 }

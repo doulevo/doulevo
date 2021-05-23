@@ -52,7 +52,7 @@ describe("create", () => {
         cmd.log = mockLog;
         const mockTemplateExport = jest.fn();
         const mockTemplateManager: any = {
-            export: mockTemplateExport,
+            exportTemplate: mockTemplateExport,
         };
         cmd.templateManager = mockTemplateManager;
         const mockCreateNewRepo = jest.fn();
@@ -64,6 +64,12 @@ describe("create", () => {
             cwd: () => cwd,
         };
         cmd.environment = mockEnv;
+        const mockProgressIndicator: any = {
+            start: () => {},
+            fail: () => {},
+            info: () => {},
+        };
+        cmd.progressIndicator = mockProgressIndicator;
 
         // Invokes the command.
         await cmd.invoke();

@@ -38,7 +38,9 @@ describe("create", () => {
         for (const file of expectedFiles) {
             const generatedFile = await fs.readFile(path.join("./test-project", file), "utf8");
             const expectedFile = await fs.readFile(path.join("./expected-test-project", file), "utf8");
-            expect(generatedFile).toEqual(expectedFile);
+            if (generatedFile !== expectedFile) {
+                throw new Error(`Content of file "${file}" is different in "test-project" to "expected-test-project".`);
+            }
         }
     });
 

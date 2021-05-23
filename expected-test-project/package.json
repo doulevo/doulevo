@@ -2,7 +2,7 @@
   "name": "test-project",
   "version": "0.0.1",
   "description": "A new project",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
     "start:dev": "nodemon src/index.js --legacy-watch",

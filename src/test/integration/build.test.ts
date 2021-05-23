@@ -1,11 +1,17 @@
-import { registerSingleton } from "@codecapers/fusion";
+import { enableVerbose, instantiateSingleton, registerSingleton } from "@codecapers/fusion";
 import { Doulevo } from "../../doulevo";
 import { Configuration, IConfiguration_id } from "../../services/configuration";
-import { ILog, ILog_id } from "../../services/log";
+import { ILog, ILog_id, Log } from "../../services/log";
 import { v4 as uuid } from "uuid";
-import { Docker } from "../../plugins/docker";
+import { Docker, IDocker_id } from "../../plugins/docker";
 
 describe("build", () => {
+
+    beforeEach(() => {
+        const argv = {};
+        registerSingleton(ILog_id, new Log(argv));
+        registerSingleton(IConfiguration_id, new Configuration(argv));
+    });
 
     it("can build project from local path", async ()  => {
 
@@ -20,7 +26,7 @@ describe("build", () => {
         // Remove existing test images.
         //
         let images = await docker.listImages();
-        let testImages = images.filter(image => image.Repository.startsWith(testTagPrefix));
+        let testImages = images.filter((image: any) => image.Repository.startsWith(testTagPrefix));
         for (const testImage of testImages) {
             await docker.removeImage(testImage.ID);
         }
@@ -29,7 +35,7 @@ describe("build", () => {
         // Verify that we now have no test images.
         //
         images = await docker.listImages();
-        testImages = images.filter(image => image.Repository.startsWith(testTagPrefix));
+        testImages = images.filter((image: any) => image.Repository.startsWith(testTagPrefix));
         expect(testImages.length).toEqual(0);
 
         const log: ILog = {
@@ -62,7 +68,7 @@ describe("build", () => {
         // Check that one test image was created.
         //        
         images = await docker.listImages();
-        testImages = images.filter(image => image.Repository === testTag);
+        testImages = images.filter((image: any) => image.Repository === testTag);
         expect(testImages.length).toEqual(1);
 
         //

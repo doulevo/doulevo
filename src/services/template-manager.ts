@@ -11,6 +11,7 @@ import { exportTemplate } from "inflate-template";
 import * as handlebars from "handlebars";
 import { IProgressIndicator, IProgressIndicator_id } from "./progress-indicator";
 import { IQuestioner, IQuestioner_id } from "./questioner";
+import { IProject } from "../lib/project";
 
 export const ITemplateManager_id = "ITemplateManager";
 
@@ -24,7 +25,7 @@ export interface ITemplateManager {
     //
     // Expands a template file with fallbacks.
     //
-    expandTemplateFile(templateData: any, ...fileNames: string[]): Promise<string | undefined>;
+    expandTemplateFile(project: IProject, templateData: any, ...fileNames: string[]): Promise<string | undefined>;
 }
 
 @InjectableSingleton(ITemplateManager_id)
@@ -154,11 +155,12 @@ class TemplateManager implements ITemplateManager {
     //
     // Expands a template file with fallbacks.
     //
-    async expandTemplateFile(templateData: any, ...fileNames: string[]): Promise<string | undefined> {
+    async expandTemplateFile(project: IProject, templateData: any, ...fileNames: string[]): Promise<string | undefined> {
 
-        const pluginPath = await this.configuration.getLocalPluginPath();
+        const pluginPath = await project.getLocalPluginPath();
+
         if (!pluginPath) {
-            throw new Error(`Failed to detemrine local plugin path.`);
+            throw new Error(`Failed to determine local plugin path.`);
         }
 
         for (const fileName of fileNames) {

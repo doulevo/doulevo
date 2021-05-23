@@ -1,5 +1,5 @@
 import { ILog, InjectableClass, InjectProperty } from "@codecapers/fusion";
-import { IDoulevoCommand } from "../lib/doulevo-command";
+import { IDoulevoCommand, IDoulevoCommandDesc } from "../lib/doulevo-command";
 import { joinPath } from "../lib/join-path";
 import { IDocker, IDocker_id } from "../plugins/docker";
 import { IConfiguration_id, IConfiguration } from "../services/configuration";
@@ -92,8 +92,15 @@ export class BuildCommand implements IDoulevoCommand {
     }
 }
 
-export default {
+const command: IDoulevoCommandDesc = {
     name: "build",
     description: "Builds the project in the working directory (or the directory specified by --project=<path>).",
     constructor: BuildCommand,
+    help: {
+        usage: "todo",
+        message: "todo",
+        arguments: [],
+    }
 };
+
+export default command;

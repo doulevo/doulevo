@@ -42,6 +42,7 @@ The executable is generated to `doulevo.exe` in the current directory.
 
 Some commands for testing...
 
+
 ### Creating a project with a local plugin
 
 ```bash
@@ -76,13 +77,19 @@ npx ts-node src/index.ts --version
 Use the `help` command:
 
 ```bash
-npx ts-node src/index.ts help
+npx ts-node src/index.ts --help
 ```
 
 Or no command:
 
 ```bash
 npx ts-node src/index.ts
+```
+
+Or get help for a sub command, eg:
+
+```bash
+npx ts-node src/index.ts create --help
 ```
 
 ### Building the project

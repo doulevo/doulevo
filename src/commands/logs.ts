@@ -1,5 +1,5 @@
 import { InjectableClass, InjectProperty } from "@codecapers/fusion";
-import { IDoulevoCommand } from "../lib/doulevo-command";
+import { IDoulevoCommand, IDoulevoCommandDesc } from "../lib/doulevo-command";
 import { joinPath } from "../lib/join-path";
 import { IDocker, IDocker_id } from "../plugins/docker";
 import { IConfiguration_id, IConfiguration } from "../services/configuration";
@@ -52,8 +52,15 @@ export class LogsCommand implements IDoulevoCommand {
     }
 }
 
-export default {
+const command: IDoulevoCommandDesc = {
     name: "logs",
     description: "Shows logs from the container for the project in the working directory (or the directory specified by --project=<path>).",
     constructor: LogsCommand,
+    help: {
+        usage: "todo",
+        message: "todo",
+        arguments: [],
+    }
 };
+
+export default command;

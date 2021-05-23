@@ -1,4 +1,4 @@
-import { IDoulevoCommand } from "../lib/doulevo-command";
+import { IDoulevoCommand, IDoulevoCommandDesc } from "../lib/doulevo-command";
 import { IPluginManager, IPluginManager_id } from "../services/plugin-manager";
 import { InjectableClass, InjectProperty } from "@codecapers/fusion";
 import { IConfiguration, IConfiguration_id } from "../services/configuration";
@@ -37,28 +37,7 @@ export class CreateCommand implements IDoulevoCommand {
     @InjectProperty(IProgressIndicator_id)
     progressIndicator!: IProgressIndicator;
 
-    displayHelp(): void {
-        this.log.info(`\nUsage: doulevo create [options] <project-dir>\n`);
-        this.log.info(`Creates a new Doulevo project at <project-dir>\n`);
-
-        this.log.info(`Options:`);
-
-        const optionPadding = 25;
-        this.log.info(" ".repeat(4) + "--force".padEnd(optionPadding) + "Deletes project directory if it already exists.");
-        this.log.info(" ".repeat(4) + "--local-plugin".padEnd(optionPadding) + "When set, Doulevo will create the project using the 'local' plugin from the specified location.");
-        this.log.info(" ".repeat(4) + "--plugin-url".padEnd(optionPadding) + "When set, Doulevo will create the project using the 'remote' plugin from the specified location.");
-        this.log.info(" ".repeat(4) + "--project-type".padEnd(optionPadding) + "When set, Doulevo will create the project using the default plugin for the specified project type.");
-        this.log.info(" ".repeat(4) + "--debug".padEnd(optionPadding) + "Logs command executions in the terminal.");
-        this.log.info(" ".repeat(4) + "--help".padEnd(optionPadding) + "Prints usage for this command.");
-    }
-
     async invoke(): Promise<void> {
-
-        const isHelp = this.configuration.getArg<boolean>("help");
-
-        if (isHelp) {
-            return this.displayHelp();
-        }
 
         const projectDir = this.configuration.getMainCommand();
         if (!projectDir) {
@@ -104,8 +83,23 @@ export class CreateCommand implements IDoulevoCommand {
     } 
 }
 
-export default {
+const command: IDoulevoCommandDesc = {
     name: "create",
     description: "Creates a new Doulevo project.",
     constructor: CreateCommand,
+    help: {
+        usage: "doulevo create [options] <project-dir>",
+        message: `Creates a new Doulevo project at <project-dir>`,
+        arguments: [
+            [ "--force", "Deletes project directory if it already exists." ],
+            [ "--local-plugin",  "When set, Doulevo will create the project using the 'local' plugin from the specified location." ],
+            [ "--plugin-url",  "When set, Doulevo will create the project using the 'remote' plugin from the specified location." ],
+            [ "--project-type",  "When set, Doulevo will create the project using the default plugin for the specified project type." ],
+            [ "--debug",  "Logs command executions in the terminal." ],
+            [ "--help",  "Prints usage for this command." ],
+        ],
+    }
 };
+
+export default command;
+

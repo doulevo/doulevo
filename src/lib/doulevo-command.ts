@@ -11,6 +11,26 @@ export interface IDoulevoCommand {
 }
 
 //
+// Describes the help output for a particular command.
+//
+export interface IDoulevoCommandHelp {
+    // 
+    // Shows how to use the command.
+    // 
+    usage: string;
+
+    //
+    // Describes what the command does.
+    //
+    message: string;
+
+    //
+    // Describe the arguments for the command.
+    //
+    arguments: [string, string][];
+}
+
+//
 // Describes a Doulevo command.
 //
 export interface IDoulevoCommandDesc {
@@ -29,4 +49,9 @@ export interface IDoulevoCommandDesc {
     // Constructor function for the command.
     //
     constructor: Function;
+
+    //
+    // Defines the --help option output for the command.
+    //
+    help: IDoulevoCommandHelp;
 }

@@ -95,7 +95,6 @@ const command: IDoulevoCommandDesc = {
             [ "--local-plugin",  "When set, Doulevo will create the project using the 'local' plugin from the specified location." ],
             [ "--plugin-url",  "When set, Doulevo will create the project using the 'remote' plugin from the specified location." ],
             [ "--project-type",  "When set, Doulevo will create the project using the default plugin for the specified project type." ],
-            [ "--debug",  "Logs command executions in the terminal." ],
             [ "--help",  "Prints usage for this command." ],
         ],
     }

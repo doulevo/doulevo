@@ -101,12 +101,11 @@ export class Doulevo {
             arguments: [
                 [ "--version", "Displays the current version number." ],
                 [ "--non-interactive", "Runs in non-interactive mode. All questions will default, except project-type, if you have to set the project type, use the --project-type options." ],
-                [ "--project-type=<type>", "Sets the type of project to create (if not specified you'll be asked)." ],
                 [ "--project=<path>", "Sets the path to the project, defaults to the working directory if not specified." ],
                 [ "--plugin-url=<url>", "Sets the URL of the Git repo for the plugin (no need to set project type if you use this)." ],
                 [ "--local-plugin=<path>", "Sets the local path for a plugin (good for testing when you are developing a plugin)." ],
                 [ "--mode={dev|prod}", "Sets the mode for the build process, can be either dev or prod." ],
-                [ "--force", "Forces the command to be completed (even if it would overite existing files)." ],
+                [ "--force", "Forces the command to be completed (even if it would overwite existing files)." ],
                 [ "--verbose", "Enables versbose logging." ],
                 [ "--quiet", "Tuns in quiet mode, supresses logging unless absolutely necessary." ],
                 [ "--debug", "Enables debug logging." ],

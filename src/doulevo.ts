@@ -6,9 +6,16 @@ import { ILog, InjectableClass, InjectProperty } from "@codecapers/fusion";
 import { IEnvironment, IEnvironment_id } from "./services/environment";
 import { ILog_id } from "./services/log";
 import { IConfiguration, IConfiguration_id } from "./services/configuration";
-import { ICommandManager, ICommandManager_id } from "./services/command-manager";
 import { IDetectInterrupt, IDetectInterrupt_id } from "./services/detect-interrupt";
+import { IDoulevoCommand } from "./lib/doulevo-command";
 const packageInfo = require("../package.json");
+
+import { commands } from "./commands";
+
+const commandConstructorMap: any = {};
+for (const command of commands) {
+    commandConstructorMap[command.name] = command.constructor;
+}
 
 @InjectableClass()
 export class Doulevo {
@@ -21,9 +28,6 @@ export class Doulevo {
 
     @InjectProperty(IConfiguration_id)
     configuration!: IConfiguration;
-
-    @InjectProperty(ICommandManager_id)
-    commandManager!: ICommandManager;
 
     @InjectProperty(IDetectInterrupt_id)
     detectInterrupt!: IDetectInterrupt;
@@ -49,7 +53,13 @@ export class Doulevo {
         // Consumes the main command, allows the next nested sub command to bubble up and be the new main command.
         this.configuration.consumeMainCommand(); 
 
-        await this.commandManager.invokeCommand(cmd);
+        
+        const Command = commandConstructorMap[cmd];
+        if (Command === undefined) {
+            throw new Error(`Unexpected command ${cmd}`);
+        }
+        const command: IDoulevoCommand = new Command();
+        await command.invoke();
 
         await this.detectInterrupt.close();
     }

@@ -4,6 +4,9 @@ import { Configuration, IConfiguration_id } from "./services/configuration";
 import * as minimist from "minimist";
 import { ILog_id, Log } from "./services/log";
 
+//
+// Main entry point for the Doulevo command line tool.
+//
 async function main(): Promise<void> {
 
     //

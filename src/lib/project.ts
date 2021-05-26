@@ -93,7 +93,13 @@ export class Project implements IProject {
     // Gets the data for the project.
     //
     getData(): any {
-        //todo: expand this with name, etc.
-        return this.configurationFile.data;
+        return Object.assign(
+            {}, 
+            this.configurationFile.data,
+            {
+                name: this.configurationFile.name,
+                desc: this.configurationFile.description,
+            }
+        );
     }
 }

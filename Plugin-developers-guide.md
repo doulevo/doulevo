@@ -157,7 +157,7 @@ All the files in `template-files` go through template expansion before being use
 2. The *create template* for the plugin (this is the template starter project) is a simple hello world style program (the simplest possible program for the type of project, e.g. the sipmlest possible Node.js program) and is stored under the `create-template` directory of the plugin's repo ([click here to see the directory in the Node.js plugin](https://github.com/doulevo/plugin-nodejs/tree/main/create-template)).
    1. The file `template.json` is a configuration file for the create template.
    2. The `assets` directory contains the files for the project that will go through template expansion to create a project for the user.
-3. Create Dockerfiles and Kubernetes files to build, run and deploy the project.
+3. Create Dockerfiles and Kubernetes files to build, run and deploy the project. Put these files under the `template-files` directory, [see the Node.js plugin for examples](https://github.com/doulevo/plugin-nodejs/tree/main/template-files/).
 4. Test that your plugin works with Doulevo (see below).
 5. Publish the files in the Git repo.
 
@@ -231,4 +231,10 @@ doulevo up --mode=prod --project=./some-project --local-plugin=<path-to-your-plu
 
 ```bash
 doulevo down --project=./some-project --local-plugin=<path-to-your-plugin> --debug
+```
+
+## Deploying a project
+
+```bash
+doulevo deploy --project=./some-project --local-plugin=<path-to-your-plugin> --debug
 ```

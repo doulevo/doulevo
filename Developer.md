@@ -163,3 +163,9 @@ npx ts-node src/index.ts ls --project=./test-project --local-plugin=./test-plugi
 ```bash
 npx ts-node src/index.ts ps --project=./test-project --local-plugin=./test-plugin --debug
 ```
+
+### Deploying the project
+
+```bash
+npx ts-node src/index.ts deploy --project=./test-project --local-plugin=./test-plugin --debug
+```

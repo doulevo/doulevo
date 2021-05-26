@@ -26,6 +26,11 @@ export interface IDocker {
     build(project: IProject, mode: "dev" | "prod", tags: string[], plugin: IPlugin): Promise<void>;
 
     //
+    // Builds and publishes the image for the project.
+    //
+    publish(project: IProject, plugin: IPlugin): Promise<string>;
+
+    //
     // Builds and runs the requested project.
     //
     up(project: IProject, mode: "dev" | "prod", tags: string[], plugin: IPlugin, isDetached: boolean): Promise<void>;
@@ -178,18 +183,49 @@ export class Docker implements IDocker {
     }
 
     //
+    // Builds and publishes the image for the project.
+    // Returns the imageRef for the published image.
+    //
+    async publish(project: IProject, plugin: IPlugin): Promise<string> {
+
+        //todo: don't allow a publish when there are working changes!
+        //todo: get the git hash for version
+
+        const version = "todo";
+        const dockerRegistry = "todo";
+        const application = "my-application"; //todo:
+        const imageRef = `${dockerRegistry}/${application}/${project.getName()}:${version}`;
+        const tags = [ imageRef ];
+
+        //
+        // Build the image.
+        //
+        await this.build(project, "prod", tags, plugin);
+
+        const dockerUn = "todo";
+        const dockerPw = "todo";
+
+        //
+        // Login to the remote Docker reigstry.
+        //
+        await this.exec.invoke(
+            `echo ${dockerPw} | docker login ${dockerRegistry} --username ${dockerUn}  --password-stdin`
+        );
+
+        //
+        // Push image to the Docker registry.
+        //
+        await this.exec.invoke(
+            `docker push ${imageRef}`
+        );
+
+        return imageRef;
+    }
+
+    //
     // Builds and runs the requested project.
     //
     async up(project: IProject, mode: "dev" | "prod", tags: string[], plugin: IPlugin, isDetached: boolean): Promise<void> {
-
-        //
-        //  generate the docker command line parameters
-        //  up the container (either in detatched or non-detatched mode)
-        //
-        // just exec 'docker run <application>/<project>'
-        //
-        // Setup volumes for live reload.
-        //
 
         this.progressIndicator.start("Building...");
 
@@ -227,7 +263,8 @@ export class Docker implements IDocker {
 
         try {
             runResult = await this.exec.invoke(
-                `docker run -d ${sharedVolumes} ${this.getProjectTag(project, mode)}`);
+                `docker run -d ${sharedVolumes} ${this.getProjectTag(project, mode)}`
+            );
         }
         finally {
             this.progressIndicator.succeed("Container was started.");

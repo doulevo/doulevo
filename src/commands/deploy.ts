@@ -1,19 +1,80 @@
+import { InjectableClass, InjectProperty } from "@codecapers/fusion";
+import { IDoulevoCommand, IDoulevoCommandDesc } from "../lib/doulevo-command";
+import { joinPath } from "../lib/join-path";
+import { IDocker, IDocker_id } from "../plugins/docker";
+import { IConfiguration_id, IConfiguration } from "../services/configuration";
+import { IEnvironment, IEnvironment_id } from "../services/environment";
+import { IFs, IFs_id } from "../services/fs";
+import { Project } from "../lib/project";
+import { Plugin } from "../lib/plugin";
+import { IProgressIndicator, IProgressIndicator_id } from "../services/progress-indicator";
+import { IKubernetes, IKubernetes_id } from "../plugins/kubernetes";
 
-export default async function (argv: any): Promise<void> {
+@InjectableClass()
+export class DeployCommand implements IDoulevoCommand {
 
-    //
-    // invoke the build command (prod mode)
-    //    
-    // get the deploy plugin 
-    //      (probably Kubernetes)
-    //
-    //      if cached config is out of date
-    //
-    //          get the Kub config generator plugin (depends on project type)
-    //          
-    //          generate Kub deployment configuration
-    //
-    //      set Kubectl config to the required backend
-    //      Run Kubectl to do the deployment
-    //
+    @InjectProperty(IEnvironment_id)
+    environment!: IEnvironment;
+
+    @InjectProperty(IConfiguration_id)
+    configuration!: IConfiguration;
+
+    @InjectProperty(IDocker_id)
+    docker!: IDocker;
+
+    @InjectProperty(IKubernetes_id)
+    kubernetes!: IKubernetes;
+
+    @InjectProperty(IFs_id)
+    fs!: IFs;
+
+    @InjectProperty(IProgressIndicator_id)
+    progressIndicator!: IProgressIndicator;
+
+    async invoke(): Promise<void> {
+
+        //
+        // The up command operates against the current working directory.
+        // Or the path can be set with the --project=<path> argument.
+        //
+        const projectPath = this.configuration.getArg("project") || this.environment.cwd();
+
+        //
+        // Load the project's configuration file.
+        //
+        const configurationFilePath = joinPath(projectPath, "doulevo.json");
+        const configurationFile = await this.fs.readJsonFile(configurationFilePath);
+        const project = new Project(projectPath, configurationFile);
+
+        const mode = this.configuration.getArg("mode") || "dev";
+        if (mode !== "prod" && mode !== "dev") {
+            throw new Error(`--mode can only be either "dev" or "prod".`);
+        }
+
+        //
+        // Load the plugin for this project.
+        //
+        const pluginPath = project.getLocalPluginPath();
+        if (!pluginPath) {
+            throw new Error(`Failed to determine local plugin path for project!`);
+        }
+        const pluginConfigurationFilePath = joinPath(pluginPath, "plugin.json");
+        const pluginConfigurationFile = await this.fs.readJsonFile(pluginConfigurationFilePath);
+        const plugin = new Plugin(pluginPath, pluginConfigurationFile); 
+
+        await this.kubernetes.deploy(project, plugin);
+    }
 }
+
+const command: IDoulevoCommandDesc = {
+    name: "deploy",
+    description: "Builds and deploys the project in the working directory (or the directory specified by --project=<path>).",
+    constructor: DeployCommand,
+    help: {
+        usage: "todo",
+        message: "todo",
+        arguments: [],
+    }
+};
+
+export default command;

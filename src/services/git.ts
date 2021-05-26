@@ -12,6 +12,11 @@ export const IGit_id = "IGit";
 export interface IGit {
 
     //
+    // Get the commit hash for the head.
+    // 
+    getCommitHash(path: string): Promise<string>;
+
+    //
     // Clones a Git repo.
     //
     clone(remoteRepo: string, localPath: string): Promise<void>;
@@ -35,6 +40,14 @@ class Git implements IGit {
     exec!: IExec;
 
     private constructor() {
+    }
+
+    //
+    // Get the commit hash for the head.
+    // 
+    async getCommitHash(path: string): Promise<string> {
+        const result = await this.exec.invoke(`git rev-parse HEAD`, { cwd: path });
+        return result.stdout.trim();
     }
 
     //

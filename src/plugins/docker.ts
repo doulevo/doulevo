@@ -14,6 +14,7 @@ import { IExec, IExec_id } from "../services/exec";
 import { IDetectInterrupt, IDetectInterrupt_id } from "../services/detect-interrupt";
 import { IProgressIndicator, IProgressIndicator_id } from "../services/progress-indicator";
 import { ICommandResult } from "../lib/command";
+import { IGit, IGit_id } from "../services/git";
 const AsciiTable = require('../lib/ascii-table');
 
 export const IDocker_id = "IDocker"
@@ -101,6 +102,9 @@ export class Docker implements IDocker {
 
     @InjectProperty(IProgressIndicator_id)
     progressIndicator!: IProgressIndicator;
+
+    @InjectProperty(IGit_id)
+    git!: IGit;
 
     //
     // Gets the name of the repository for the project.
@@ -191,7 +195,7 @@ export class Docker implements IDocker {
         //todo: don't allow a publish when there are working changes!
         //todo: get the git hash for version
 
-        const version = "todo";
+        const version = await this.git.getCommitHash(project.getPath());
         const dockerRegistry = "todo";
         const application = "my-application"; //todo:
         const imageRef = `${dockerRegistry}/${application}/${project.getName()}:${version}`;

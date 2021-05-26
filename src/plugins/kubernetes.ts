@@ -14,6 +14,7 @@ import { IProgressIndicator, IProgressIndicator_id } from "../services/progress-
 import { IDocker, IDocker_id } from "./docker";
 import { v4 as uuid } from "uuid";
 import { decodeBase64, encodeBase64 } from "../lib/base64";
+import { IQuestioner, IQuestioner_id } from "../services/questioner";
 
 export const IKubernetes_id = "IKubernetes"
 
@@ -49,6 +50,9 @@ export class Kubernetes implements IKubernetes {
     @InjectProperty(IDocker_id)
     docker!: IDocker;
 
+    @InjectProperty(IQuestioner_id)
+    questioner!: IQuestioner;
+
     //
     // Deploys the project to the backend.
     //
@@ -56,7 +60,10 @@ export class Kubernetes implements IKubernetes {
 
         let imageRef: string | undefined;
 
-        this.progressIndicator.start("Publish project...");
+        // Commented these because they make asking questions impossible.
+        // TODO: Want to get this back online but would be better to raise events and have progress reporting 
+        //       be done at the highest level.
+        // this.progressIndicator.start("Publish project...");
 
         try {
             //
@@ -64,22 +71,40 @@ export class Kubernetes implements IKubernetes {
             //
             imageRef = await this.docker.publish(project, plugin);
 
-            this.progressIndicator.succeed("Publish successful.");
+            // this.progressIndicator.succeed("Publish successful.");
         }
         catch (err) {
-            this.progressIndicator.fail("Publish failed.");
+            // this.progressIndicator.fail("Publish failed.");
             throw err;
         }
 
-        this.progressIndicator.start("Deploying...");
+        // this.progressIndicator.start("Deploying...");
 
-        const dockerUn = "todo";
-        const dockerPw = "todo";
-        const encodedAuth = encodeBase64(`${dockerUn}:${dockerPw}`);
+        let deployQuestions = [
+            {
+                type: "input",
+                name: "registryHostname",
+                message: "Please enter the host name for your container registry: ",
+            },
+            {
+                type: "input",
+                name: "registryUn",
+                message: "Please enter the user name for your container registry: ",
+            },
+            {
+                type: "input",
+                name: "registryPw",
+                message: "Please enter the password for your container registry: ",
+            },
+        ];
 
-        const dockerRegistry = "todo";
+        const answers = await this.questioner.prompt(deployQuestions);
+        const { registryHostname, registryUn, registryPw } = answers;
+
+        const encodedAuth = encodeBase64(`${registryUn}:${registryPw}`);
+
         const auths: any = {};
-        auths[dockerRegistry] = {
+        auths[registryHostname] = {
             auth: encodedAuth,
         };
         const dockerConfig = {
@@ -118,10 +143,10 @@ export class Kubernetes implements IKubernetes {
                 stdin: kubernetesFileContent,
             });
 
-            this.progressIndicator.succeed("Deployed.");
+            // this.progressIndicator.succeed("Deployed.");
         }
         catch (err) {
-            this.progressIndicator.fail("Deployment failed.");
+            // this.progressIndicator.fail("Deployment failed.");
             throw err;
         }
     }

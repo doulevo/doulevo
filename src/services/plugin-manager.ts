@@ -78,6 +78,7 @@ class PluginManager implements IPluginManager {
    
             let pluginUrl = this.configuration.getPluginUrl();
             if (pluginUrl === undefined) {
+                //TODO: This check and exception should be moved into the questioner?
                 const isNonInteractive = this.configuration.getArg<boolean>("non-interactive");
                 if (isNonInteractive) {
                     //

@@ -5,6 +5,7 @@
 import { InjectableSingleton, InjectProperty } from "@codecapers/fusion";
 import { ILog, ILog_id } from "./log";
 import * as fs from "fs-extra";
+import * as pathX from "path";
 
 export const IFs_id = "IFs";
 
@@ -15,6 +16,11 @@ export interface IFs {
     //
     exists(path: string): Promise<boolean>;   
     
+    //
+    // Ensures that a directory exist.
+    //
+    ensureDir(path: string): Promise<void>;
+
     //
     // Removes a file or directory.
     //
@@ -58,6 +64,13 @@ class Fs implements IFs {
     }
 
     //
+    // Ensures that a directory exist.
+    //
+    async ensureDir(path: string): Promise<void> {
+        return await fs.ensureDir(path);
+    }
+
+    //
     // Removes a file or directory.
     //
     async remove(path: string): Promise<void> {
@@ -75,6 +88,7 @@ class Fs implements IFs {
     // Writes a file to disk.
     //
     async writeFile(path: string, data: string): Promise<void> {
+        await fs.ensureDir(pathX.dirname(path));
         await fs.writeFile(path, data);
     }
 

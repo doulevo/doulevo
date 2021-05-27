@@ -12,9 +12,8 @@ import { IExec, IExec_id } from "../services/exec";
 import { IDetectInterrupt, IDetectInterrupt_id } from "../services/detect-interrupt";
 import { IProgressIndicator, IProgressIndicator_id } from "../services/progress-indicator";
 import { IDocker, IDocker_id } from "./docker";
-import { v4 as uuid } from "uuid";
-import { decodeBase64, encodeBase64 } from "../lib/base64";
-import { IQuestioner, IQuestioner_id } from "../services/questioner";
+import { encodeBase64 } from "../lib/base64";
+import { IVariables, IVariables_id, Variables } from "../services/variables";
 
 export const IKubernetes_id = "IKubernetes"
 
@@ -50,8 +49,8 @@ export class Kubernetes implements IKubernetes {
     @InjectProperty(IDocker_id)
     docker!: IDocker;
 
-    @InjectProperty(IQuestioner_id)
-    questioner!: IQuestioner;
+    @InjectProperty(IVariables_id)
+    variables!: IVariables;
 
     //
     // Deploys the project to the backend.
@@ -80,31 +79,26 @@ export class Kubernetes implements IKubernetes {
 
         // this.progressIndicator.start("Deploying...");
 
-        let deployQuestions = [
+        const variableSpecs = [
             {
-                type: "input",
-                name: "registryHostname",
+                name: "docker.registry.host",
                 message: "Please enter the host name for your container registry: ",
             },
             {
-                type: "input",
-                name: "registryUn",
+                name: "docker.registry.username",
                 message: "Please enter the user name for your container registry: ",
             },
             {
-                type: "input",
-                name: "registryPw",
+                name: "docker.registry.password",
                 message: "Please enter the password for your container registry: ",
             },
         ];
 
-        const answers = await this.questioner.prompt(deployQuestions);
-        const { registryHostname, registryUn, registryPw } = answers;
-
-        const encodedAuth = encodeBase64(`${registryUn}:${registryPw}`);
+        const variables = await this.variables.loadVariables(variableSpecs, project);
+        const encodedAuth = encodeBase64(`${variables.docker.registry.username}:${variables.docker.registry.password}`);
 
         const auths: any = {};
-        auths[registryHostname] = {
+        auths[variables.docker.registry.host] = {
             auth: encodedAuth,
         };
         const dockerConfig = {

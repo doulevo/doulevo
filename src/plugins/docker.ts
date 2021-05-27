@@ -15,7 +15,7 @@ import { IDetectInterrupt, IDetectInterrupt_id } from "../services/detect-interr
 import { IProgressIndicator, IProgressIndicator_id } from "../services/progress-indicator";
 import { ICommandResult } from "../lib/command";
 import { IGit, IGit_id } from "../services/git";
-import { IQuestioner, IQuestioner_id } from "../services/questioner";
+import { IVariables, IVariables_id } from "../services/variables";
 const AsciiTable = require('../lib/ascii-table');
 
 export const IDocker_id = "IDocker"
@@ -107,8 +107,8 @@ export class Docker implements IDocker {
     @InjectProperty(IGit_id)
     git!: IGit;
 
-    @InjectProperty(IQuestioner_id)
-    questioner!: IQuestioner;
+    @InjectProperty(IVariables_id)
+    variables!: IVariables;
 
     //
     // Gets the name of the repository for the project.
@@ -198,35 +198,32 @@ export class Docker implements IDocker {
 
         //todo: don't allow a publish when there are working changes!
 
-        let deployQuestions = [
+        const variableSpecs = [
             {
-                type: "input",
-                name: "registryHostname",
+                name: "docker.registry.host",
                 message: "Please enter the host name for your container registry: ",
             },
             {
-                type: "input",
-                name: "repositoryName",
+                name: "docker.registry.repository",
                 message: "Please enter the repository under the container registry: ",
             },
             {
                 type: "input",
-                name: "registryUn",
+                name: "docker.registry.username",
                 message: "Please enter the user name for your container registry: ",
             },
             {
                 type: "input",
-                name: "registryPw",
+                name: "docker.registry.password",
                 message: "Please enter the password for your container registry: ",
             },
         ];
 
-        const answers = await this.questioner.prompt(deployQuestions);
-        const { registryHostname, repositoryName, registryUn, registryPw } = answers;
+        const variables = await this.variables.loadVariables(variableSpecs, project);
 
         const version = await this.git.getCommitHash(project.getPath());
         const application = "my-application"; //todo:
-        const imageRef = `${registryHostname}/${repositoryName}/${application}/${project.getName()}:${version}`;
+        const imageRef = `${variables.docker.registry.host}/${variables.docker.registry.repository}/${application}/${project.getName()}:${version}`;
         const tags = [ imageRef ];
 
         //
@@ -238,7 +235,7 @@ export class Docker implements IDocker {
         // Login to the remote Docker reigstry.
         //
         await this.exec.invoke(
-            `echo ${registryPw} | docker login ${registryHostname} --username ${registryUn} --password-stdin`
+            `echo ${variables.docker.registry.password} | docker login ${variables.docker.registry.host} --username ${variables.docker.registry.username} --password-stdin`
         );
 
         //

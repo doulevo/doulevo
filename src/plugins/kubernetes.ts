@@ -40,7 +40,7 @@ export interface IKubernetes {
     //
     // Ejects configuration for customization.
     //
-    eject(project: IProject): Promise<void>;
+    eject(project: IProject, plugin: IPlugin): Promise<void>;
 }
 
 @InjectableSingleton(IKubernetes_id)
@@ -112,7 +112,7 @@ export class Kubernetes implements IKubernetes {
         };
         const encodedDockerConfig = encodeBase64(JSON.stringify(dockerConfig));
 
-        const kubernetesFileContent = await this.generateConfiguration(project, imageRef, encodedDockerConfig);
+        const kubernetesFileContent = await this.generateConfiguration(project, plugin, imageRef, encodedDockerConfig);
 
         this.log.verbose("Building with Kubernetes configuration:");
         this.log.verbose(kubernetesFileContent);
@@ -130,7 +130,7 @@ export class Kubernetes implements IKubernetes {
     //
     // Generate Kubernetes configuration file.
     //
-    private async generateConfiguration(project: IProject, imageRef: string, encodedDockerConfig: string): Promise<string> {
+    private async generateConfiguration(project: IProject, plugin: IPlugin, imageRef: string, encodedDockerConfig: string): Promise<string> {
         const projectData = project.getData();
         const deploymentData = Object.assign({}, projectData, {
             imageRef: imageRef,
@@ -147,7 +147,7 @@ export class Kubernetes implements IKubernetes {
         // Generate the Kubernetes configuration file.
         //TODO: Might be useful to cache the configuration file in the .doulevo sub-directory.
         //
-        const kubernetesFileContent = await this.templateManager.expandTemplateFile(project, deploymentData, `kubernetes/deployment.yaml`);
+        const kubernetesFileContent = await this.templateManager.expandTemplateFile(project, plugin, deploymentData, `kubernetes/deployment.yaml`);
         if (!kubernetesFileContent) {
             throw new Error(`Failed to find Kubernetes template file in plugin.`);
         }
@@ -204,8 +204,8 @@ export class Kubernetes implements IKubernetes {
     //
     // Ejects configuration for customization.
     //
-    async eject(project: IProject): Promise<void> {
-        const kubernetesFileContent = await this.generateConfiguration(project, "{{imageRef}}", "{{dockerAuth}}");
+    async eject(project: IProject, plugin: IPlugin): Promise<void> {
+        const kubernetesFileContent = await this.generateConfiguration(project, plugin, "{{imageRef}}", "{{dockerAuth}}");
         await this.fs.writeFile(joinPath(project.getPath(), "Deployment.yaml"), kubernetesFileContent);
         this.log.info("Wrote Deployment.yaml");
     }

@@ -57,8 +57,8 @@ export class EjectCommand implements IDoulevoCommand {
         const pluginConfigurationFile = await this.fs.readJsonFile(pluginConfigurationFilePath);
         const plugin = new Plugin(pluginPath, pluginConfigurationFile); 
 
-        await this.docker.eject(project);
-        await this.kubernetes.eject(project);
+        await this.docker.eject(project, plugin);
+        await this.kubernetes.eject(project, plugin);
     }
 }
 

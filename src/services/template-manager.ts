@@ -12,6 +12,7 @@ import * as handlebars from "handlebars";
 import { IProgressIndicator, IProgressIndicator_id } from "./progress-indicator";
 import { IQuestioner, IQuestioner_id } from "./questioner";
 import { IProject } from "../lib/project";
+import { IPlugin } from "../lib/plugin";
 
 export const ITemplateManager_id = "ITemplateManager";
 
@@ -20,12 +21,12 @@ export interface ITemplateManager {
     //
     // Exports a template.
     //
-    exportTemplate(defaultProjectName: string, projectPath: string): Promise<void>;
+    exportTemplate(defaultProjectName: string, projectPath: string, plugin: IPlugin): Promise<void>;
 
     //
     // Expands a template file with fallbacks.
     //
-    expandTemplateFile(project: IProject, templateData: any, ...fileNames: string[]): Promise<string | undefined>;
+    expandTemplateFile(project: IProject, plugin: IPlugin, templateData: any, ...fileNames: string[]): Promise<string | undefined>;
 }
 
 @InjectableSingleton(ITemplateManager_id)
@@ -49,13 +50,10 @@ class TemplateManager implements ITemplateManager {
     private constructor() {
     }
 
-    //TODO: pass plugin through.
     //
     // Exports a template.
     //
-    async exportTemplate(defaultProjectName: string, projectPath: string): Promise<void> {
-        // TODO: Fill out answers already provided on the command line.
-        //    --answer=PROJECT_NAME=something etc
+    async exportTemplate(defaultProjectName: string, projectPath: string, plugin: IPlugin): Promise<void> {
     
         let createQuestions = [
             {
@@ -72,14 +70,14 @@ class TemplateManager implements ITemplateManager {
             },
         ];
 
-        const localTemplatePath = this.configuration.getCreateTemplatePath();
+        const localTemplatePath = joinPath(plugin.getLocalPath(), "create-template");
         const templateConfigFilePath = joinPath(localTemplatePath, "template.json");
         const templateConfigExists = await this.fs.exists(templateConfigFilePath);
         if (templateConfigExists) {
             const templateConfig = await this.fs.readJsonFile(templateConfigFilePath);
             if (templateConfig.questions !== undefined) {
                 if (!Array.isArray(templateConfig.questions)) {
-                    throw new Error(`Expected "questions" field in template config file ${templateConfigFilePath} to be an array of questions in the inquirer format (see https://www.npmjs.com/package/inquirer#question).`)
+                    throw new Error(`Expected "questions" field in template config file ${templateConfigFilePath} to be an array of questions in the inquirer format (see https://www.npmjs.com/package/inquirer#question).`);
                 }
     
                 createQuestions = createQuestions.concat(templateConfig.questions);
@@ -101,6 +99,8 @@ class TemplateManager implements ITemplateManager {
             for (const question of createQuestions) {
 
                 if (question.default === undefined) {
+                    // TODO: Fill out answers already provided on the command line.
+                    //    --answer=PROJECT_NAME=something etc
                     throw new Error(`No default answer to the question "${question.name}, this plugin can't run in non-interactive mode.`);
                 }
                 
@@ -139,7 +139,7 @@ class TemplateManager implements ITemplateManager {
                 name: name,
                 description: description,
                 projectType: this.configuration.getProjectType(),
-                localPluginPath: this.configuration.getRelativePluginPath(),
+                localPluginPath: this.configuration.getLocalPluginPath(),
                 pluginUrl: this.configuration.getPluginUrl(),
                 data: templateData,
             };
@@ -153,17 +153,12 @@ class TemplateManager implements ITemplateManager {
         }
     }
 
-    //TODO: pass plugin through.
     //
     // Expands a template file with fallbacks.
     //
-    async expandTemplateFile(project: IProject, templateData: any, ...fileNames: string[]): Promise<string | undefined> {
+    async expandTemplateFile(project: IProject, plugin: IPlugin, templateData: any, ...fileNames: string[]): Promise<string | undefined> {
 
-        const pluginPath = await project.getLocalPluginPath();
-
-        if (!pluginPath) {
-            throw new Error(`Failed to determine local plugin path.`);
-        }
+        const pluginPath = await plugin.getLocalPath();
 
         for (const fileName of fileNames) {
             const templateFilePath = joinPath(pluginPath, "template-files", fileName);

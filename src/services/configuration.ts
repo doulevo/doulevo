@@ -53,44 +53,14 @@ export interface IConfiguration {
     getProjectType(): string | undefined;
 
     //
-    // Sets the type of the project.
-    //
-    setProjectType(projectType: string): void;
-
-    //
     // The URL for the plugin, if specified.
     //
     getPluginUrl(): string | undefined;
 
     //
-    // Set the URL for the plugin.
-    //
-    setPluginUrl(pluginUrl: string): void;
-
-    //
     // Get the local path for the plugin, if specified.
     //
     getLocalPluginPath(): string | undefined;    
-
-    //
-    // Sets the local path to the plugin.
-    //
-    setLocalPluginPath(localPluginPath: string): void;
-
-    //
-    // Gets the plugin path relative to the plugins directory (or pull path if the plugin is loaded from elsewhere).
-    //
-    getRelativePluginPath(): string | undefined;
-
-    //
-    // Gets the plugin path relative to the plugins directory (or pull path if the plugin is loaded from elsewhere).
-    //
-    setRelativePluginPath(relativePluginPath: string): void;
-
-    //
-    // Gets the local path for the "create" template.
-    //
-    getCreateTemplatePath(): string;
 }
 
 @InjectableClass()
@@ -98,7 +68,6 @@ export class Configuration implements IConfiguration {
 
     private projectType: string | undefined;
     private localPluginPath: string | undefined;
-    private relativePluginPath: string | undefined;
     private pluginUrl: string | undefined;
     
     //
@@ -192,13 +161,6 @@ export class Configuration implements IConfiguration {
     }
 
     //
-    // Sets the type of the project.
-    //
-    setProjectType(projectType: string): void {
-        this.projectType = projectType;
-    }
-
-    //
     // The URL for the plugin, if specified.
     //
     getPluginUrl(): string | undefined {
@@ -207,13 +169,6 @@ export class Configuration implements IConfiguration {
         }
 
         return this.pluginUrl;
-    }
-
-    //
-    // Set the URL for the plugin.
-    //
-    setPluginUrl(pluginUrl: string): void { //fio:
-        this.pluginUrl = pluginUrl;
     }
 
     //
@@ -226,43 +181,4 @@ export class Configuration implements IConfiguration {
 
         return this.localPluginPath;
     }
-
-    //
-    // Sets the local path to the plugin.
-    //
-    setLocalPluginPath(localPluginPath: string): void { //fio:
-        this.localPluginPath = localPluginPath;
-    }
-
-    //
-    // Gets the plugin path relative to the plugins directory (or pull path if the plugin is loaded from elsewhere).
-    //
-    getRelativePluginPath(): string | undefined {
-        if (!this.relativePluginPath) {
-            this.relativePluginPath = this.getArg("local-plugin");
-        }
-        
-        return this.relativePluginPath;
-    }
-
-    //
-    // Gets the plugin path relative to the plugins directory (or pull path if the plugin is loaded from elsewhere).
-    //
-    setRelativePluginPath(relativePluginPath: string): void { //fio:
-        this.relativePluginPath = relativePluginPath;
-    }
-
-    //
-    // Gets the local path for the "create" template.
-    //
-    getCreateTemplatePath(): string {
-        const localPluginPath = this.getLocalPluginPath();
-        if (!localPluginPath) {
-            throw Error(`Failed to determine local plugin path!`);
-        }
-
-        return joinPath(localPluginPath, "create-template");
-    }
-
-
 }

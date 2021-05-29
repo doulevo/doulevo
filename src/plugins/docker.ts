@@ -16,7 +16,6 @@ import { IProgressIndicator, IProgressIndicator_id } from "../services/progress-
 import { ICommandResult } from "../lib/command";
 import { IGit, IGit_id } from "../services/git";
 import { IVariables, IVariables_id } from "../services/variables";
-import { fstat } from "fs-extra";
 import { IFs, IFs_id } from "../services/fs";
 const AsciiTable = require('../lib/ascii-table');
 
@@ -87,7 +86,7 @@ export interface IDocker {
     //
     // Ejects configuration for customization.
     //
-    eject(project: IProject): Promise<void>;
+    eject(project: IProject, plugin: IPlugin): Promise<void>;
 }
 
 @InjectableSingleton(IDocker_id)
@@ -154,7 +153,7 @@ export class Docker implements IDocker {
             }
         }
 
-        let dockerFileContent = await this.generateConfiguration(project, mode);
+        let dockerFileContent = await this.generateConfiguration(project, plugin, mode);
 
         // Generate the .dockerignore file (if not existing, or out of date).
 
@@ -186,12 +185,12 @@ export class Docker implements IDocker {
     //
     // Generates the Docker configuration.
     //
-    private async generateConfiguration(project: IProject, mode: string): Promise<string | string> {
+    private async generateConfiguration(project: IProject, plugin: IPlugin, mode: string): Promise<string | string> {
 
         //TODO: If there's a Dockerfile-{dev|prod} or just a Dockerfile just use that.
         //TODO: Could cache the generated file.
         
-        const dockerFileContent = await this.templateManager.expandTemplateFile(project, project.getData(), `docker/Dockerfile-${mode}`, "docker/Dockerfile");
+        const dockerFileContent = await this.templateManager.expandTemplateFile(project, plugin, project.getData(), `docker/Dockerfile-${mode}`, "docker/Dockerfile");
         if (!dockerFileContent) {
             throw new Error(`Failed to find Docker template file in plugin.`);
         }
@@ -495,12 +494,12 @@ export class Docker implements IDocker {
     //
     // Ejects configuration for customization.
     //
-    async eject(project: IProject): Promise<void> {
-        const devDockerFileContent = await this.generateConfiguration(project, "dev");
+    async eject(project: IProject, plugin: IPlugin): Promise<void> {
+        const devDockerFileContent = await this.generateConfiguration(project, plugin, "dev");
         await this.fs.writeFile(joinPath(project.getPath(), "Dockerfile-dev"), devDockerFileContent);
         this.log.info("Wrote Dockerfile-dev");
 
-        const prodDockerFileContent = await this.generateConfiguration(project, "prod");
+        const prodDockerFileContent = await this.generateConfiguration(project, plugin, "prod");
         await this.fs.writeFile(joinPath(project.getPath(), "Dockerfile-prod"), prodDockerFileContent);
         this.log.info("Wrote Dockerfile-prod");
     }

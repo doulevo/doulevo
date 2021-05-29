@@ -133,12 +133,12 @@ export class Variables implements IVariables {
         }
 
         if (questions.length > 0) {
-            //TODO: This check and exception should be moved into the questioner?
             const isNonInteractive = this.configuration.getArg<boolean>("non-interactive");
             if (isNonInteractive) {
                 //
                 // Need to know some variable values, but can't ask the user in non-interactive mode.
                 //
+                //TODO: Implement ability to set vars on the command line.
                 throw new Error(`Running in non-interactive mode, you need to set the variable by argument --variable=<name>=<value> or environent variable.`);
             }
 

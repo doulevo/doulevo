@@ -9,6 +9,7 @@ import { ITemplateManager, ITemplateManager_id } from "../services/template-mana
 import { IGit, IGit_id } from "../services/git";
 import { IEnvironment, IEnvironment_id } from "../services/environment";
 import { IProgressIndicator, IProgressIndicator_id } from "../services/progress-indicator";
+import { Plugin } from "../lib/plugin";
 
 @InjectableClass()
 export class CreateCommand implements IDoulevoCommand {
@@ -57,12 +58,14 @@ export class CreateCommand implements IDoulevoCommand {
         }
 
         this.progressIndicator.start("Updating plugin...");
+
+        let pluginPath: string;
    
         try {
             //
             // Clone or update the plugin requested by the configuration.
             //
-            await this.pluginManager.updatePlugin();
+            pluginPath = await this.pluginManager.updatePlugin();
 
             this.progressIndicator.info("Updated plugin.");
         }
@@ -72,9 +75,16 @@ export class CreateCommand implements IDoulevoCommand {
         }
         
         //
+        // Load the plugin for this project.
+        //
+        const pluginConfigurationFilePath = joinPath(pluginPath, "plugin.json");
+        const pluginConfigurationFile = await this.fs.readJsonFile(pluginConfigurationFilePath);
+        const plugin = new Plugin(pluginPath, pluginConfigurationFile); 
+
+        //
         // Exports the create-template, filling in the blanks.
         //
-        await this.templateManager.exportTemplate(projectDir, projectPath);  //todo: Pass in the plugin!
+        await this.templateManager.exportTemplate(projectDir, projectPath, plugin);
 
         //
         // Create a Git repo for the project.

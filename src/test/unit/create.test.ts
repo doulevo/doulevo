@@ -1,5 +1,6 @@
 import { disableInjector, enableInjector } from "@codecapers/fusion";
 import { CreateCommand } from "../../commands/create";
+import { Plugin } from "../../lib/plugin";
 
 describe("create", () => {
 
@@ -21,9 +22,13 @@ describe("create", () => {
 
         const projectDir = "a-new-project";
         const cwd = "a-directory";
+        const pluginPath = "a-plugin";
 
         const cmd = new CreateCommand();
         const args: any = {
+
+        };
+        const pluginConfiguration: any = {
 
         };
         const mockConfiguration: any = {
@@ -38,9 +43,13 @@ describe("create", () => {
             exists: async (path: string) => {
                 return false;
             },
+            readJsonFile: async (path: string) => {
+                expect(path).toEqual(`${pluginPath}/plugin.json`);
+                return pluginConfiguration;
+            }
         };
         cmd.fs = mockFs;
-        const mockUpdatePlugin = jest.fn();
+        const mockUpdatePlugin = jest.fn(async () => pluginPath);
         const mockPluginManager: any = {
             updatePlugin: mockUpdatePlugin,
         };
@@ -79,7 +88,9 @@ describe("create", () => {
 
         // New project is exported from template.
         expect(mockTemplateExport).toHaveBeenCalledTimes(1);
-        expect(mockTemplateExport).toHaveBeenCalledWith(projectDir, `${cwd}/${projectDir}`);
+        
+        const plugin = new Plugin(pluginPath, pluginConfiguration)
+        expect(mockTemplateExport).toHaveBeenCalledWith(projectDir, `${cwd}/${projectDir}`, plugin);
 
         // Git repo is created for new project.
         expect(mockCreateNewRepo).toHaveBeenCalledTimes(1);

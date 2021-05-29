@@ -148,7 +148,7 @@ export class Command implements ICommand {
 
                 const throwOnNonZeroExitCode = !didTerminate && (this.options.throwOnNonZeroExitCode === true || this.options.throwOnNonZeroExitCode === undefined);
                 if (throwOnNonZeroExitCode && code !== 0) {
-                    const err: any = new Error(`Cmd "${this.cmd}" exited with error code ${code}`);
+                    const err: any = new Error(`Cmd "${this.cmd}" exited with error code ${code}\n${stdError}`);
                     err.code = code;
                     err.stdout = stdOutput;
                     err.stderr = stdError;

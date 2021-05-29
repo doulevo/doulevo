@@ -3,6 +3,7 @@
 //
 
 import { InjectableClass, InjectProperty } from "@codecapers/fusion";
+import chalk = require("chalk");
 import { exec, ExecOptions } from "child_process";
 import * as stream from "stream";
 import { IConfiguration, IConfiguration_id } from "../services/configuration";
@@ -24,6 +25,11 @@ export interface ICommandOptions extends ExecOptions {
     // Set to true to always show output.
     //
     showOutput?: boolean;
+
+    //
+    // Prefix to show for each line of output.
+    //
+    outputPrefix?: string;
 
     //
     // Set to true to throw an error for a non-zero exit code.
@@ -101,12 +107,24 @@ export class Command implements ICommand {
 
             let stdOutput = "";
 
+            const writeOutput = (output: string) => {
+                if (this.options.outputPrefix) {
+                    const lines = output.split("\n");
+                    for (const line of lines) {
+                        process.stdout.write(`${this.options.outputPrefix}: ${line.trim()}\n`);
+                    }
+                }
+                else {
+                    process.stdout.write(output);
+                }
+            }
+
             proc.stdout!.on('data', (data) => {
                 const output = data.toString();
                 stdOutput += output;
 
                 if (this.options.showOutput || this.configuration.isDebug()) {
-                    console.log(output);
+                    writeOutput(output);
                 }
             });
 
@@ -117,7 +135,7 @@ export class Command implements ICommand {
                 stdError += output;
 
                 if (this.options.showOutput || this.configuration.isDebug()) {
-                    console.log(output);
+                    writeOutput(output);
                 }
             });
 

@@ -23,6 +23,16 @@ export interface IKubernetes {
     // Deploys the project to the backend.
     //
     deploy(project: IProject, plugin: IPlugin): Promise<void>;
+
+    //
+    // Print logs from the backend.
+    //
+    logs(project: IProject): Promise<void>;
+
+    //
+    // Get the pods running for this project.
+    //
+    getPods(project: IProject): Promise<any[]>;
 }
 
 @InjectableSingleton(IKubernetes_id)
@@ -144,5 +154,30 @@ export class Kubernetes implements IKubernetes {
             throw err;
         }
     }
+
+    //
+    // Print logs from the backend.
+    //
+    async logs(project: IProject): Promise<void> {
+
+        const pods = await this.getPods(project);
+        const podNames = pods.map(pod => pod.metadata.name);
+        await Promise.all(podNames.map(async podName => {
+            await this.exec.invoke(`kubectl logs ${podName}`, {
+                showOutput: true,
+                outputPrefix: podName,
+            });
+        }));
+    }
+
+    //
+    // Get the pods running for this project.
+    //
+    async getPods(project: IProject): Promise<any[]> {
+
+        const result = await this.exec.invoke(`kubectl get pods -l=app=${project.getName()} -o json`);
+        return JSON.parse(result.stdout).items;
+    }
+
 } 
 

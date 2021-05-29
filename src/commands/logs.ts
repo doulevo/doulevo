@@ -7,6 +7,7 @@ import { IEnvironment, IEnvironment_id } from "../services/environment";
 import { IFs, IFs_id } from "../services/fs";
 import { Project } from "../lib/project";
 import { Plugin } from "../lib/plugin";
+import { IKubernetes, IKubernetes_id } from "../plugins/kubernetes";
 
 @InjectableClass()
 export class LogsCommand implements IDoulevoCommand {
@@ -19,6 +20,9 @@ export class LogsCommand implements IDoulevoCommand {
 
     @InjectProperty(IDocker_id)
     docker!: IDocker;
+
+    @InjectProperty(IKubernetes_id)
+    kubernetes!: IKubernetes;
 
     @InjectProperty(IFs_id)
     fs!: IFs;
@@ -45,10 +49,18 @@ export class LogsCommand implements IDoulevoCommand {
 
         const follow = this.configuration.getArg<boolean>("f") || this.configuration.getArg<boolean>("follow") || false;
 
-        //
-        // Show logs.
-        //
-        await this.docker.logs(project, follow);
+        if (mode === "dev") {
+            //
+            // Show local logs.
+            //
+            await this.docker.logs(project, follow);
+        }
+        else {
+            //
+            // Show remote logs.
+            //
+            await this.kubernetes.logs(project);
+        }
     }
 }
 

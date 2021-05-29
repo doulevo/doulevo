@@ -152,7 +152,14 @@ Follow:
 npx ts-node src/index.ts logs --follow --project=./test-project --local-plugin=./test-plugin --debug
 ```
 
-### Viewing imagesiamges for the project
+Prod
+
+```bash
+npx ts-node src/index.ts logs --mode=prod --project=./test-project --local-plugin=./test-plugin --debug
+```
+
+
+### Viewing images for the project
 
 ```bash
 npx ts-node src/index.ts ls --project=./test-project --local-plugin=./test-plugin --debug

@@ -49,6 +49,7 @@ class TemplateManager implements ITemplateManager {
     private constructor() {
     }
 
+    //TODO: pass plugin through.
     //
     // Exports a template.
     //
@@ -152,6 +153,7 @@ class TemplateManager implements ITemplateManager {
         }
     }
 
+    //TODO: pass plugin through.
     //
     // Expands a template file with fallbacks.
     //

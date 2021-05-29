@@ -16,6 +16,8 @@ import { IProgressIndicator, IProgressIndicator_id } from "../services/progress-
 import { ICommandResult } from "../lib/command";
 import { IGit, IGit_id } from "../services/git";
 import { IVariables, IVariables_id } from "../services/variables";
+import { fstat } from "fs-extra";
+import { IFs, IFs_id } from "../services/fs";
 const AsciiTable = require('../lib/ascii-table');
 
 export const IDocker_id = "IDocker"
@@ -81,6 +83,11 @@ export interface IDocker {
     // Removes an image.
     //
     removeImage(imageId: string): Promise<void>;
+
+    //
+    // Ejects configuration for customization.
+    //
+    eject(project: IProject): Promise<void>;
 }
 
 @InjectableSingleton(IDocker_id)
@@ -109,6 +116,9 @@ export class Docker implements IDocker {
 
     @InjectProperty(IVariables_id)
     variables!: IVariables;
+
+    @InjectProperty(IFs_id)
+    fs!: IFs;
 
     //
     // Gets the name of the repository for the project.
@@ -144,24 +154,7 @@ export class Docker implements IDocker {
             }
         }
 
-        let dockerFileContent: string | undefined;
-
-        const docker_file_already_exists = false; // TODO: If there's a Dockerfile-{dev|prod} or just a Dockerfile just use that.
-        if (!docker_file_already_exists) {
-            // Get previous Dockerfile from local cache.
-    
-            // If no previous Dockerfile, or it's out of date (eg if configuration has changed that would change the Dockerfile)
-                // Out of date if project data has changed.
-                // Out of date if plugin hash has changed.
-
-                //TODO: Could delegate generation of the Dockerfile to code in the plugin if necessary.
-                dockerFileContent = await this.templateManager.expandTemplateFile(project, project.getData(), `docker/Dockerfile-${mode}`, "docker/Dockerfile");
-                if (!dockerFileContent) {
-                    throw new Error(`Failed to find Docker template file in plugin.`);
-                }
-
-                // Generate and cache the Dockerfile.
-        }
+        let dockerFileContent = await this.generateConfiguration(project, mode);
 
         // Generate the .dockerignore file (if not existing, or out of date).
 
@@ -188,6 +181,22 @@ export class Docker implements IDocker {
         //      - project name
         //      - content / dockerfile hash
         //      - tag it with "local" if not build in an official CD system.
+    }
+
+    //
+    // Generates the Docker configuration.
+    //
+    private async generateConfiguration(project: IProject, mode: string): Promise<string | string> {
+
+        //TODO: If there's a Dockerfile-{dev|prod} or just a Dockerfile just use that.
+        //TODO: Could cache the generated file.
+        
+        const dockerFileContent = await this.templateManager.expandTemplateFile(project, project.getData(), `docker/Dockerfile-${mode}`, "docker/Dockerfile");
+        if (!dockerFileContent) {
+            throw new Error(`Failed to find Docker template file in plugin.`);
+        }
+
+        return dockerFileContent;
     }
 
     //
@@ -482,4 +491,18 @@ export class Docker implements IDocker {
     async removeImage(imageId: string): Promise<void> {
         await this.exec.invoke(`docker image rm ${imageId} --force`);
     }
+
+    //
+    // Ejects configuration for customization.
+    //
+    async eject(project: IProject): Promise<void> {
+        const devDockerFileContent = await this.generateConfiguration(project, "dev");
+        await this.fs.writeFile(joinPath(project.getPath(), "Dockerfile-dev"), devDockerFileContent);
+        this.log.info("Wrote Dockerfile-dev");
+
+        const prodDockerFileContent = await this.generateConfiguration(project, "prod");
+        await this.fs.writeFile(joinPath(project.getPath(), "Dockerfile-prod"), prodDockerFileContent);
+        this.log.info("Wrote Dockerfile-prod");
+    }
+
 } 

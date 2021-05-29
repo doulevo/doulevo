@@ -11,6 +11,7 @@ import logsCommand from "./commands/logs";
 import psCommand from "./commands/ps";
 import lsCommand from "./commands/ls";
 import deployCommand from "./commands/deploy";
+import ejectCommand from "./commands/eject";
 
 export const commands: IDoulevoCommandDesc[] = [
     createCommand,
@@ -21,5 +22,6 @@ export const commands: IDoulevoCommandDesc[] = [
     psCommand,
     lsCommand,
     deployCommand,
+    ejectCommand,
 ];
 

@@ -181,3 +181,9 @@ npx ts-node src/index.ts ps --mode=prod --project=./test-project --local-plugin=
 ```bash
 npx ts-node src/index.ts deploy --project=./test-project --local-plugin=./test-plugin --debug
 ```
+
+### Ejecting configuration
+
+```bash
+npx ts-node src/index.ts eject --project=./test-project --local-plugin=./test-plugin --debug
+```

@@ -14,6 +14,8 @@ import { IProgressIndicator, IProgressIndicator_id } from "../services/progress-
 import { IDocker, IDocker_id } from "./docker";
 import { encodeBase64 } from "../lib/base64";
 import { IVariables, IVariables_id } from "../services/variables";
+import { joinPath } from "../lib/join-path";
+import { IFs, IFs_id } from "../services/fs";
 const AsciiTable = require('../lib/ascii-table');
 
 export const IKubernetes_id = "IKubernetes"
@@ -34,6 +36,11 @@ export interface IKubernetes {
     // Print containers running in Kubernetes.
     //
     ps(project: IProject): Promise<void>;
+
+    //
+    // Ejects configuration for customization.
+    //
+    eject(project: IProject): Promise<void>;
 }
 
 @InjectableSingleton(IKubernetes_id)
@@ -63,6 +70,9 @@ export class Kubernetes implements IKubernetes {
     @InjectProperty(IVariables_id)
     variables!: IVariables;
 
+    @InjectProperty(IFs_id)
+    fs!: IFs;
+
     //
     // Deploys the project to the backend.
     //
@@ -70,25 +80,10 @@ export class Kubernetes implements IKubernetes {
 
         let imageRef: string | undefined;
 
-        // Commented these because they make asking questions impossible.
-        // TODO: Want to get this back online but would be better to raise events and have progress reporting 
-        //       be done at the highest level.
-        // this.progressIndicator.start("Publish project...");
-
-        try {
-            //
-            // Do the build.
-            //
-            imageRef = await this.docker.publish(project, plugin);
-
-            // this.progressIndicator.succeed("Publish successful.");
-        }
-        catch (err) {
-            // this.progressIndicator.fail("Publish failed.");
-            throw err;
-        }
-
-        // this.progressIndicator.start("Deploying...");
+        //
+        // Do the build.
+        //
+        imageRef = await this.docker.publish(project, plugin);
 
         const variableSpecs = [
             {
@@ -117,43 +112,46 @@ export class Kubernetes implements IKubernetes {
         };
         const encodedDockerConfig = encodeBase64(JSON.stringify(dockerConfig));
 
-        try {
-            const projectData = project.getData();
-            const deploymentData = Object.assign({}, projectData, {
-                imageRef: imageRef,
+        const kubernetesFileContent = await this.generateConfiguration(project, imageRef, encodedDockerConfig);
 
-                //
-                // Docker authentication.
-                //
-                // https://dev.to/asizikov/using-github-container-registry-with-kubernetes-38fb
-                //
-                dockerConfigSecret: encodedDockerConfig,
-            });
+        this.log.verbose("Building with Kubernetes configuration:");
+        this.log.verbose(kubernetesFileContent);
+
+        //TODO: Set the Kubectl context to the cluster that the application is linked to.
+
+        // 
+        // Deploy the service to Kubernetes.
+        //
+        await this.exec.invoke(`kubectl apply -f -`, {
+            stdin: kubernetesFileContent,
+        });
+    }
+
+    //
+    // Generate Kubernetes configuration file.
+    //
+    private async generateConfiguration(project: IProject, imageRef: string, encodedDockerConfig: string): Promise<string> {
+        const projectData = project.getData();
+        const deploymentData = Object.assign({}, projectData, {
+            imageRef: imageRef,
 
             //
-            // Generate the Kubernetes configuration file.
-            //TODO: Might be useful to cache the configuration file in the .doulevo sub-directory.
+            // Docker authentication.
             //
-            const kubernetesFileContent = await this.templateManager.expandTemplateFile(project, deploymentData, `kubernetes/deployment.yaml`);
-    
-            this.log.verbose("Building with Kubernetes configuration:");
-            this.log.verbose(kubernetesFileContent);
-
-            //TODO: Set the Kubectl context to the cluster that the application is linked to.
-    
-            // 
-            // Deploy the service to Kubernetes.
+            // https://dev.to/asizikov/using-github-container-registry-with-kubernetes-38fb
             //
-            await this.exec.invoke(`kubectl apply -f -`, {
-                stdin: kubernetesFileContent,
-            });
+            dockerConfigSecret: encodedDockerConfig,
+        });
 
-            // this.progressIndicator.succeed("Deployed.");
+        //
+        // Generate the Kubernetes configuration file.
+        //TODO: Might be useful to cache the configuration file in the .doulevo sub-directory.
+        //
+        const kubernetesFileContent = await this.templateManager.expandTemplateFile(project, deploymentData, `kubernetes/deployment.yaml`);
+        if (!kubernetesFileContent) {
+            throw new Error(`Failed to find Kubernetes template file in plugin.`);
         }
-        catch (err) {
-            // this.progressIndicator.fail("Deployment failed.");
-            throw err;
-        }
+        return kubernetesFileContent;
     }
 
     //
@@ -203,5 +201,13 @@ export class Kubernetes implements IKubernetes {
         return JSON.parse(result.stdout).items;
     }
 
+    //
+    // Ejects configuration for customization.
+    //
+    async eject(project: IProject): Promise<void> {
+        const kubernetesFileContent = await this.generateConfiguration(project, "{{imageRef}}", "{{dockerAuth}}");
+        await this.fs.writeFile(joinPath(project.getPath(), "Deployment.yaml"), kubernetesFileContent);
+        this.log.info("Wrote Deployment.yaml");
+    }
 } 
 

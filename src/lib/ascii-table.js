@@ -594,8 +594,8 @@
       for (var k = 0; k < this.__maxCells; k++) {
         var cell = row[k]
           , just = this.__justify ? Math.max.apply(null, max) : max[k]
-          // , pad = k === this.__maxCells - 1 ? just : just + this.__spacing
-          , pad = 20 //just
+          , pad = k === this.__maxCells - 1 ? just : just + this.__spacing
+          , pad = just
           , cAlign = this.__aligns[k]
           , use = align
           , method = 'alignAuto'

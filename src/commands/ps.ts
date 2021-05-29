@@ -6,6 +6,7 @@ import { IConfiguration_id, IConfiguration } from "../services/configuration";
 import { IEnvironment, IEnvironment_id } from "../services/environment";
 import { IFs, IFs_id } from "../services/fs";
 import { Project } from "../lib/project";
+import { IKubernetes, IKubernetes_id } from "../plugins/kubernetes";
 
 @InjectableClass()
 export class PsCommand implements IDoulevoCommand {
@@ -18,6 +19,9 @@ export class PsCommand implements IDoulevoCommand {
 
     @InjectProperty(IDocker_id)
     docker!: IDocker;
+
+    @InjectProperty(IKubernetes_id)
+    kubernetes!: IKubernetes;
 
     @InjectProperty(IFs_id)
     fs!: IFs;
@@ -37,12 +41,23 @@ export class PsCommand implements IDoulevoCommand {
         const configurationFile = await this.fs.readJsonFile(configurationFilePath);
         const project = new Project(projectPath, configurationFile);
 
-        //
-        // Do the build.
-        //
-        // TODO: Choose the current build plugin (eg "build/docker") based on project configuration.
-        //
-        await this.docker.ps(project);
+        const mode = this.configuration.getArg("mode") || "dev";
+        if (mode !== "prod" && mode !== "dev") {
+            throw new Error(`--mode can only be either "dev" or "prod".`);
+        }
+
+        if (mode === "dev") {
+            //
+            // Show local containers.
+            //
+            await this.docker.ps(project);
+        }
+        else {
+            //
+            // Show remote containers.
+            //
+            await this.kubernetes.ps(project);
+        }
     }
 }
 

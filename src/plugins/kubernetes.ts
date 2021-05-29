@@ -13,7 +13,8 @@ import { IDetectInterrupt, IDetectInterrupt_id } from "../services/detect-interr
 import { IProgressIndicator, IProgressIndicator_id } from "../services/progress-indicator";
 import { IDocker, IDocker_id } from "./docker";
 import { encodeBase64 } from "../lib/base64";
-import { IVariables, IVariables_id, Variables } from "../services/variables";
+import { IVariables, IVariables_id } from "../services/variables";
+const AsciiTable = require('../lib/ascii-table');
 
 export const IKubernetes_id = "IKubernetes"
 
@@ -30,9 +31,9 @@ export interface IKubernetes {
     logs(project: IProject): Promise<void>;
 
     //
-    // Get the pods running for this project.
+    // Print containers running in Kubernetes.
     //
-    getPods(project: IProject): Promise<any[]>;
+    ps(project: IProject): Promise<void>;
 }
 
 @InjectableSingleton(IKubernetes_id)
@@ -171,10 +172,33 @@ export class Kubernetes implements IKubernetes {
     }
 
     //
+    // Print containers running in Kubernetes.
+    //
+    async ps(project: IProject): Promise<void> {
+        const pods = await this.getPods(project);
+
+        const table = new AsciiTable()
+        table
+            // .setBorder("", "", "", "")
+            .removeBorder()
+            .setAlign(0, AsciiTable.LEFT)
+            .setAlign(1, AsciiTable.LEFT)
+            .setAlign(2, AsciiTable.LEFT)
+            .setHeadingAlign(AsciiTable.LEFT)
+            .setHeading('Pod', 'Status', 'Created');
+
+        for (const pod of pods) {
+            table.addRow(pod.metadata.name, pod.status.phase, pod.metadata.creationTimestamp);
+        }
+    
+        this.log.info(table.toString());
+
+    }
+
+    //
     // Get the pods running for this project.
     //
-    async getPods(project: IProject): Promise<any[]> {
-
+    private async getPods(project: IProject): Promise<any[]> {
         const result = await this.exec.invoke(`kubectl get pods -l=app=${project.getName()} -o json`);
         return JSON.parse(result.stdout).items;
     }

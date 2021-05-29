@@ -116,7 +116,7 @@ npx ts-node src/index.ts build --project=./test-project --local-plugin=./test-pl
 npx ts-node src/index.ts up --project=./test-project --local-plugin=./test-plugin --debug
 ```
 
-Dev  mode:
+Dev mode:
 
 ```bash
 npx ts-node src/index.ts up --project=./test-project --local-plugin=./test-plugin --mode=dev --debug

@@ -7,7 +7,7 @@
     "lib": [                                  /* Specify library files to be included in the compilation:  */
         "es2015"
     ],                                        
-    //"allowJs": true,                        /* Allow javascript files to be compiled. */
+    "allowJs": true,                          /* Allow javascript files to be compiled. */
     // "checkJs": true,                       /* Report errors in .js files. */
     // "jsx": "preserve",                     /* Specify JSX code generation: 'preserve', 'react-native', or 'react'. */
     "declaration": true,                      /* Generates corresponding '.d.ts' file. */
@@ -55,6 +55,10 @@
   },
   "exclude": [
       "node_modules",
-      "build"
+      "build",
+      "expected-test-project",
+      "test-plugin",
+      "test-project",
+      "jest.config.js"
   ]
 }

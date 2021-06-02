@@ -4,6 +4,7 @@
 
 import { InjectableClass } from "@codecapers/fusion";
 import { runInThisContext } from "node:vm";
+import { IPluginDetails } from "../services/plugin-manager";
 
 //
 // Defines a directory that is shared between the host OS and the container.
@@ -23,10 +24,21 @@ export interface ISharedDirectory {
 
 export interface IPlugin {
 
+
+    //
+    // Gets the project type for the plugin (if known).
+    //
+    getProjectType(): string | undefined;
+
+    //
+    // Get the URL for the plugin (if known).
+    //
+    getUrl(): string | undefined;
+
     //
     // Get the local path for the plugin, if specified.
     //
-    getLocalPath(): string; 
+    getPath(): string; 
 
     //
     // Gets the directories that are shared between the host OS and the container.
@@ -38,25 +50,39 @@ export interface IPlugin {
 export class Plugin implements IPlugin {
 
     //
-    // Local path to the plugin.
+    // Details for the plugin.
     //
-    private localPath: string;
+    private pluginDetails: IPluginDetails;
 
     //
     // Plugin configuration.
     //
     private configurationFile: any;
 
-    constructor(localPluginPath: string, configurationFile: any) {
-        this.localPath = localPluginPath;
+    constructor(pluginDetails: IPluginDetails, configurationFile: any) {
+        this.pluginDetails = pluginDetails;
         this.configurationFile = configurationFile;
+    }
+
+    //
+    // Gets the project type for the plugin (if known).
+    //
+    getProjectType(): string | undefined {
+        return this.pluginDetails.projectType;
+    }
+
+    //
+    // Get the URL for the plugin (if known).
+    //
+    getUrl(): string | undefined {
+        return this.pluginDetails.url;
     }
 
     //
     // Get the local path for the plugin.
     //
-    getLocalPath(): string {
-        return this.localPath;
+    getPath(): string {
+        return this.pluginDetails.path;
     }
 
     //

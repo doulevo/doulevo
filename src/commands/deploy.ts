@@ -60,7 +60,7 @@ export class DeployCommand implements IDoulevoCommand {
         }
         const pluginConfigurationFilePath = joinPath(pluginPath, "plugin.json");
         const pluginConfigurationFile = await this.fs.readJsonFile(pluginConfigurationFilePath);
-        const plugin = new Plugin(pluginPath, pluginConfigurationFile); 
+        const plugin = new Plugin({ path: pluginPath }, pluginConfigurationFile); 
 
         await this.kubernetes.deploy(project, plugin);
     }

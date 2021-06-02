@@ -13,6 +13,7 @@ import { IProgressIndicator, IProgressIndicator_id } from "./progress-indicator"
 import { IQuestioner, IQuestioner_id } from "./questioner";
 import { IProject } from "../lib/project";
 import { IPlugin } from "../lib/plugin";
+import { IEnvironment, IEnvironment_id } from "./environment";
 
 export const ITemplateManager_id = "ITemplateManager";
 
@@ -47,6 +48,9 @@ class TemplateManager implements ITemplateManager {
     @InjectProperty(IQuestioner_id)
     questioner!: IQuestioner;
 
+    @InjectProperty(IEnvironment_id)
+    environment!: IEnvironment;
+
     private constructor() {
     }
 
@@ -70,7 +74,7 @@ class TemplateManager implements ITemplateManager {
             },
         ];
 
-        const localTemplatePath = joinPath(plugin.getLocalPath(), "create-template");
+        const localTemplatePath = joinPath(plugin.getPath(), "create-template");
         const templateConfigFilePath = joinPath(localTemplatePath, "template.json");
         const templateConfigExists = await this.fs.exists(templateConfigFilePath);
         if (templateConfigExists) {
@@ -131,6 +135,13 @@ class TemplateManager implements ITemplateManager {
             const description = templateData.description;
             delete templateData.description;
 
+            let pluginPath = plugin.getPath();
+            const pluginsPath = this.environment.getPluginsDirectory();
+            if (pluginPath.startsWith(pluginsPath)) {
+                // Make the path relative to the application's data directory.
+                pluginPath = joinPath("^", pluginPath.substring(pluginsPath.length));
+            }
+
             //
             // Create the Doulevo config file.
             //
@@ -138,9 +149,9 @@ class TemplateManager implements ITemplateManager {
             const defaultConfig = {
                 name: name,
                 description: description,
-                projectType: this.configuration.getProjectType(),
-                localPluginPath: this.configuration.getLocalPluginPath(),
-                pluginUrl: this.configuration.getPluginUrl(),
+                projectType: plugin.getProjectType(),
+                localPluginPath: pluginPath,
+                pluginUrl: plugin.getUrl(),
                 data: templateData,
             };
             await this.fs.writeJsonFile(configFilePath, defaultConfig);
@@ -158,7 +169,7 @@ class TemplateManager implements ITemplateManager {
     //
     async expandTemplateFile(project: IProject, plugin: IPlugin, templateData: any, ...fileNames: string[]): Promise<string | undefined> {
 
-        const pluginPath = await plugin.getLocalPath();
+        const pluginPath = await plugin.getPath();
 
         for (const fileName of fileNames) {
             const templateFilePath = joinPath(pluginPath, "template-files", fileName);

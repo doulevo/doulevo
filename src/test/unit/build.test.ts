@@ -87,7 +87,7 @@ describe("build", () => {
             new Project(cwd, projectConfiguration),
             "dev",
             [],
-            new Plugin(pluginPath, pluginConfiguration)
+            new Plugin({ path: pluginPath }, pluginConfiguration)
         );
     });
 

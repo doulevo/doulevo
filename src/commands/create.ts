@@ -8,7 +8,6 @@ import { IFs, IFs_id } from "../services/fs";
 import { ITemplateManager, ITemplateManager_id } from "../services/template-manager";
 import { IGit, IGit_id } from "../services/git";
 import { IEnvironment, IEnvironment_id } from "../services/environment";
-import { IProgressIndicator, IProgressIndicator_id } from "../services/progress-indicator";
 import { Plugin } from "../lib/plugin";
 
 @InjectableClass()
@@ -35,9 +34,6 @@ export class CreateCommand implements IDoulevoCommand {
     @InjectProperty(IEnvironment_id)
     environment!: IEnvironment;
 
-    @InjectProperty(IProgressIndicator_id)
-    progressIndicator!: IProgressIndicator;
-
     async invoke(): Promise<void> {
 
         const projectDir = this.configuration.getMainCommand();
@@ -56,30 +52,18 @@ export class CreateCommand implements IDoulevoCommand {
                 throw new Error(`Directory already exists at ${projectPath}, please delete the existing directory, or use the --force flag if you want to create a new project here`);
             }
         }
-
-        this.progressIndicator.start("Updating plugin...");
-
-        let pluginPath: string;
    
-        try {
-            //
-            // Clone or update the plugin requested by the configuration.
-            //
-            pluginPath = await this.pluginManager.updatePlugin();
+        //
+        // Clone or update the plugin requested by the configuration.
+        //
+        const pluginDetails = await this.pluginManager.updatePlugin();
 
-            this.progressIndicator.info("Updated plugin.");
-        }
-        catch (err) {
-            this.progressIndicator.fail("Failed to update plugin.");
-            throw err;
-        }
-        
         //
         // Load the plugin for this project.
         //
-        const pluginConfigurationFilePath = joinPath(pluginPath, "plugin.json");
+        const pluginConfigurationFilePath = joinPath(pluginDetails.path, "plugin.json");
         const pluginConfigurationFile = await this.fs.readJsonFile(pluginConfigurationFilePath);
-        const plugin = new Plugin(pluginPath, pluginConfigurationFile); 
+        const plugin = new Plugin(pluginDetails, pluginConfigurationFile); 
 
         //
         // Exports the create-template, filling in the blanks.

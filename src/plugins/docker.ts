@@ -301,7 +301,7 @@ export class Docker implements IDocker {
             );
         }
         finally {
-            this.progressIndicator.succeed("Container was started.");
+            this.progressIndicator.succeed("Container started.");
         }
 
         const containerId = runResult.stdout.trim();

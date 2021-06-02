@@ -11,16 +11,37 @@ import { ILog, ILog_id } from "./log";
 import { joinPath } from "../lib/join-path";
 import { IGit, IGit_id } from "./git";
 import { IQuestioner, IQuestioner_id } from "./questioner";
+import { IProgressIndicator, IProgressIndicator_id } from "./progress-indicator";
 
 export const IPluginManager_id = "IPluginManager";
+
+//
+// Details for the current plugin.
+//
+export interface IPluginDetails {
+    //
+    // The type of the project (if provided).
+    //
+    projectType?: string;
+
+    //
+    // URL where the plugin was downloaded from (if provided or generated).
+    //
+    url?: string;
+
+    //
+    // The local path of the plugin.
+    //
+    path: string;
+}
 
 export interface IPluginManager {
 
     //
     // Clones or updates the local version of the plugin if necessary.
-    // Returns the local path of the plugin.
+    // Returns the details of the plugin.
     //
-    updatePlugin(): Promise<string>;
+    updatePlugin(): Promise<IPluginDetails>;
 }
 
 @InjectableSingleton(IPluginManager_id)
@@ -40,6 +61,9 @@ class PluginManager implements IPluginManager {
 
     @InjectProperty(IQuestioner_id)
     questioner!: IQuestioner;
+
+    @InjectProperty(IProgressIndicator_id)
+    progressIndicator!: IProgressIndicator;
 
     //
     // Requests the project type from the user if it's not already set in the configuration.
@@ -63,7 +87,7 @@ class PluginManager implements IPluginManager {
         const projectTypeQuestion = {
             type: "list",
             name: "projectType",
-            message: "Choose the type of the project (more choices comming in the future): ", 
+            message: "Choose the type of the project (more choices coming in the future): ", 
             choices: [ //TODO: Get choices from some kind of manifest.
                 {
                     name: "Node.js",
@@ -83,17 +107,19 @@ class PluginManager implements IPluginManager {
     // Clones or updates the local version of the plugin if necessary.
     // Returns the local path of the plugin.
     //
-    async updatePlugin(): Promise<string> {
+    async updatePlugin(): Promise<IPluginDetails> {
 
-        let localPluginPath = this.configuration.getLocalPluginPath();
-        if (localPluginPath === undefined) {
+        let projectType: string | undefined;
+        let pluginUrl: string | undefined;
+        let pluginPath = this.configuration.getLocalPluginPath();
+        if (pluginPath === undefined) {
    
-            let pluginUrl = this.configuration.getPluginUrl();
+            pluginUrl = this.configuration.getPluginUrl();
             if (pluginUrl === undefined) {
                 //
                 // Get the project type, request it from the user it not specified in the configuration.
                 //
-                const projectType = await this.getProjectType();
+                projectType = await this.getProjectType();
                 pluginUrl = `https://github.com/doulevo/plugin-${projectType}.git`;
             }
     
@@ -102,25 +128,39 @@ class PluginManager implements IPluginManager {
             //
             // Download and cache the plugin for this type of project.
             //
-            const pluginsCachePath = joinPath(this.environment.getAppDataDirectory(), "plugins")
-            localPluginPath = joinPath(pluginsCachePath, pluginDir); 
+            const pluginsPath = this.environment.getPluginsDirectory();
+            pluginPath = joinPath(pluginsPath, pluginDir); 
 
-            const pluginExists = await fs.pathExists(localPluginPath);
+            const pluginExists = await fs.pathExists(pluginPath);
             if (!pluginExists) {
             
-                // Download the plugin.
-                await this.git.clone(pluginUrl, localPluginPath);
+                this.progressIndicator.start("Updating plugin...");
+
+                try {
+                    // Download the plugin.
+                    await this.git.clone(pluginUrl, pluginPath);
+
+                    this.progressIndicator.info("Updated plugin.");
+                }
+                catch (err) {
+                    this.progressIndicator.fail("Failed to update plugin.");
+                    throw err;
+                }
         
-                this.log.verbose(`Downloaded plugin to ${localPluginPath}.`);
+                this.log.verbose(`Downloaded plugin to ${pluginPath}.`);
             }
             else {
-                this.log.verbose(`Plugin already cached at ${localPluginPath}.`);
+                this.log.verbose(`Plugin already cached at ${pluginPath}.`);
             }
         }
         else {
-            this.log.verbose(`Using local plugin at ${localPluginPath}.`);
+            this.log.verbose(`Using local plugin at ${pluginPath}.`);
         }
 
-        return localPluginPath;
+        return {
+            projectType: projectType,
+            url: pluginUrl,
+            path: pluginPath,
+        };
     }
 }

@@ -21,6 +21,11 @@ export interface IEnvironment {
     getAppDataDirectory(): string;
 
     //
+    // Gets the directory where plugins are stored.
+    //
+    getPluginsDirectory(): string;
+
+    //
     // Gets the current working directory.
     //
     cwd(): string;
@@ -57,6 +62,13 @@ class Environment implements IEnvironment {
     //
     getAppDataDirectory(): string {
         return this.appData;
+    }
+
+    //
+    // Gets the directory where plugins are stored.
+    //
+    getPluginsDirectory(): string {
+        return joinPath(this.getAppDataDirectory(), "plugins");
     }
 
     //

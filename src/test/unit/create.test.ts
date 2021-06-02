@@ -49,7 +49,7 @@ describe("create", () => {
             }
         };
         cmd.fs = mockFs;
-        const mockUpdatePlugin = jest.fn(async () => pluginPath);
+        const mockUpdatePlugin = jest.fn(async () => ({ path: pluginPath }));
         const mockPluginManager: any = {
             updatePlugin: mockUpdatePlugin,
         };
@@ -73,12 +73,6 @@ describe("create", () => {
             cwd: () => cwd,
         };
         cmd.environment = mockEnv;
-        const mockProgressIndicator: any = {
-            start: () => {},
-            fail: () => {},
-            info: () => {},
-        };
-        cmd.progressIndicator = mockProgressIndicator;
 
         // Invokes the command.
         await cmd.invoke();
@@ -89,7 +83,7 @@ describe("create", () => {
         // New project is exported from template.
         expect(mockTemplateExport).toHaveBeenCalledTimes(1);
         
-        const plugin = new Plugin(pluginPath, pluginConfiguration)
+        const plugin = new Plugin({ path: pluginPath }, pluginConfiguration)
         expect(mockTemplateExport).toHaveBeenCalledWith(projectDir, `${cwd}/${projectDir}`, plugin);
 
         // Git repo is created for new project.

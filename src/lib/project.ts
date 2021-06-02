@@ -2,7 +2,8 @@
 // Access to the project configuration.
 //
 
-import { InjectableClass } from "@codecapers/fusion";
+import { InjectableClass, InjectProperty } from "@codecapers/fusion";
+import { IEnvironment, IEnvironment_id } from "../services/environment";
 
 export interface IProject {
        
@@ -41,6 +42,9 @@ export interface IProject {
 @InjectableClass()
 export class Project implements IProject {
 
+    @InjectProperty(IEnvironment_id)
+    environment!: IEnvironment;
+
     private projectPath: string;
 
     //
@@ -72,7 +76,11 @@ export class Project implements IProject {
     // Get the local path for the plugin, if specified.
     //
     getLocalPluginPath(): string | undefined {
-        return this.configurationFile.localPluginPath;
+        let path = this.configurationFile.localPluginPath;
+        if (path.startsWith("^")) {
+            path = path.replace("^", this.environment.getPluginsDirectory());
+        }
+        return path;
     }
 
     //

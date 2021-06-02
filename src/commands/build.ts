@@ -67,22 +67,12 @@ export class BuildCommand implements IDoulevoCommand {
         const pluginConfigurationFile = await this.fs.readJsonFile(pluginConfigurationFilePath);
         const plugin = new Plugin({ path: pluginPath }, pluginConfigurationFile); 
 
-        this.progressIndicator.start("Building project...");
-
-        try {
-            //
-            // Do the build.
-            //
-            // TODO: Choose the current build plugin (eg "build/docker") based on project configuration.
-            //
-            await this.docker.build(project, mode, tags, plugin);
-
-            this.progressIndicator.succeed("Build successful.");
-        }
-        catch (err) {
-            this.progressIndicator.fail("Building failed.");
-            throw err;
-        }
+        //
+        // Do the build.
+        //
+        // TODO: Choose the current build plugin (eg "build/docker") based on project configuration.
+        //
+        await this.docker.build(project, mode, tags, plugin);
 
         const images = await this.docker.listProjectImages(project, mode);
         this.log.info(`Created images:`);

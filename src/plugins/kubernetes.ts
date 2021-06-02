@@ -112,19 +112,30 @@ export class Kubernetes implements IKubernetes {
         };
         const encodedDockerConfig = encodeBase64(JSON.stringify(dockerConfig));
 
-        const kubernetesFileContent = await this.generateConfiguration(project, plugin, imageRef, encodedDockerConfig);
+        this.progressIndicator.start("Deploying container...");
 
-        this.log.verbose("Building with Kubernetes configuration:");
-        this.log.verbose(kubernetesFileContent);
+        try {
+            const kubernetesFileContent = await this.generateConfiguration(project, plugin, imageRef, encodedDockerConfig);
+    
+            this.log.verbose("Building with Kubernetes configuration:");
+            this.log.verbose(kubernetesFileContent);
+    
+            //TODO: Set the Kubectl context to the cluster that the application is linked to.
+    
+            // 
+            // Deploy the service to Kubernetes.
+            //
+            await this.exec.invoke(`kubectl apply -f -`, {
+                stdin: kubernetesFileContent,
+            });
 
-        //TODO: Set the Kubectl context to the cluster that the application is linked to.
+            this.progressIndicator.succeed("Deployed container.");
+        }
+        catch (err) {
+            this.progressIndicator.fail("Failed to deploy container.");
+            throw err;
+        }
 
-        // 
-        // Deploy the service to Kubernetes.
-        //
-        await this.exec.invoke(`kubectl apply -f -`, {
-            stdin: kubernetesFileContent,
-        });
     }
 
     //

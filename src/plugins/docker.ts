@@ -153,25 +153,35 @@ export class Docker implements IDocker {
             }
         }
 
-        let dockerFileContent = await this.generateConfiguration(project, plugin, mode);
+        this.progressIndicator.start("Building image...");
 
-        // Generate the .dockerignore file (if not existing, or out of date).
+        try {
+            let dockerFileContent = await this.generateConfiguration(project, plugin, mode);
+    
+            // Generate the .dockerignore file (if not existing, or out of date).
+    
+            // Input .dockerignore from std input.
+    
+            this.log.verbose("Building with Dockerfile:");
+            this.log.verbose(dockerFileContent);
+    
+            //TODO: Ultimately need a way to allocation a version number.
+            const tagArgs = tags.map(tag => `--tag=${tag}`).join(" ") || "";
+            const projectTag = this.getProjectTag(project, mode);
+            const projectPath = project.getPath();
+            await this.exec.invoke(
+                `docker build ${projectPath} --tag=${projectTag} ${tagArgs} -f -`, 
+                { 
+                    stdin: dockerFileContent, 
+                }
+            );
 
-        // Input .dockerignore from std input.
-
-        this.log.verbose("Building with Dockerfile:");
-        this.log.verbose(dockerFileContent);
-
-        //TODO: Ultimately need a way to allocation a version number.
-        const tagArgs = tags.map(tag => `--tag=${tag}`).join(" ") || "";
-        const projectTag = this.getProjectTag(project, mode);
-        const projectPath = project.getPath();
-        await this.exec.invoke(
-            `docker build ${projectPath} --tag=${projectTag} ${tagArgs} -f -`, 
-            { 
-                stdin: dockerFileContent, 
-            }
-        );
+            this.progressIndicator.succeed("Built image.");
+        }
+        catch (err) {
+            this.progressIndicator.fail("Failed to build image.");
+            throw err;
+        }
 
         // Tag Dockerfile with:
         //      - application? 
@@ -246,12 +256,22 @@ export class Docker implements IDocker {
             `echo ${variables.docker.registry.password} | docker login ${variables.docker.registry.host} --username ${variables.docker.registry.username} --password-stdin`
         );
 
-        //
-        // Push image to the Docker registry.
-        //
-        await this.exec.invoke(
-            `docker push ${imageRef}`
-        );
+        this.progressIndicator.start("Publishing image...");
+
+        try {
+            //
+            // Push image to the Docker registry.
+            //
+            await this.exec.invoke(
+                `docker push ${imageRef}`
+            );
+
+            this.progressIndicator.succeed("Published image.");
+        }
+        catch (err) {
+            this.progressIndicator.fail("Failed to publish image.");
+            throw err;
+        }
 
         return imageRef;
     }

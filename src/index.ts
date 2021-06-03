@@ -31,6 +31,12 @@ async function main(): Promise<void> {
     //
     const doulevo = new Doulevo();
     await doulevo.invoke();
+
+    //
+    // Need an explicit exit. 
+    // Something to do with the interupt handler keeps the compiled exe alive!
+    //
+    process.exit(0);
 }
 
 main()

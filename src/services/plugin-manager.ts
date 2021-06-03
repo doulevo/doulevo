@@ -131,28 +131,32 @@ class PluginManager implements IPluginManager {
             const pluginsPath = this.environment.getPluginsDirectory();
             pluginPath = joinPath(pluginsPath, pluginDir); 
 
-            const pluginExists = await fs.pathExists(pluginPath);
-            if (!pluginExists) {
+            this.progressIndicator.start("Updating plugin...");
+            try {
+                const pluginExists = await fs.pathExists(pluginPath);
+                if (!pluginExists) {
             
-                this.progressIndicator.start("Updating plugin...");
-
-                try {
                     // Download the plugin.
                     await this.git.clone(pluginUrl, pluginPath);
+           
+                    this.log.verbose(`Downloaded plugin to ${pluginPath}.`);
+                }
+                else {
+                    this.log.verbose(`Plugin already cached at ${pluginPath}, updating...`);
 
-                    this.progressIndicator.info("Updated plugin.");
+                    // Update the plugin.
+                    await this.git.pull(pluginPath);
+
+                    this.log.verbose(`Updated plugin at ${pluginPath}.`);
                 }
-                catch (err) {
-                    this.progressIndicator.fail("Failed to update plugin.");
-                    throw err;
-                }
-        
-                this.log.verbose(`Downloaded plugin to ${pluginPath}.`);
+
+                this.progressIndicator.info("Updated plugin.");
             }
-            else {
-                this.log.verbose(`Plugin already cached at ${pluginPath}.`);
+            catch (err) {
+                this.progressIndicator.fail("Failed to update plugin.");
+                throw err;
             }
-        }
+    }
         else {
             this.log.verbose(`Using local plugin at ${pluginPath}.`);
         }

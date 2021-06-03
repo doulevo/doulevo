@@ -22,6 +22,11 @@ export interface IGit {
     clone(remoteRepo: string, localPath: string): Promise<void>;
 
     //
+    // Pulls changes to a local git repo.
+    //
+    pull(localPath: string): Promise<void>;
+
+    //
     // Create a new repo.
     //
     createNewRepo(path: string, comment: string): Promise<void>;
@@ -55,6 +60,13 @@ class Git implements IGit {
     //
     async clone(remoteRepo: string, localPath: string): Promise<void> {
         await this.exec.invoke(`git clone ${remoteRepo} ${localPath}`);
+    }
+
+    //
+    // Pulls changes to a local git repo.
+    //
+    async pull(localPath: string): Promise<void> {
+        await this.exec.invoke(`git pull`, { cwd: localPath });
     }
 
     //

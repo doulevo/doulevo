@@ -90,7 +90,7 @@ class PluginManager implements IPluginManager {
             message: "Choose the type of the project (more choices coming in the future): ", 
             choices: [ //TODO: Get choices from some kind of manifest.
                 {
-                    name: "Node.js",
+                    name: "Node.js / Express",
                     value: "nodejs",
                 },
             ],

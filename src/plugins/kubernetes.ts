@@ -93,10 +93,12 @@ export class Kubernetes implements IKubernetes {
             {
                 name: "docker.registry.username",
                 message: "Please enter the user name for your container registry: ",
+                isSensitive: true,
             },
             {
                 name: "docker.registry.password",
                 message: "Please enter the password for your container registry: ",
+                isSensitive: true,
             },
         ];
 

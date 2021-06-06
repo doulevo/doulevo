@@ -16,6 +16,12 @@ export const IVariables_id = "IVariables";
 // Defines a variable.
 //
 export interface IVariableSpec {
+    
+    //
+    // Set to true if the value of the variable is sensitive.
+    //
+    isSensitive?: boolean;
+
     //
     // The name of the variable.
     //
@@ -125,7 +131,7 @@ export class Variables implements IVariables {
                 //TODO: Attempt to load the variable from environment.
 
                 questions.push({
-                    type: "input",
+                    type: variableSpec.isSensitive ? "password" : "input",
                     name: variableSpec.name,
                     message: variableSpec.message,
                 });

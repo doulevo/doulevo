@@ -226,14 +226,14 @@ export class Docker implements IDocker {
                 message: "Please enter the repository under the container registry: ",
             },
             {
-                type: "input",
                 name: "docker.registry.username",
                 message: "Please enter the user name for your container registry: ",
+                isSensitive: true,
             },
             {
-                type: "input",
                 name: "docker.registry.password",
                 message: "Please enter the password for your container registry: ",
+                isSensitive: true,
             },
         ];
 

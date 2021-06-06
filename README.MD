@@ -53,8 +53,6 @@ npm install doulevo -g
 
 ## Basic usage
 
-NOTE: CURRENTLY ONLY THE CREATE COMMAND IS IMPLEMENTED.
-
 To get help:
 
 ```bash

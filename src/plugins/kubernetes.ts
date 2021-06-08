@@ -88,16 +88,16 @@ export class Kubernetes implements IKubernetes {
         const variableSpecs = [
             {
                 name: "docker.registry.host",
-                message: "Please enter the host name for your container registry: ",
+                message: "Container registry / host name: ",
             },
             {
                 name: "docker.registry.username",
-                message: "Please enter the user name for your container registry: ",
+                message: "Container registry / user name: ",
                 isSensitive: true,
             },
             {
                 name: "docker.registry.password",
-                message: "Please enter the password for your container registry: ",
+                message: "Container registry / password: ",
                 isSensitive: true,
             },
         ];

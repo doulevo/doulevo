@@ -42,6 +42,15 @@ export class DetectInterrupt implements IDetectInterrupt {
     private readline?: readline.Interface;
     
     private constructor() {
+        this.invokeHandlers = this.invokeHandlers.bind(this);
+    }
+
+    private init() {
+        if (this.readline) {
+            // Already initialised.
+            return;
+        }
+
         //
         // https://stackoverflow.com/a/20165643/25868
         // https://stackoverflow.com/a/14861513/25868
@@ -52,14 +61,10 @@ export class DetectInterrupt implements IDetectInterrupt {
                 output: process.stdout
             });
           
-            this.readline.on("SIGINT", () => {
-                (process.emit as any)("SIGINT");
-            });
+            this.readline.addListener("SIGINT", this.emitSigint);
         }
           
-        process.on("SIGINT", () =>  {
-            this.invokeHandlers();
-        });
+        process.addListener("SIGINT", this.invokeHandlers);
     }
 
     //
@@ -67,7 +72,9 @@ export class DetectInterrupt implements IDetectInterrupt {
     //
     close(): void {
         if (this.readline) {
+            this.readline.removeListener("SIGINT", this.emitSigint);
             this.readline.close();
+            process.addListener("SIGINT", this.invokeHandlers);
             this.readline = undefined;
         }  
     }
@@ -100,10 +107,17 @@ export class DetectInterrupt implements IDetectInterrupt {
         }
     }
 
+    private emitSigint(): void{
+        (process.emit as any)("SIGINT");
+    }
+
     //
     // Pushs an interrupt handler.
     //
     pushHandler(handler: InterruptHandler): void {
+
+        this.init();
+
         this.handlers.push(handler);        
     }
 
@@ -112,5 +126,9 @@ export class DetectInterrupt implements IDetectInterrupt {
     //
     popHandler(): void {
         this.handlers.pop();
+
+        if (this.handlers.length === 0) {
+            this.close();
+        }
     }
 }

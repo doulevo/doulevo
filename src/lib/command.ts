@@ -99,11 +99,15 @@ export class Command implements ICommand {
 
             const proc = exec(this.cmd, this.options);
 
-            this.detectInterrupt.pushHandler(async () => {
-                proc.kill("SIGINT");
-                didTerminate = true;
-                return true; // Allow process termination.
-            });
+            //
+            // TODO: 
+            // Is it worth having this? There's problems with it on Windows.
+            //
+            // this.detectInterrupt.pushHandler(async () => {
+            //     proc.kill("SIGINT");
+            //     didTerminate = true;
+            //     return true; // Allow process termination.
+            // });
 
             let stdOutput = "";
 
@@ -140,7 +144,8 @@ export class Command implements ICommand {
             });
 
             proc.on("exit", code => {
-                this.detectInterrupt.popHandler();
+                //TODO: Reconsider this, see above.
+                // this.detectInterrupt.popHandler();
 
                 if (this.options.showCommand || this.configuration.isDebug()) {
                     console.log(`CMD finished: ${this.cmd}`);

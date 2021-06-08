@@ -281,17 +281,10 @@ export class Docker implements IDocker {
     //
     async up(project: IProject, mode: "dev" | "prod", tags: string[], plugin: IPlugin, isDetached: boolean): Promise<void> {
 
-        this.progressIndicator.start("Building...");
-
-        try {
-            await Promise.all([
-                this.build(project, mode, tags, plugin),
-                this.down(project, true)
-            ]);
-        }
-        finally {
-            this.progressIndicator.stop();
-        }
+        await Promise.all([
+            this.build(project, mode, tags, plugin),
+            this.down(project, true)
+        ]);
 
         let sharedVolumes = "";
 
@@ -328,18 +321,20 @@ export class Docker implements IDocker {
         this.log.info(`Container ID: ${containerId}`);
 
         if (!isDetached) {
-            this.detectInterrupt.pushHandler(async () => {
-                this.log.verbose(`Stoppping and removing container ${containerId}.`);
-                await this.exec.invoke(`docker stop ${containerId}`);
-                await this.exec.invoke(`docker rm ${containerId}`);
-                return true;
-            });
+            //TODO: Reconsider this later. It doesn't work well on Windows.
+            // this.detectInterrupt.pushHandler(async () => {
+            //     this.log.verbose(`Stoppping and removing container ${containerId}.`);
+            //     await this.exec.invoke(`docker stop ${containerId}`);
+            //     await this.exec.invoke(`docker rm ${containerId}`);
+            //     return true;
+            // });
 
             try {
                 await this.logs(project, true);
             }
             finally {
-                this.detectInterrupt.popHandler();
+                //TODO: Reconsider this later. It doesn't work well on Windows.
+                // this.detectInterrupt.popHandler();
             }
         }       
     }
@@ -357,14 +352,16 @@ export class Docker implements IDocker {
                 }
             }
               
-            this.progressIndicator.start("Stopping containers...");
+            // TODO: This conflicts with "build" indicator. I need to make my own progress indicator so that multiple tasks can be displayed.
+            // this.progressIndicator.start("Stopping containers...");
 
             try {
                 await Promise.all(containers.map(container => this.exec.invoke(`docker stop ${container.ID}`)));
                 await Promise.all(containers.map(container => this.exec.invoke(`docker rm ${container.ID}`)));
             }
             finally {
-                this.progressIndicator.succeed("Stopped containers.");
+                //TODO: See above.
+                // this.progressIndicator.succeed("Stopped containers.");
             }
         }
         else {

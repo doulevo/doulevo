@@ -41,12 +41,12 @@ export class PsCommand implements IDoulevoCommand {
         const configurationFile = await this.fs.readJsonFile(configurationFilePath);
         const project = new Project(projectPath, configurationFile);
 
-        const mode = this.configuration.getArg("mode") || "dev";
-        if (mode !== "prod" && mode !== "dev") {
-            throw new Error(`--mode can only be either "dev" or "prod".`);
+        const env = this.configuration.getArg("env") || "local";
+        if (env !== "prod" && env !== "local") {
+            throw new Error(`--prod can only be either "prod" or "local".`);
         }
 
-        if (mode === "dev") {
+        if (env === "local") {
             //
             // Show local containers.
             //

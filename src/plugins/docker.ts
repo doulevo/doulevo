@@ -26,7 +26,7 @@ export interface IDocker {
     //
     // Builds the requested project.
     //
-    build(project: IProject, mode: "dev" | "prod", tags: string[], plugin: IPlugin): Promise<void>;
+    build(project: IProject, mode: "dev" | "release", tags: string[], plugin: IPlugin): Promise<void>;
 
     //
     // Builds and publishes the image for the project.
@@ -36,7 +36,7 @@ export interface IDocker {
     //
     // Builds and runs the requested project.
     //
-    up(project: IProject, mode: "dev" | "prod", tags: string[], plugin: IPlugin, isDetached: boolean): Promise<void>;
+    up(project: IProject, mode: "dev" | "release", tags: string[], plugin: IPlugin, isDetached: boolean): Promise<void>;
 
     //
     // Stops the container for the current project.
@@ -71,7 +71,7 @@ export interface IDocker {
     //
     // List images for this project.
     //
-    listProjectImages(project: IProject, mode?: "dev" | "prod"): Promise<any[]>;
+    listProjectImages(project: IProject, mode?: "dev" | "release"): Promise<any[]>;
 
     //
     // List any containers running for this project.
@@ -131,14 +131,14 @@ export class Docker implements IDocker {
     //
     // Gets the tag that can identify the image build for a project.
     //
-    private getProjectTag(project: IProject, mode: "dev" | "prod"): string {
+    private getProjectTag(project: IProject, mode: "dev" | "release"): string {
         return `${this.getProjectRespository(project)}:${mode}`;
     }
 
     //
     // Builds the requested project.
     //
-    async build(project: IProject, mode: "dev" | "prod", tags: string[], plugin: IPlugin): Promise<void> {
+    async build(project: IProject, mode: "dev" | "release", tags: string[], plugin: IPlugin): Promise<void> {
 
         const force = this.configuration.getArg<boolean>("force");
         if (!force) {
@@ -247,7 +247,7 @@ export class Docker implements IDocker {
         //
         // Build the image.
         //
-        await this.build(project, "prod", tags, plugin);
+        await this.build(project, "release", tags, plugin);
 
         //
         // Login to the remote Docker reigstry.
@@ -279,7 +279,7 @@ export class Docker implements IDocker {
     //
     // Builds and runs the requested project.
     //
-    async up(project: IProject, mode: "dev" | "prod", tags: string[], plugin: IPlugin, isDetached: boolean): Promise<void> {
+    async up(project: IProject, mode: "dev" | "release", tags: string[], plugin: IPlugin, isDetached: boolean): Promise<void> {
 
         await Promise.all([
             this.build(project, mode, tags, plugin),
@@ -448,7 +448,7 @@ export class Docker implements IDocker {
     //
     // List images for this project.
     //
-    async listProjectImages(project: IProject, mode?: "dev" | "prod"): Promise<any[]> {
+    async listProjectImages(project: IProject, mode?: "dev" | "release"): Promise<any[]> {
         const images = await this.listImages();
         const matchingImages = images.filter(image => {
             if (image.Repository !== this.getProjectRespository(project)) {
@@ -516,7 +516,7 @@ export class Docker implements IDocker {
         await this.fs.writeFile(joinPath(project.getPath(), "Dockerfile-dev"), devDockerFileContent);
         this.log.info("Wrote Dockerfile-dev");
 
-        const prodDockerFileContent = await this.generateConfiguration(project, plugin, "prod");
+        const prodDockerFileContent = await this.generateConfiguration(project, plugin, "release");
         await this.fs.writeFile(joinPath(project.getPath(), "Dockerfile-prod"), prodDockerFileContent);
         this.log.info("Wrote Dockerfile-prod");
     }

@@ -47,8 +47,8 @@ export class DeployCommand implements IDoulevoCommand {
         const project = new Project(projectPath, configurationFile);
 
         const mode = this.configuration.getArg("mode") || "dev";
-        if (mode !== "prod" && mode !== "dev") {
-            throw new Error(`--mode can only be either "dev" or "prod".`);
+        if (mode !== "release" && mode !== "dev") {
+            throw new Error(`--mode can only be either "dev" or "release".`);
         }
 
         //

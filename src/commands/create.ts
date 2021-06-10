@@ -79,19 +79,29 @@ export class CreateCommand implements IDoulevoCommand {
 
 const command: IDoulevoCommandDesc = {
     name: "create",
-    description: "Creates a new Doulevo project.",
     constructor: CreateCommand,
     help: {
         usage: "doulevo create [options] <project-dir>",
         message: `Creates a new Doulevo project at <project-dir>`,
-        arguments: [
-            [ "--force", "Deletes project directory if it already exists." ],
-            [ "--local-plugin",  "When set, Doulevo will create the project using the 'local' plugin from the specified location." ],
-            [ "--plugin-url",  "When set, Doulevo will create the project using the 'remote' plugin from the specified location." ],
-            [ "--project-type",  "When set, Doulevo will create the project using the default plugin for the specified project type." ],
-            [ "--help",  "Prints usage for this command." ],
+        options: [
+            {
+                name: "--project-type=<type>",
+                message: "Sets the type of project to be created. Omit this to select project type interactively.",
+            },
+            {
+                name: "--local-plugin=<path>",
+                message: "Loads the plugin from a path. No need to set --project-type if you use this. It's good for testing when you are developing a plugin."
+            },
+            {
+                name: "--plugin-url=<url>",
+                message: "Loads the plugin from the specified Git repo. No need to set --project-type if you use this.",
+            },
+            {
+                name: "--force",
+                message: "Deletes and overwrites the project directory if it already exists.",
+            },
         ],
-    }
+    },
 };
 
 export default command;

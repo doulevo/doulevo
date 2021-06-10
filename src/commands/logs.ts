@@ -66,12 +66,26 @@ export class LogsCommand implements IDoulevoCommand {
 
 const command: IDoulevoCommandDesc = {
     name: "logs",
-    description: "Shows logs from the container for the project in the working directory (or the directory specified by --project=<path>).",
     constructor: LogsCommand,
     help: {
-        usage: "todo",
-        message: "todo",
-        arguments: [],
+        usage: "doulevo logs [options]",
+        message: "Retrieves logs from containers for the project.",
+        options: [
+            {
+                name: "--project=<path>",
+                message: "Sets the path to the project, defaults to the working directory if not specified.",
+                defaultValue: "<current directory>",
+            },     
+            {
+                name: "--env={local|prod}",
+                message: "Sets the environment from which to retrieve logs.",
+                defaultValue: "local",
+            },
+            {
+                name: "--follow, --f",
+                message: "Stays attached and follows continuing logs from the project's containers.",
+            },
+        ],
     }
 };
 

@@ -53,6 +53,7 @@ export class EjectCommand implements IDoulevoCommand {
         if (!pluginPath) {
             throw new Error(`Failed to determine local plugin path for project!`);
         }
+
         const pluginConfigurationFilePath = joinPath(pluginPath, "plugin.json");
         const pluginConfigurationFile = await this.fs.readJsonFile(pluginConfigurationFilePath);
         const plugin = new Plugin({ path: pluginPath }, pluginConfigurationFile); 
@@ -64,12 +65,17 @@ export class EjectCommand implements IDoulevoCommand {
 
 const command: IDoulevoCommandDesc = {
     name: "eject",
-    description: "Ejects Docker and Kubernetes configuration so that you can customize it.",
     constructor: EjectCommand,
     help: {
-        usage: "todo",
-        message: "todo",
-        arguments: [],
+        usage: "doulevo eject [options]",
+        message: "Ejects Docker and Kubernetes configuration so that you can customize it.",
+        options: [
+            {
+                name: "--project=<path>",
+                message: "Sets the path to the project, defaults to the working directory if not specified.",
+                defaultValue: "<current directory>",
+            },          
+        ],
     }
 };
 

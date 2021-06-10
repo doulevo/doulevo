@@ -46,11 +46,6 @@ export class DeployCommand implements IDoulevoCommand {
         const configurationFile = await this.fs.readJsonFile(configurationFilePath);
         const project = new Project(projectPath, configurationFile);
 
-        const mode = this.configuration.getArg("mode") || "dev";
-        if (mode !== "release" && mode !== "dev") {
-            throw new Error(`--mode can only be either "dev" or "release".`);
-        }
-
         //
         // Load the plugin for this project.
         //
@@ -58,6 +53,7 @@ export class DeployCommand implements IDoulevoCommand {
         if (!pluginPath) {
             throw new Error(`Failed to determine local plugin path for project!`);
         }
+        
         const pluginConfigurationFilePath = joinPath(pluginPath, "plugin.json");
         const pluginConfigurationFile = await this.fs.readJsonFile(pluginConfigurationFilePath);
         const plugin = new Plugin({ path: pluginPath }, pluginConfigurationFile); 
@@ -68,12 +64,17 @@ export class DeployCommand implements IDoulevoCommand {
 
 const command: IDoulevoCommandDesc = {
     name: "deploy",
-    description: "Builds and deploys the project in the working directory (or the directory specified by --project=<path>).",
     constructor: DeployCommand,
     help: {
-        usage: "todo",
-        message: "todo",
-        arguments: [],
+        usage: "doulevo deploy [options]",
+        message: "Builds the image and deploys containers to the backend for the project.",
+        options: [
+            {
+                name: "--project=<path>",
+                message: "Sets the path to the project, defaults to the working directory if not specified.",
+                defaultValue: "<current directory>",
+            },          
+        ],
     }
 };
 

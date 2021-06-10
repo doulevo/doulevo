@@ -38,11 +38,6 @@ export class DownCommand implements IDoulevoCommand {
         const configurationFile = await this.fs.readJsonFile(configurationFilePath);
         const project = new Project(projectPath, configurationFile);
 
-        const mode = this.configuration.getArg("mode") || "dev";
-        if (mode !== "release" && mode !== "dev") {
-            throw new Error(`--mode can only be either "dev" or "release".`);
-        }
-
         //
         // Stop the container
         //
@@ -52,12 +47,17 @@ export class DownCommand implements IDoulevoCommand {
 
 const command: IDoulevoCommandDesc = {
     name: "down",
-    description: "Stops the container for the project in the working directory (or the directory specified by --project=<path>).",
     constructor: DownCommand,
     help: {
-        usage: "todo",
-        message: "todo",
-        arguments: [],
+        usage: "doulevo down [options]",
+        message: "Stops the container for the project.",
+        options: [
+            {
+                name: "--project=<path>",
+                message: "Sets the path to the project, defaults to the working directory if not specified.",
+                defaultValue: "<current directory>",
+            },          
+        ],
     }
 };
 

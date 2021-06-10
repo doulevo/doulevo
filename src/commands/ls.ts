@@ -48,12 +48,17 @@ export class LsCommand implements IDoulevoCommand {
 
 const command: IDoulevoCommandDesc = {
     name: "ls",
-    description: "View images for the project in the working directory (or the directory specified by --project=<path>).",
     constructor: LsCommand,
     help: {
-        usage: "todo",
-        message: "todo",
-        arguments: [],
+        usage: "doulevo ls [options]",
+        message: "Shows images for the project.",
+        options: [
+            {
+                name: "--project=<path>",
+                message: "Sets the path to the project, defaults to the working directory if not specified.",
+                defaultValue: "<current directory>",
+            },     
+        ],
     }
 };
 

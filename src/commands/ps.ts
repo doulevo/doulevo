@@ -63,12 +63,22 @@ export class PsCommand implements IDoulevoCommand {
 
 const command: IDoulevoCommandDesc = {
     name: "ps",
-    description: "View containers for the project in the working directory (or the directory specified by --project=<path>).",
     constructor: PsCommand,
     help: {
-        usage: "todo",
-        message: "todo",
-        arguments: [],
+        usage: "doulevo ps [options]",
+        message: "Shows containers for the project.",
+        options: [
+            {
+                name: "--project=<path>",
+                message: "Sets the path to the project, defaults to the working directory if not specified.",
+                defaultValue: "<current directory>",
+            },     
+            {
+                name: "--env={local|prod}",
+                message: "Sets the environment from which to show containers.",
+                defaultValue: "local",
+            },
+        ],
     }
 };
 

@@ -10,6 +10,23 @@ export interface IDoulevoCommand {
     invoke(): Promise<void>;
 }
 
+export interface IOptionHelp {
+    //
+    // The name of the options.
+    //
+    name: string;
+
+    //
+    // Describes the option.
+    //
+    message: string;
+
+    //
+    // The default value for the option.
+    //
+    defaultValue?: string;
+}
+
 //
 // Describes the help output for a particular command.
 //
@@ -25,9 +42,14 @@ export interface IDoulevoCommandHelp {
     message: string;
 
     //
-    // Describe the arguments for the command.
+    // Sub commands.
     //
-    arguments: [string, string][];
+    subCommands?: IDoulevoCommandDesc[];
+    
+    //
+    // Describes the options for the command.
+    //
+    options?: IOptionHelp[];
 }
 
 //
@@ -39,11 +61,6 @@ export interface IDoulevoCommandDesc {
     // The name of the command.
     //
     name: string;
-
-    //
-    // The description of the command.
-    //
-    description: string;
 
     //
     // Constructor function for the command.

@@ -7,7 +7,7 @@ import { IEnvironment, IEnvironment_id } from "./services/environment";
 import { ILog_id } from "./services/log";
 import { IConfiguration, IConfiguration_id } from "./services/configuration";
 import { IDetectInterrupt, IDetectInterrupt_id } from "./services/detect-interrupt";
-import { IDoulevoCommand, IDoulevoCommandDesc, IDoulevoCommandHelp } from "./lib/doulevo-command";
+import { IDoulevoCommand, IDoulevoCommandDesc, IDoulevoCommandHelp, IOptionHelp } from "./lib/doulevo-command";
 const packageInfo = require("../package.json");
 
 import { commands } from "./commands";
@@ -64,7 +64,7 @@ export class Doulevo {
                         throw new Error(`Unexpected command ${cmd}`);
                     }
 
-                    this.showCommandHelp(command);
+                    this.showCommandHelp(command, this.globalOptions);
                     return;
                 }
             }
@@ -91,6 +91,33 @@ export class Doulevo {
         }
     }
 
+    private globalOptions = [
+        {
+            name: "--help",
+            message: "Shows help for doulevo and sub-commands.",
+        },
+        {
+            name: "--version",
+            message: "Displays the current version number.",
+        },
+        {
+            name: "--non-interactive",
+            message: "Runs in non-interactive mode. All questions will default, except project-type, if you have to set the project type, use the --project-type options.",
+        },
+        {
+            name: "--verbose",
+            message: "Enables verbose logging.",
+        },
+        {
+            name: "--quiet",
+            message: "Enables quiet mode, supresses logging unless absolutely necessary.",
+        },
+        {
+            name: "--debug",
+            message: "Enables debug logging.",
+        },
+    ];
+
     //
     // Shows general help for Doulevo.
     //
@@ -98,42 +125,55 @@ export class Doulevo {
         this.showHelp({
             usage: `doulevo <command> [options]`,
             message: `Simplifying the development and deployment of cloud-based applications.`,
-            arguments: [
-                [ "--version", "Displays the current version number." ],
-                [ "--non-interactive", "Runs in non-interactive mode. All questions will default, except project-type, if you have to set the project type, use the --project-type options." ],
-                [ "--project=<path>", "Sets the path to the project, defaults to the working directory if not specified." ],
-                [ "--plugin-url=<url>", "Sets the URL of the Git repo for the plugin (no need to set project type if you use this)." ],
-                [ "--local-plugin=<path>", "Sets the local path for a plugin (good for testing when you are developing a plugin)." ],
-                [ "--mode={dev|prod}", "Sets the mode for the build process, can be either dev or prod." ],
-                [ "--force", "Forces the command to be completed (even if it would overwite existing files)." ],
-                [ "--verbose", "Enables versbose logging." ],
-                [ "--quiet", "Tuns in quiet mode, supresses logging unless absolutely necessary." ],
-                [ "--debug", "Enables debug logging." ],
-            ],
-        })
+            subCommands: commands,
+            options: this.globalOptions,
+        });
     }
 
     //
     // Shows help for a sub-command.
     //
-    private showCommandHelp(command: IDoulevoCommandDesc): void {
-        this.showHelp(command.help);
+    private showCommandHelp(command: IDoulevoCommandDesc, globalOptions?: IOptionHelp[]): void {
+        this.showHelp(command.help, globalOptions);
     }
 
     //
     // Formats help described in the "help" object.
     //
-    private showHelp(help: IDoulevoCommandHelp): void {
-        this.log.info(`\nUsage: ${chalk.blueBright(help.usage)}\n`);
-        this.log.info(`${help.message}\n`);
+    private showHelp(commandHelp: IDoulevoCommandHelp, globalOptions?: IOptionHelp[]): void {
 
-        this.log.info(`Options:`);
+        const usage = commandHelp.usage
+            .replace("<command>", `<${chalk.blueBright("command")}>`)
+            .replace("[options]", `[${chalk.greenBright("options")}]`)
 
+        this.log.info(`\nUsage: ${usage}\n`);
+        this.log.info(`${commandHelp.message}`);
+        
         const padding = " ".repeat(4);
-        const optionsPadding = 25;
+        const columnPadding = 25;
+        
+        if (commandHelp.subCommands) {
+            this.log.info(`\n${chalk.blueBright("Commands")}:`);
 
-        for (const [argName, argDesc] of help.arguments) {
-            this.log.info(`${padding}${argName!.padEnd(optionsPadding)}${argDesc}`)
+            for (const subCommand of commandHelp.subCommands) {
+                this.log.info(`${padding}${subCommand.name.padEnd(columnPadding)}${subCommand.help.message}`)
+            }
+        }
+
+        this.showOptions("Options", commandHelp.options, padding, columnPadding);
+        this.showOptions("Global options", globalOptions, padding, columnPadding);
+    }
+
+    private showOptions(name: string, options: IOptionHelp[] | undefined, padding: string, columnPadding: number) {
+        if (options) {
+            this.log.info(`\n${chalk.greenBright(name)}:`);
+
+            for (const option of options) {
+                this.log.info(`${padding}${option.name.padEnd(columnPadding)}${option.message}`);
+                if (option.defaultValue !== undefined) {
+                    this.log.info(`${padding}${" ".padEnd(columnPadding)}Default = ${chalk.cyan(option.defaultValue)}`);
+                }
+            }
         }
     }
 }

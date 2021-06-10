@@ -84,12 +84,26 @@ export class BuildCommand implements IDoulevoCommand {
 
 const command: IDoulevoCommandDesc = {
     name: "build",
-    description: "Builds the project in the working directory (or the directory specified by --project=<path>).",
     constructor: BuildCommand,
     help: {
-        usage: "todo",
-        message: "todo",
-        arguments: [],
+        usage: "doulevo build [options]",
+        message: "Builds the image for the project.",
+        options: [
+            {
+                name: "--project=<path>",
+                message: "Sets the path to the project, defaults to the working directory if not specified.",
+                defaultValue: "<current directory>",
+            },          
+            {
+                name: "--mode={dev|release}",
+                message: "Sets the mode for the build process, can be either of dev or release.",
+                defaultValue: "dev",
+            },
+            {
+                name: "--tag=<tag>",
+                message: "Adds a tag to the Docker image that is built. Use multiple times to apply multiple tags.",
+            },
+        ],
     }
 };
 

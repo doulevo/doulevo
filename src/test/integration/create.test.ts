@@ -4,7 +4,7 @@ import { Configuration, IConfiguration_id } from "../../services/configuration";
 import * as fs from "fs-extra";
 import * as globby from "globby";
 import * as path from "path";
-import { ILog, ILog_id } from "../../services/log";
+import { ILog, ILog_id, Log } from "../../services/log";
 
 describe("create", () => {
 
@@ -12,21 +12,15 @@ describe("create", () => {
 
         await fs.remove("./test-project");        
 
-        const log: ILog = {
-            verbose: () => {},
-            debug: () => {},
-            info: () => {},        
-        };
-        registerSingleton(ILog_id, log);
-
         const argv = {
             _: [ "create", "test-project"],     // Main arguments
             "non-interactive": true,            // Run it in non-interactive mode for the automated tests.
             "quiet": true,                      // Supress output for automated tests.
             "local-plugin": "./test-plugin",    // Use the plugin from a local path.
+            "debug": false,  // Set to true for more info.
         };
-        const configuration = new Configuration(argv);
-        registerSingleton(IConfiguration_id, configuration);
+        registerSingleton(ILog_id, new Log(argv));
+        registerSingleton(IConfiguration_id, new Configuration(argv));
 
         const doulevo = new Doulevo();
         await doulevo.invoke();

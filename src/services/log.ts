@@ -29,22 +29,38 @@ export class Log implements ILog {
     //
     // Set to true to supress all info and verbose input.
     //
-    quietMode?: boolean;
+    quietMode: boolean;
+
+    //
+    // Set to true to enable info logging.
+    //
+    enableInfo: boolean;
 
     //
     // Set to true to enable verbose logging.
     //
-    enableVerbose?: boolean;
+    enableVerbose: boolean;
 
     //
     // Set to true to enable debug logging.
     //
-    enableDebug?: boolean;
+    enableDebug: boolean;
 
     constructor(argv: any) {
-        this.quietMode = argv.quiet;
-        this.enableVerbose = argv.verbose || argv.debug;
-        this.enableDebug = argv.debug;
+        this.quietMode = argv.quiet || false;
+        this.enableInfo = !this.quietMode;
+        this.enableVerbose = false;
+        this.enableDebug = false;
+
+        if (!this.quietMode && argv.verbose) {
+            this.enableVerbose = true;
+        }
+
+        if (argv.debug) {
+            this.enableVerbose = true;
+            this.enableDebug = true;
+            this.enableVerbose = true;
+        }
     }
 
     //
@@ -52,7 +68,7 @@ export class Log implements ILog {
     // Enabled with --verbose command line argument.
     //
     verbose(...args: any[]): void {
-        if (this.enableVerbose && !this.quietMode) {
+        if (this.enableVerbose) {
             console.log(...args);
         }
     }
@@ -62,7 +78,7 @@ export class Log implements ILog {
     // Enabled with --debug command line argument.
     //
     debug(...args: any[]): void {
-        if (this.enableDebug && !this.quietMode) {
+        if (this.enableDebug) {
             console.log(...args);
         }
     }
@@ -71,7 +87,7 @@ export class Log implements ILog {
     // Information logging.
     //
     info(...args: any[]): void {
-        if (!this.quietMode) {
+        if (this.enableInfo) {
             console.log(...args);
         }
     }

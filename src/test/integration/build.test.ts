@@ -7,18 +7,25 @@ import { Docker, IDocker_id } from "../../plugins/docker";
 
 describe("build", () => {
 
-    beforeEach(() => {
-        const argv = {};
-        registerSingleton(ILog_id, new Log(argv));
-        registerSingleton(IConfiguration_id, new Configuration(argv));
-    });
-
     it("can build project from local path", async ()  => {
 
         jest.setTimeout(30000);
 
         const imageId = uuid();
         const testTagPrefix = "doulevo-test";
+        const testTag = `${testTagPrefix}-${imageId}`;
+
+        const argv = {
+            _: [ "build" ],                     // Main arguments
+            "non-interactive": true,            // Run it in non-interactive mode for the automated tests.
+            "quiet": true,                      // Supress output for automated tests.
+            "local-plugin": "./test-plugin",    // Use the plugin from a local path.
+            "tag": testTag,                     // Add tag so we can id the test Docker image.
+            "project": "expected-test-project", // Set the project to build.      
+            "debug": false,   // Change to true for more info.     
+        };
+        registerSingleton(ILog_id, new Log(argv));
+        registerSingleton(IConfiguration_id, new Configuration(argv));
 
         const docker = new Docker();
 
@@ -37,26 +44,6 @@ describe("build", () => {
         images = await docker.listImages();
         testImages = images.filter((image: any) => image.Repository.startsWith(testTagPrefix));
         expect(testImages.length).toEqual(0);
-
-        const log: ILog = {
-            verbose: () => {},
-            debug: () => {},
-            info: () => {},        
-        };
-        registerSingleton(ILog_id, log);
-
-        const testTag = `${testTagPrefix}-${imageId}`;
-
-        const argv = {
-            _: [ "build" ],                     // Main arguments
-            "non-interactive": true,            // Run it in non-interactive mode for the automated tests.
-            "quiet": true,                      // Supress output for automated tests.
-            "local-plugin": "./test-plugin",    // Use the plugin from a local path.
-            "tag": testTag,                     // Add tag so we can id the test Docker image.
-            "project": "expected-test-project", // Set the project to build.            
-        };
-        const configuration = new Configuration(argv);
-        registerSingleton(IConfiguration_id, configuration);
 
         //
         // Invoke the Doulevo build command.

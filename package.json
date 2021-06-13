@@ -13,7 +13,6 @@
     "build": "tsc --incremental",
     "bw": "npm run build:watch",
     "build:watch": "tsc  --incremental --watch",
-    "lint": "eslint **/*.ts",
     "prepublishOnly": "npm test && npm run clean && tsc",
     "t": "npm run test",
     "test": "jest --all",

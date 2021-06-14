@@ -1,0 +1,99 @@
+name: Auto-publish and auto-release
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - prod
+jobs:
+  check-and-build:
+    name: Check status and build on version bump
+    outputs:
+      tag: ${{ env.tag }}
+      version_changed: ${{ steps.check.outputs.changed }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "12.16.3"
+
+      - name: Check version changes
+        uses: EndBug/version-check@v1
+        id: check
+        with:
+          diff-search: true
+
+      - name: Check latest tag
+        if: contains(github.ref, 'prod') || github.event_name == 'workflow_dispatch'
+        run: |
+          echo "tag=latest" >> $GITHUB_ENV
+
+      - name: Check versioned release
+        if: contains(github.ref, 'main')
+        run: echo "tag=v${{ steps.check.outputs.version }}" >> $GITHUB_ENV
+
+      - name: Build
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          echo "Building ${{ env.tag }}"
+          npm ci
+          npx tsc index.ts
+
+  prepare-artifacts:
+    name: Platform-specific builds
+    needs: check-and-build
+    if: needs.check-and-build.outputs.version_changed == 'true'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest]
+    steps:
+      - name: Build for Windows
+        if: matrix.os == 'windows-latest'
+        run: echo "This is where we build for Windows"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-files
+          path: |
+            doulevo*.exe
+          retention-days: 3
+          if-no-files-found: error
+
+  release-and-publish:
+    name: Release and publish on version bump
+    needs: [check-and-build, prepare-artifacts]
+    if: needs.check-and-build.outputs.version_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "12.16.3"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: build-files
+
+      - name: Publish to npm if latest release
+        if: needs.check-and-build.outputs.tag == 'latest'
+        run: npm publish --access public --tag latest
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub Release with artifacts if versioned release
+        if: needs.check-and-build.outputs.tag != 'latest'
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: Doulevo ${{ needs.check-and-build.outputs.tag }}
+          tag_name: ${{ needs.check-and-build.outputs.tag }}
+          draft: false
+          files: doulevo*.js
+          fail_on_unmatched_files: true

@@ -176,7 +176,13 @@ Prod:
 npx ts-node src/index.ts ps --mode=prod --project=./test-project --local-plugin=./test-plugin --debug
 ```
 
-### Deploying the project
+### Publishing the image
+
+```bash
+npx ts-node src/index.ts publish --project=./test-project --local-plugin=./test-plugin --debug
+```
+
+### Deploying the container
 
 ```bash
 npx ts-node src/index.ts deploy --project=./test-project --local-plugin=./test-plugin --debug

@@ -1,5 +1,5 @@
 import { enableVerbose, instantiateSingleton, registerSingleton } from "@codecapers/fusion";
-import { Doulevo } from "../../doulevo";
+import { Api } from "../../api";
 import { Configuration, IConfiguration_id } from "../../services/configuration";
 import { ILog, ILog_id, Log } from "../../services/log";
 import { v4 as uuid } from "uuid";
@@ -48,7 +48,7 @@ describe("build", () => {
         //
         // Invoke the Doulevo build command.
         //
-        const doulevo = new Doulevo();
+        const doulevo = new Api();
         await doulevo.invoke();
 
         //

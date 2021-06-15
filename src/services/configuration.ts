@@ -100,7 +100,7 @@ export class Configuration implements IConfiguration {
         //
         // NOTE: This can't use the ILog interface because that would create a circular dependency.
         //
-        console.log(`Doulevo configuration:`);
+        console.log(`Configuration:`);
         console.log(JSON.stringify(this.argv, null, 4));
     }
 

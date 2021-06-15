@@ -1,5 +1,5 @@
 import { InjectableClass, InjectProperty } from "@codecapers/fusion";
-import { IDoulevoCommand, IDoulevoCommandDesc } from "../lib/doulevo-command";
+import { ICommand, ICommandDesc } from "../command";
 import { joinPath } from "../lib/join-path";
 import { IDocker, IDocker_id } from "../plugins/docker";
 import { IConfiguration_id, IConfiguration } from "../services/configuration";
@@ -9,7 +9,7 @@ import { Project } from "../lib/project";
 import { Plugin } from "../lib/plugin";
 
 @InjectableClass()
-export class UpCommand implements IDoulevoCommand {
+export class UpCommand implements ICommand {
 
     @InjectProperty(IEnvironment_id)
     environment!: IEnvironment;
@@ -70,30 +70,30 @@ export class UpCommand implements IDoulevoCommand {
     }
 }
 
-const command: IDoulevoCommandDesc = {
+const command: ICommandDesc = {
     name: "up",
     constructor: UpCommand,
     help: {
         usage: "doulevo up [options]",
-        message: "Builds the image and runs the container for the project.",
+        description: "Builds the image and runs the container for the project.",
         options: [
             {
                 name: "--project=<path>",
-                message: "Sets the path to the project, defaults to the working directory if not specified.",
+                description: "Sets the path to the project, defaults to the working directory if not specified.",
                 defaultValue: "<current directory>",
             },          
             {
                 name: `--mode={dev|release}`,
-                message: "Sets the mode for the build process, can be either of dev or release.",
+                description: "Sets the mode for the build process, can be either of dev or release.",
                 defaultValue: "dev",
             },
             {
                 name: "--tag=<tag>",
-                message: "Adds a tag to the Docker image that is built. Use multiple times to apply multiple tags.",
+                description: "Adds a tag to the Docker image that is built. Use multiple times to apply multiple tags.",
             },
             {
                 name: "--detatched, --d",
-                message: "Runs the container in detached mode. If not specified the terminal remains attached to the container to view its output.",
+                description: "Runs the container in detached mode. If not specified the terminal remains attached to the container to view its output.",
             },
             
         ],

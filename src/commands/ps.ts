@@ -1,5 +1,5 @@
 import { InjectableClass, InjectProperty } from "@codecapers/fusion";
-import { IDoulevoCommand, IDoulevoCommandDesc } from "../lib/doulevo-command";
+import { ICommand, ICommandDesc } from "../command";
 import { joinPath } from "../lib/join-path";
 import { IDocker, IDocker_id } from "../plugins/docker";
 import { IConfiguration_id, IConfiguration } from "../services/configuration";
@@ -9,7 +9,7 @@ import { Project } from "../lib/project";
 import { IKubernetes, IKubernetes_id } from "../plugins/kubernetes";
 
 @InjectableClass()
-export class PsCommand implements IDoulevoCommand {
+export class PsCommand implements ICommand {
 
     @InjectProperty(IEnvironment_id)
     environment!: IEnvironment;
@@ -61,21 +61,21 @@ export class PsCommand implements IDoulevoCommand {
     }
 }
 
-const command: IDoulevoCommandDesc = {
+const command: ICommandDesc = {
     name: "ps",
     constructor: PsCommand,
     help: {
         usage: "doulevo ps [options]",
-        message: "Shows containers for the project.",
+        description: "Shows containers for the project.",
         options: [
             {
                 name: "--project=<path>",
-                message: "Sets the path to the project, defaults to the working directory if not specified.",
+                description: "Sets the path to the project, defaults to the working directory if not specified.",
                 defaultValue: "<current directory>",
             },     
             {
                 name: "--env={local|prod}",
-                message: "Sets the environment from which to show containers.",
+                description: "Sets the environment from which to show containers.",
                 defaultValue: "local",
             },
         ],

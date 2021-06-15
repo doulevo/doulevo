@@ -7,22 +7,43 @@ import { IEnvironment, IEnvironment_id } from "./services/environment";
 import { ILog_id } from "./services/log";
 import { IConfiguration, IConfiguration_id } from "./services/configuration";
 import { IDetectInterrupt, IDetectInterrupt_id } from "./services/detect-interrupt";
-import { IDoulevoCommand, IDoulevoCommandDesc, IDoulevoCommandHelp, IOptionHelp } from "./lib/doulevo-command";
+import { ICommand, ICommandDesc, ICommandHelp, IOptionHelp } from "./command";
 const packageInfo = require("../package.json");
 
 import { commands } from "./commands";
 import chalk = require("chalk");
 
 //
-// Cache commands for lookup.
+// Find a command or sub-command by name.
 //
-const commandMap: any = {};
-for (const command of commands) {
-    commandMap[command.name] = command;
+function findCommand(parentCommand: ICommandDesc | undefined, commandName: string): ICommandDesc {
+    let searchCommands: ICommandDesc[];
+    if (parentCommand) {
+        if (!parentCommand.subCommands) {
+            throw new Error(`Failed to find command ${commandName}, the parent command ${parentCommand.name} has no sub-commands!`);
+        }
+        searchCommands = parentCommand.subCommands;
+    }
+    else {
+        searchCommands = commands;
+    }
+
+    for (const command of searchCommands) {
+        if (command.name === commandName) {
+            return command;
+        }
+    }
+
+    if (parentCommand) {
+        throw new Error(`Failed to find command ${commandName} under command ${parentCommand.name}`);
+    }
+    else {
+        throw new Error(`Failed to find command ${commandName}`);
+    }
 }
 
 @InjectableClass()
-export class Doulevo {
+export class Api {
     
     @InjectProperty(ILog_id)
     log!: ILog;
@@ -50,40 +71,37 @@ export class Doulevo {
                 return;
             }
     
-            let cmd = this.configuration.getMainCommand();
-    
+            let commandDesc: ICommandDesc | undefined = undefined;
+            while (true) {
+                const commandName = this.configuration.getMainCommand();
+                if (commandName === undefined) {
+                    break;
+                }
+
+                commandDesc = findCommand(commandDesc, commandName);
+                this.configuration.consumeMainCommand();
+            }
+
             const help = this.configuration.getArg<boolean>("help");
             if (help) {
-                if (cmd === undefined) {
+                if (commandDesc === undefined) {
                     this.showGeneralHelp();
                     return;
                 }
                 else {
-                    const command = commandMap[cmd];
-                    if (command === undefined) {
-                        throw new Error(`Unexpected command ${cmd}`);
-                    }
-
-                    this.showCommandHelp(command, this.globalOptions);
+                    this.showCommandHelp(commandDesc);
                     return;
                 }
             }
-    
-            if (cmd === undefined) {
+
+            if (commandDesc === undefined) {
                 this.showGeneralHelp();
                 return;
             }
-    
-            // Consumes the main command, allows the next nested sub command to bubble up and be the new main command.
-            this.configuration.consumeMainCommand(); 
-    
-            const Command = commandMap[cmd].constructor;
-            if (Command === undefined) {
-                throw new Error(`Unexpected command ${cmd}`);
-            }
-            const command: IDoulevoCommand = new Command();
-            await command.invoke();
-    
+
+            const Command: any = commandDesc.constructor;
+            const command: ICommand = new Command();
+            await command.invoke();   
         }
         finally {
             // Close the interrupt detecter so it doesn't keep Node.js running.
@@ -94,69 +112,71 @@ export class Doulevo {
     private globalOptions = [
         {
             name: "--help",
-            message: "Shows help for doulevo and sub-commands.",
+            description: "Shows help for Doulevo and sub-commands.",
         },
         {
             name: "--version",
-            message: "Displays the current version number.",
+            description: "Displays the current version number.",
         },
         {
             name: "--non-interactive",
-            message: "Runs in non-interactive mode. All questions will default, except project-type, if you have to set the project type, use the --project-type options.",
+            description: "Runs in non-interactive mode.",
         },
         {
             name: "--verbose",
-            message: "Enables verbose logging.",
+            description: "Enables verbose logging.",
         },
         {
             name: "--quiet",
-            message: "Enables quiet mode, supresses logging unless absolutely necessary.",
+            description: "Enables quiet mode, supresses logging unless absolutely necessary.",
         },
         {
             name: "--debug",
-            message: "Enables debug logging.",
+            description: "Enables debug logging.",
         },
     ];
 
     //
-    // Shows general help for Doulevo.
+    // Shows general help.
     //
     private showGeneralHelp(): void {
-        this.showHelp({
-            usage: `doulevo <command> [options]`,
-            message: `Simplifying the development and deployment of cloud-based applications.`,
-            subCommands: commands,
-            options: this.globalOptions,
-        });
+        this.showHelp(
+            {
+                usage: `doulevo <command> [options]`,
+                description: `Simplifying the development and deployment of cloud-based applications.`,
+                options: this.globalOptions,
+            },
+            commands
+        );
     }
 
     //
     // Shows help for a sub-command.
     //
-    private showCommandHelp(command: IDoulevoCommandDesc, globalOptions?: IOptionHelp[]): void {
-        this.showHelp(command.help, globalOptions);
+    private showCommandHelp(command: ICommandDesc): void {
+        this.showHelp(command.help, command.subCommands, this.globalOptions);
     }
 
     //
     // Formats help described in the "help" object.
     //
-    private showHelp(commandHelp: IDoulevoCommandHelp, globalOptions?: IOptionHelp[]): void {
+    private showHelp(commandHelp: ICommandHelp, subCommands?: ICommandDesc[], globalOptions?: IOptionHelp[]): void {
 
         const usage = commandHelp.usage
             .replace("<command>", `<${chalk.blueBright("command")}>`)
             .replace("[options]", `[${chalk.greenBright("options")}]`)
 
         this.log.info(`\nUsage: ${usage}\n`);
-        this.log.info(`${commandHelp.message}`);
+        this.log.info(`${commandHelp.description}`);
         
         const padding = " ".repeat(4);
         const columnPadding = 25;
-        
-        if (commandHelp.subCommands) {
+
+        if (subCommands) {
             this.log.info(`\n${chalk.blueBright("Commands")}:`);
 
-            for (const subCommand of commandHelp.subCommands) {
-                this.log.info(`${padding}${subCommand.name.padEnd(columnPadding)}${subCommand.help.message}`)
+            for (const subCommand of subCommands) {
+                this.log.info(`${padding}${subCommand.name.padEnd(columnPadding)}${subCommand.help.description}`)
             }
         }
 
@@ -169,7 +189,7 @@ export class Doulevo {
             this.log.info(`\n${chalk.greenBright(name)}:`);
 
             for (const option of options) {
-                this.log.info(`${padding}${option.name.padEnd(columnPadding)}${option.message}`);
+                this.log.info(`${padding}${option.name.padEnd(columnPadding)}${option.description}`);
                 if (option.defaultValue !== undefined) {
                     this.log.info(`${padding}${" ".padEnd(columnPadding)}Default = ${chalk.cyan(option.defaultValue)}`);
                 }

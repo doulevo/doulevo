@@ -1,5 +1,5 @@
 import { InjectableClass, InjectProperty } from "@codecapers/fusion";
-import { IDoulevoCommand, IDoulevoCommandDesc } from "../lib/doulevo-command";
+import { ICommand, ICommandDesc } from "../command";
 import { joinPath } from "../lib/join-path";
 import { IDocker, IDocker_id } from "../plugins/docker";
 import { IConfiguration_id, IConfiguration } from "../services/configuration";
@@ -11,7 +11,7 @@ import { IProgressIndicator, IProgressIndicator_id } from "../services/progress-
 import { IKubernetes, IKubernetes_id } from "../plugins/kubernetes";
 
 @InjectableClass()
-export class DeployCommand implements IDoulevoCommand {
+export class DeployCommand implements ICommand {
 
     @InjectProperty(IEnvironment_id)
     environment!: IEnvironment;
@@ -62,16 +62,16 @@ export class DeployCommand implements IDoulevoCommand {
     }
 }
 
-const command: IDoulevoCommandDesc = {
+const command: ICommandDesc = {
     name: "deploy",
     constructor: DeployCommand,
     help: {
         usage: "doulevo deploy [options]",
-        message: "Builds the image and deploys containers to the backend for the project.",
+        description: "Builds the image and deploys containers to the backend for the project.",
         options: [
             {
                 name: "--project=<path>",
-                message: "Sets the path to the project, defaults to the working directory if not specified.",
+                description: "Sets the path to the project, defaults to the working directory if not specified.",
                 defaultValue: "<current directory>",
             },          
         ],

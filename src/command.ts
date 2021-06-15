@@ -1,8 +1,8 @@
 
 //
-// Interface for a Doulevo command.
+// Interface for a command.
 //
-export interface IDoulevoCommand {
+export interface ICommand {
 
     //
     // Invokes the command.
@@ -19,7 +19,7 @@ export interface IOptionHelp {
     //
     // Describes the option.
     //
-    message: string;
+    description: string;
 
     //
     // The default value for the option.
@@ -30,7 +30,7 @@ export interface IOptionHelp {
 //
 // Describes the help output for a particular command.
 //
-export interface IDoulevoCommandHelp {
+export interface ICommandHelp {
     // 
     // Shows how to use the command.
     // 
@@ -39,13 +39,8 @@ export interface IDoulevoCommandHelp {
     //
     // Describes what the command does.
     //
-    message: string;
+    description: string;
 
-    //
-    // Sub commands.
-    //
-    subCommands?: IDoulevoCommandDesc[];
-    
     //
     // Describes the options for the command.
     //
@@ -53,9 +48,9 @@ export interface IDoulevoCommandHelp {
 }
 
 //
-// Describes a Doulevo command.
+// Describes a command.
 //
-export interface IDoulevoCommandDesc {
+export interface ICommandDesc {
 
     //
     // The name of the command.
@@ -68,7 +63,12 @@ export interface IDoulevoCommandDesc {
     constructor: Function;
 
     //
-    // Defines the --help option output for the command.
+    // Sub-commands under the command.
     //
-    help: IDoulevoCommandHelp;
+    subCommands?: ICommandDesc[];
+
+    //
+    // Defines the --help output for the command.
+    //
+    help: ICommandHelp;
 }

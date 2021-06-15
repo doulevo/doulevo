@@ -1,5 +1,5 @@
 import { ILog, InjectableClass, InjectProperty } from "@codecapers/fusion";
-import { IDoulevoCommand, IDoulevoCommandDesc } from "../lib/doulevo-command";
+import { ICommand, ICommandDesc } from "../command";
 import { joinPath } from "../lib/join-path";
 import { IDocker, IDocker_id } from "../plugins/docker";
 import { IConfiguration_id, IConfiguration } from "../services/configuration";
@@ -11,7 +11,7 @@ import { IProgressIndicator, IProgressIndicator_id } from "../services/progress-
 import { ILog_id } from "../services/log";
 
 @InjectableClass()
-export class PublishCommand implements IDoulevoCommand {
+export class PublishCommand implements ICommand {
 
     @InjectProperty(IEnvironment_id)
     environment!: IEnvironment;
@@ -45,16 +45,16 @@ export class PublishCommand implements IDoulevoCommand {
     }
 }
 
-const command: IDoulevoCommandDesc = {
+const command: ICommandDesc = {
     name: "publish",
     constructor: PublishCommand,
     help: {
         usage: "doulevo publish [options]",
-        message: "Builds and publishes the image for the project.",
+        description: "Builds and publishes the image for the project.",
         options: [
             {
                 name: "--project=<path>",
-                message: "Sets the path to the project, defaults to the working directory if not specified.",
+                description: "Sets the path to the project, defaults to the working directory if not specified.",
                 defaultValue: "<current directory>",
             },          
         ],

@@ -1,5 +1,5 @@
 import { InjectableClass, InjectProperty } from "@codecapers/fusion";
-import { IDoulevoCommand, IDoulevoCommandDesc } from "../lib/doulevo-command";
+import { ICommand, ICommandDesc } from "../command";
 import { joinPath } from "../lib/join-path";
 import { IDocker, IDocker_id } from "../plugins/docker";
 import { IConfiguration_id, IConfiguration } from "../services/configuration";
@@ -10,7 +10,7 @@ import { Plugin } from "../lib/plugin";
 import { IKubernetes, IKubernetes_id } from "../plugins/kubernetes";
 
 @InjectableClass()
-export class LogsCommand implements IDoulevoCommand {
+export class LogsCommand implements ICommand {
 
     @InjectProperty(IEnvironment_id)
     environment!: IEnvironment;
@@ -64,26 +64,26 @@ export class LogsCommand implements IDoulevoCommand {
     }
 }
 
-const command: IDoulevoCommandDesc = {
+const command: ICommandDesc = {
     name: "logs",
     constructor: LogsCommand,
     help: {
         usage: "doulevo logs [options]",
-        message: "Retrieves logs from containers for the project.",
+        description: "Retrieves logs from containers for the project.",
         options: [
             {
                 name: "--project=<path>",
-                message: "Sets the path to the project, defaults to the working directory if not specified.",
+                description: "Sets the path to the project, defaults to the working directory if not specified.",
                 defaultValue: "<current directory>",
             },     
             {
                 name: "--env={local|prod}",
-                message: "Sets the environment from which to retrieve logs.",
+                description: "Sets the environment from which to retrieve logs.",
                 defaultValue: "local",
             },
             {
                 name: "--follow, --f",
-                message: "Stays attached and follows continuing logs from the project's containers.",
+                description: "Stays attached and follows continuing logs from the project's containers.",
             },
         ],
     }

@@ -1,5 +1,5 @@
 import { registerSingleton } from "@codecapers/fusion";
-import { Doulevo } from "./doulevo";
+import { Api } from "./api";
 import { Configuration, IConfiguration_id } from "./services/configuration";
 import * as minimist from "minimist";
 import { ILog_id, Log } from "./services/log";
@@ -29,7 +29,7 @@ async function main(): Promise<void> {
     //
     // Run Doulevo.
     //
-    const doulevo = new Doulevo();
+    const doulevo = new Api();
     await doulevo.invoke();
 }
 

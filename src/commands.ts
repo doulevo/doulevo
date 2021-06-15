@@ -2,7 +2,7 @@
 // The collection of all Doulevo commands.
 //
 
-import { IDoulevoCommandDesc } from "./lib/doulevo-command";
+import { ICommandDesc } from "./command";
 import createCommand from "./commands/create";
 import buildCommand from "./commands/build";
 import upCommand from "./commands/up";
@@ -14,7 +14,7 @@ import deployCommand from "./commands/deploy";
 import ejectCommand from "./commands/eject";
 import publishCommand from "./commands/publish";
 
-export const commands: IDoulevoCommandDesc[] = [
+export const commands: ICommandDesc[] = [
     createCommand,
     buildCommand,
     upCommand,

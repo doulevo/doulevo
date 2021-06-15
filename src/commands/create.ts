@@ -1,4 +1,4 @@
-import { IDoulevoCommand, IDoulevoCommandDesc } from "../lib/doulevo-command";
+import { ICommand, ICommandDesc } from "../command";
 import { IPluginManager, IPluginManager_id } from "../services/plugin-manager";
 import { InjectableClass, InjectProperty } from "@codecapers/fusion";
 import { IConfiguration, IConfiguration_id } from "../services/configuration";
@@ -11,7 +11,7 @@ import { IEnvironment, IEnvironment_id } from "../services/environment";
 import { Plugin } from "../lib/plugin";
 
 @InjectableClass()
-export class CreateCommand implements IDoulevoCommand {
+export class CreateCommand implements ICommand {
 
     @InjectProperty(IPluginManager_id)
     pluginManager!: IPluginManager;
@@ -77,28 +77,28 @@ export class CreateCommand implements IDoulevoCommand {
     } 
 }
 
-const command: IDoulevoCommandDesc = {
+const command: ICommandDesc = {
     name: "create",
     constructor: CreateCommand,
     help: {
         usage: "doulevo create [options] <project-dir>",
-        message: `Creates a new Doulevo project at <project-dir>`,
+        description: `Creates a new Doulevo project at <project-dir>`,
         options: [
             {
                 name: "--project-type=<type>",
-                message: "Sets the type of project to be created. Omit this to select project type interactively.",
+                description: "Sets the type of project to be created. Omit this to select project type interactively.",
             },
             {
                 name: "--local-plugin=<path>",
-                message: "Loads the plugin from a path. No need to set --project-type if you use this. It's good for testing when you are developing a plugin."
+                description: "Loads the plugin from a path. No need to set --project-type if you use this. It's good for testing when you are developing a plugin."
             },
             {
                 name: "--plugin-url=<url>",
-                message: "Loads the plugin from the specified Git repo. No need to set --project-type if you use this.",
+                description: "Loads the plugin from the specified Git repo. No need to set --project-type if you use this.",
             },
             {
                 name: "--force",
-                message: "Deletes and overwrites the project directory if it already exists.",
+                description: "Deletes and overwrites the project directory if it already exists.",
             },
         ],
     },

@@ -1,5 +1,5 @@
 import { registerSingleton } from "@codecapers/fusion";
-import { Doulevo } from "../../doulevo";
+import { Api } from "../../api";
 import { Configuration, IConfiguration_id } from "../../services/configuration";
 import * as fs from "fs-extra";
 import * as globby from "globby";
@@ -22,7 +22,7 @@ describe("create", () => {
         registerSingleton(ILog_id, new Log(argv));
         registerSingleton(IConfiguration_id, new Configuration(argv));
 
-        const doulevo = new Doulevo();
+        const doulevo = new Api();
         await doulevo.invoke();
 
         const files = await globby("**/*", { cwd: "./test-project" });

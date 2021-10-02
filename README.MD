@@ -12,9 +12,9 @@ https://www.the-data-wrangler.com/simplifying-application-deployment-with-doulev
 
 Doulevo is an open source project developed in this code repository.
 
-If you like the idea please star this repo.
+If you live this, please star this repo.
 
-[Follow the developer on Twitter for updates](https://twitter.com/ashleydavis75).
+[Click here to support my work](https://www.codecapers.com.au/about#support-my-work)
 
 ## Become a contributor
 
@@ -23,6 +23,7 @@ Doulevo needs your help!
 Check out [the developer guide](Developer.md)
 
 Email ashley@codecapers.com.au to find out how you can help.
+
 
 ## Give feedback
 
